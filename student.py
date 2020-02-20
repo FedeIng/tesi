@@ -156,7 +156,7 @@ def on_chat_message(msg):
             array[txt]['id'].append(str(chat_id))
             with open('data.txt','w') as f:
                 f.write(str(array).replace("'",'"'))
-            dizionario.append(txt)
+            array[txt]['a']=''
             bot.sendMessage(chat_id, 'Risposta non trovata. Domanda inviata al professore')
             msg=txt
             s.send(msg.encode())
