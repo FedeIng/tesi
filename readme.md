@@ -23,7 +23,7 @@
         * /sban: permette di rimettere una domanda definita inopportuna nella lista delle domande in attesa di risposta.
 * Da fare in un prossimo futuro:
     * Diminuire debito tecnico (anche se basso vorrei ridurlo).
-    * Migliorare la struttura dati.
+    * Migliorare la struttura dati. (Fatto)
     * Migliorare e velocizzare il riconoscimento della frase.
     * Migliorare le keyboards.
     * Refactoring.
