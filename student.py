@@ -74,7 +74,7 @@ class OutputThread (threading.Thread):
             y[0] = y[0].replace("@",":")
             y[1] = y[1].replace("@",":")
             if y[0] in array:
-                if array[y[0]] == "":
+                if array[y[0]]['a'] == "":
                     print("La risposta "+y[0]+" é stata eliminata")
                     if y[1] =='BANNED':
                         for elem in array[y[0]]['id']:
@@ -82,9 +82,7 @@ class OutputThread (threading.Thread):
                     else :
                         for elem in array[y[0]]['id']:
                             bot.sendMessage(elem, "La risposta alla domanda '"+y[0]+"' e' '"+y[1]+"'")
-                    for i in array:
-                        if y[0] == array[i]:
-                            array[i]['a']=y[1]
+                    array[y[0]]['a']=y[1]
                     with open('data.txt','w') as f:
                         f.write(str(array).replace("'",'"'))
             else :

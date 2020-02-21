@@ -46,6 +46,7 @@ def on_callback_query(msg):
                     stringa=elem
                 else:
                     stringa+=",\n"+elem
+                print(stringa)
         if stringa !="":
             bot.sendMessage(group_id, stringa)
         else:
