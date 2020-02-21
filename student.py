@@ -14,6 +14,7 @@ from spacy.lang.it.examples import sentences
 from filelock import Timeout, FileLock
 from gensim.models import Word2Vec
 
+start_string='Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo'
 lock = FileLock("student.txt.lock")
 nlp = spacy.load('it_core_news_sm')
 #model = Word2Vec.load('wiki_iter=5_algorithm=skipgram_window=10_size=300_neg-samples=10.m')
@@ -30,7 +31,7 @@ def on_callback_query(msg):
         bot.sendMessage(from_id, 'Digitare il bug da segnalare al programmatore:')
         id_command[from_id]=2
     if query_data=='s':
-        bot.sendMessage(from_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
+        bot.sendMessage(from_id, start_string, reply_markup=keyboard)
 
 def process_text(text):
     doc = nlp(text.lower())
@@ -103,7 +104,7 @@ def on_chat_message(msg):
         if  txt == '/start' and req_type==0 :
             req_type=3
             trovata = True
-            bot.sendMessage(chat_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
+            bot.sendMessage(from_id, start_string, reply_markup=keyboard)
         elif  txt == '/question' and req_type==0 :
             req_type=3
             trovata = True
@@ -148,7 +149,7 @@ def on_chat_message(msg):
             req_type=4
             trovata = True
             bot.sendMessage(chat_id, 'Comando non trovato')
-            bot.sendMessage(chat_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
+            bot.sendMessage(from_id, start_string, reply_markup=keyboard)
         if  not trovata and req_type==1:
             array[txt]={}
             array[txt]['id']=[]
