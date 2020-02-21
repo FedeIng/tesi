@@ -206,6 +206,8 @@ with open('data.txt','r') as json_file:
     for elem in data:
         array[elem]=data[elem]["a"]
 
+print("teacher: "+str(array))
+
 print("Connected")
 ricevo()
 ShellThread.join()

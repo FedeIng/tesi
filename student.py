@@ -16,7 +16,7 @@ from gensim.models import Word2Vec
 
 lock = FileLock("student.txt.lock")
 nlp = spacy.load('it_core_news_sm')
-model = Word2Vec.load('wiki_iter=5_algorithm=skipgram_window=10_size=300_neg-samples=10.m')
+#model = Word2Vec.load('wiki_iter=5_algorithm=skipgram_window=10_size=300_neg-samples=10.m')
 keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/question", callback_data='q')],[InlineKeyboardButton(text="/report", callback_data='r')],[InlineKeyboardButton(text="/start", callback_data='s')]])
 
 id_command={}
@@ -152,6 +152,7 @@ def on_chat_message(msg):
             bot.sendMessage(chat_id, 'Comando non trovato')
             bot.sendMessage(chat_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
         if  not trovata and req_type==1:
+            array[txt]={}
             array[txt]['id']=[]
             array[txt]['id'].append(str(chat_id))
             with open('data.txt','w') as f:
@@ -169,6 +170,8 @@ bot = telepot.Bot(TOKEN)
 
 with open('data.txt','r') as json_file:
     array=json.load(json_file)
+
+print("student: "+str(array))
 
 bot.message_loop({'chat':on_chat_message,'callback_query':on_callback_query})
 
