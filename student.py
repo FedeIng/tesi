@@ -104,7 +104,7 @@ def on_chat_message(msg):
         if  txt == '/start' and req_type==0 :
             req_type=3
             trovata = True
-            bot.sendMessage(from_id, start_string, reply_markup=keyboard)
+            bot.sendMessage(chat_id, start_string, reply_markup=keyboard)
         elif  txt == '/question' and req_type==0 :
             req_type=3
             trovata = True
@@ -149,7 +149,7 @@ def on_chat_message(msg):
             req_type=4
             trovata = True
             bot.sendMessage(chat_id, 'Comando non trovato')
-            bot.sendMessage(from_id, start_string, reply_markup=keyboard)
+            bot.sendMessage(chat_id, start_string, reply_markup=keyboard)
         if  not trovata and req_type==1:
             array[txt]={}
             array[txt]['id']=[]
