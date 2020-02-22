@@ -14,6 +14,7 @@ from spacy.lang.it.examples import sentences
 from filelock import Timeout, FileLock
 from gensim.models import Word2Vec
 
+file_name="data.txt"
 start_string='Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo'
 lock = FileLock("student.txt.lock")
 nlp = spacy.load('it_core_news_sm')
@@ -84,7 +85,7 @@ class OutputThread (threading.Thread):
                         for elem in array[y[0]]['id']:
                             bot.sendMessage(elem, "La risposta alla domanda '"+y[0]+"' e' '"+y[1]+"'")
                     array[y[0]]['a']=y[1]
-                    with open('data.txt','w') as f:
+                    with open(file_name,'w') as f:
                         f.write(str(array).replace("'",'"'))
             else :
                 print("Error: String not found")
@@ -132,7 +133,7 @@ def on_chat_message(msg):
                         bot.sendMessage(chat_id, 'Domanda in attesa di risposta')
                         if chat_id not in array[val]['id']:
                             array[val]['id'].append(str(chat_id))
-                            with open('data.txt','w') as f:
+                            with open(file_name,'w') as f:
                                 f.write(str(array).replace("'",'"'))
                     elif array[val]['a']=='BANNED':
                         bot.sendMessage(chat_id, 'La domanda da te fatta é stata bannata')
@@ -154,7 +155,7 @@ def on_chat_message(msg):
             array[txt]={}
             array[txt]['id']=[]
             array[txt]['id'].append(str(chat_id))
-            with open('data.txt','w') as f:
+            with open(file_name,'w') as f:
                 f.write(str(array).replace("'",'"'))
             array[txt]['a']=''
             bot.sendMessage(chat_id, 'Risposta non trovata. Domanda inviata al professore')
@@ -167,7 +168,7 @@ ShellThread=OutputThread(s)
 ShellThread.start()
 bot = telepot.Bot(TOKEN)
 
-with open('data.txt','r') as json_file:
+with open(file_name,'r') as json_file:
     array=json.load(json_file)
 
 print("student: "+str(array))
