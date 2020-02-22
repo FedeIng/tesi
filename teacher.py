@@ -9,6 +9,8 @@ import sys
 from filelock import Timeout, FileLock
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup
 
+empty_string="Lista vuota"
+qstring="Selezionare la domanda:"
 group_id=-1001143270084
 num=0
 array={}
@@ -31,7 +33,7 @@ def on_callback_query(msg):
                 list1.append([elem])
         print(list1)
         keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
-        bot.sendMessage(group_id, 'Digitare il codice della domanda:',reply_markup=keyboard1)
+        bot.sendMessage(group_id, qstring,reply_markup=keyboard1)
         id_command[group_id]=1
     if query_data=='r':
         bot.sendMessage(group_id, 'Digitare il bug da segnalare al programmatore:')
@@ -50,7 +52,7 @@ def on_callback_query(msg):
         if stringa !="":
             bot.sendMessage(group_id, stringa)
         else:
-            bot.sendMessage(group_id, "Lista vuota")
+            bot.sendMessage(group_id, empty_string)
     if query_data=='b':
         list1=[]
         for elem in array:
@@ -58,7 +60,7 @@ def on_callback_query(msg):
                 list1.append([elem])
         print(list1)
         keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
-        bot.sendMessage(group_id, 'Digitare il codice della domanda:',reply_markup=keyboard1)
+        bot.sendMessage(group_id, qstring,reply_markup=keyboard1)
         id_command[group_id]=3
     if query_data=='bl':
         stringa=""
@@ -72,7 +74,7 @@ def on_callback_query(msg):
         if stringa !="":
             bot.sendMessage(group_id, stringa)
         else:
-            bot.sendMessage(group_id, "Lista vuota")
+            bot.sendMessage(group_id, empty_string)
 
 try:
     s=socket.socket()
@@ -100,7 +102,7 @@ def on_chat_message(msg):
                     list1.append([elem])
             print(list1)
             keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
-            bot.sendMessage(group_id, 'Digitare il codice della domanda:',reply_markup=keyboard1)
+            bot.sendMessage(group_id, qstring,reply_markup=keyboard1)
             id_command[group_id]=1
         elif txt=="/ban":
             list1=[]
@@ -109,7 +111,7 @@ def on_chat_message(msg):
                     list1.append([elem])
             print(list1)
             keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
-            bot.sendMessage(group_id, 'Digitare il codice della domanda:',reply_markup=keyboard1)
+            bot.sendMessage(group_id, qstring,reply_markup=keyboard1)
             id_command[group_id]=3
         elif txt=="/report":
             bot.sendMessage(group_id, 'Digitare il bug da segnalare al programmatore:')
@@ -125,7 +127,7 @@ def on_chat_message(msg):
             if stringa !="":
                 bot.sendMessage(chat_id, stringa)
             else:
-                bot.sendMessage(chat_id, "Lista vuota")
+                bot.sendMessage(chat_id, empty_string)
         elif txt == "/ban_list":
             stringa=""
             for elem in array:
@@ -138,7 +140,7 @@ def on_chat_message(msg):
             if stringa !="":
                 bot.sendMessage(group_id, stringa)
             else:
-                bot.sendMessage(group_id, "Lista vuota")
+                bot.sendMessage(group_id, empty_string)
         elif chat_id in id_command:
             if id_command[chat_id]==1:
                 if txt in array:
