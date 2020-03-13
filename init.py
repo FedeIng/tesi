@@ -1,5 +1,7 @@
 import os
+import subprocess
 import sys
+import json
 import telepot
 import threading
 import time
@@ -11,6 +13,8 @@ bot = telepot.Bot(TOKEN)
 
 lockS = FileLock("student.txt.lock")
 lockT = FileLock("teacher.txt.lock")
+lockM = FileLock("mode.txt.lock")
+lockN = FileLock("num.txt.lock")
 
 def student():
     os.system("student.py")
@@ -18,17 +22,26 @@ def student():
 def teacher():
     os.system("teacher.py")
 
+def student1():
+    os.system("student1.py")
+
+def teacher1():
+    os.system("teacher1.py")
+
+t=Process(target=teacher,args=())
+s=Process(target=student,args=())
+
+mode="standard"
+
 def parse(name):
+    vector=[]
     with open(name,"r") as f:
-        string = f.read()
-        if string!="":
-            array=string.split("###@@@")
-            array[0]=array[0].replace("@@@","")
-            array[len(array)-1]=array[len(array)-1].replace("###","")
-            for line in array:
-                bot.sendMessage(297895076, "Error "+ name.replace(".txt","") + " " + line)
+        vector=json.load(f)
+    if len(vector)>0:
+        for line in vector:
+            bot.sendMessage(297895076, "Error "+ name.replace(".txt","") + " " + line.replace("#","'").replace("$",'"'))
     with open(name,"w") as f:
-        f.write("")
+        f.write("[]")
 
 class FileThread (threading.Thread):
     def __init__(self):
@@ -37,11 +50,13 @@ class FileThread (threading.Thread):
         while 1:
             time.sleep(10)
             with lockS:
-                with lockT:
-                    parse('student.txt')
-                    parse('teacher.txt')
+                parse('student.txt')
+            with lockT:
+                parse('teacher.txt')
 
 def on_chat_message(msg):
+    global mode
+    num_closed="0"
     content_type, chat_type, chat_id = telepot.glance(msg)
     if content_type == 'text' and chat_id == 297895076:
         txt=msg['text'].lower()
@@ -56,14 +71,103 @@ def on_chat_message(msg):
             with open('data.txt','w') as f:
                 f.write("{}")
             bot.sendMessage(chat_id, "Dati cancellati")
+        elif txt=="/man_mode":
+            if mode=="standard":
+                mode="manutention"
+                with lockM:
+                    with open('mode.txt','w') as f:
+                        f.write("man")
+                while num_closed!="4":
+                    time.sleep(10)
+                    with lockN:
+                        with open('num.txt','r') as f:
+                            num_closed=f.read()
+                bot.sendMessage(chat_id, "Modalitá manutenzione attivata")
+                t=Process(target=teacher1,args=())
+                s=Process(target=student1,args=())
+                t.start()
+                s.start()
+                with lockN:
+                    with open('num.txt','w') as f:
+                        num_closed=f.write("0")
+            else:
+                bot.sendMessage(chat_id, "Error: Modalitá manutenzione giá attiva")
+        elif txt=="/std_mode":
+            if mode=="manutention":
+                mode="standard"
+                with lockM:
+                    with open('mode.txt','w') as f:
+                        f.write("std")
+                while num_closed!="2":
+                    time.sleep(10)
+                    with lockN:
+                        with open('num.txt','r') as f:
+                            num_closed=f.read()
+                bot.sendMessage(chat_id, "Modalitá standard attivata")
+                t=Process(target=teacher,args=())
+                s=Process(target=student,args=())
+                t.start()
+                s.start()
+                with lockN:
+                    with open('num.txt','w') as f:
+                        num_closed=f.write("0")
+            else:
+                bot.sendMessage(chat_id, "Error: Modalitá standard giá attiva")
+        elif txt=="/restart":
+            if mode=="standard":
+                with lockM:
+                    with open('mode.txt','w') as f:
+                        f.write("man")
+                while num_closed!="4":
+                    time.sleep(10)
+                    with lockN:
+                        with open('num.txt','r') as f:
+                            num_closed=f.read()
+                with lockM:
+                    with open('mode.txt','w') as f:
+                        f.write("std")
+                t=Process(target=teacher,args=())
+                s=Process(target=student,args=())
+                t.start()
+                s.start()
+                bot.sendMessage(chat_id, "Restart complete")
+                with lockN:
+                    with open('num.txt','w') as f:
+                        num_closed=f.write("0")
+            elif mode=="manutention":
+                with lockM:
+                    with open('mode.txt','w') as f:
+                        f.write("std")
+                while num_closed!="2":
+                    time.sleep(10)
+                    with lockN:
+                        with open('num.txt','r') as f:
+                            num_closed=f.read()
+                with lockM:
+                    with open('mode.txt','w') as f:
+                        f.write("man")
+                t=Process(target=teacher1,args=())
+                s=Process(target=student1,args=())
+                t.start()
+                s.start()
+                bot.sendMessage(chat_id, "Restart complete")
+                with lockN:
+                    with open('num.txt','w') as f:
+                        num_closed=f.write("0")
+            else:
+                print("Error: unknown mode")
     else :
         bot.sendMessage(chat_id,"Permesso negato")
                     
 
 
 if __name__=='__main__':
-    t=Process(target=teacher,args=())
-    s=Process(target=student,args=())
+    with lockM:
+        with open('mode.txt','w') as f:
+            f.write("std")
+    with lockN:
+        with open('num.txt','w') as f:
+            f.write("0")
     t.start()
     s.start()
     bot.sendMessage(297895076, "Bot operativi")

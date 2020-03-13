@@ -10,18 +10,33 @@ from random import random
 from random import randrange
 from datetime import datetime
 import threading
+from functions import match
 from spacy.lang.it.examples import sentences 
 from filelock import Timeout, FileLock
 from gensim.models import Word2Vec
 
-file_name="data.txt"
-start_string='Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo'
 lock = FileLock("student.txt.lock")
+lockM = FileLock("mode.txt.lock")
+lockN = FileLock("num.txt.lock")
+
 nlp = spacy.load('it_core_news_sm')
-#model = Word2Vec.load('wiki_iter=5_algorithm=skipgram_window=10_size=300_neg-samples=10.m')
+
+model = Word2Vec.load('wiki_iter=5_algorithm=skipgram_window=10_size=300_neg-samples=10.m')
+
+keys = []
+for idx in range(733392):
+    keys.append(model.wv.index2word[idx])
+
+# Set the vectors for our nlp object to the google news vectors
+nlp.vocab.vectors = spacy.vocab.Vectors(data=model.wv.vectors, keys=keys)
+
+print(nlp.vocab.vectors.shape)
+
 keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/question", callback_data='q')],[InlineKeyboardButton(text="/report", callback_data='r')],[InlineKeyboardButton(text="/start", callback_data='s')]])
 
 id_command={}
+
+bot_name="polito1_bot"
 
 def on_callback_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
@@ -32,7 +47,7 @@ def on_callback_query(msg):
         bot.sendMessage(from_id, 'Digitare il bug da segnalare al programmatore:')
         id_command[from_id]=2
     if query_data=='s':
-        bot.sendMessage(from_id, start_string, reply_markup=keyboard)
+        bot.sendMessage(from_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
 
 def process_text(text):
     doc = nlp(text.lower())
@@ -71,7 +86,19 @@ class OutputThread (threading.Thread):
     def run(self):
         while True:
             txt=self.inp.recv(4096)
-            y=txt.decode().split(": ")
+            y=txt.decode()
+            if y=="CHANGE MODE":
+                print("Student2 bot ended")
+                with lockN:
+                    num="0"
+                    with open('num.txt','r') as f:
+                        num=f.read()
+                    num=int(num)+1
+                    with open('num.txt','w') as f:
+                        f.write(str(num))
+                exit()
+            y=y.split(": ")
+            print(y)
             threadLock.acquire()
             y[0] = y[0].replace("@",":")
             y[1] = y[1].replace("@",":")
@@ -84,8 +111,11 @@ class OutputThread (threading.Thread):
                     else :
                         for elem in array[y[0]]['id']:
                             bot.sendMessage(elem, "La risposta alla domanda '"+y[0]+"' e' '"+y[1]+"'")
-                    array[y[0]]['a']=y[1]
-                    with open(file_name,'w') as f:
+                    for i in array:
+                        print(i)
+                        if y[0] == i:
+                            array[i]['a']=y[1].replace("'","#").replace('"',"$")
+                    with open('data.txt','w') as f:
                         f.write(str(array).replace("'",'"'))
             else :
                 print("Error: String not found")
@@ -93,7 +123,7 @@ class OutputThread (threading.Thread):
 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
-    print(chat_id)
+    print(msg)
     req_type=0
     sim=0
     val=0
@@ -102,16 +132,16 @@ def on_chat_message(msg):
         threadLock.acquire()
         trovata = False
         txt=msg['text'].lower()
-        if  txt == '/start' and req_type==0 :
+        if  match(txt,'/start',chat_type,bot_name) and req_type==0 :
             req_type=3
             trovata = True
-            bot.sendMessage(chat_id, start_string, reply_markup=keyboard)
-        elif  txt == '/question' and req_type==0 :
+            bot.sendMessage(chat_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
+        elif  match(txt,'/question',chat_type,bot_name) and req_type==0 :
             req_type=3
             trovata = True
             bot.sendMessage(chat_id, 'Digitare la domanda da inviare al prof o agli assistenti del corso:')
             id_command[chat_id]=1
-        elif  txt == '/report' and req_type==0 :
+        elif  match(txt,'/report',chat_type,bot_name) and req_type==0 :
             req_type=3
             trovata = True
             bot.sendMessage(chat_id, 'Digitare il bug da segnalare al programmatore:')
@@ -133,31 +163,37 @@ def on_chat_message(msg):
                         bot.sendMessage(chat_id, 'Domanda in attesa di risposta')
                         if chat_id not in array[val]['id']:
                             array[val]['id'].append(str(chat_id))
-                            with open(file_name,'w') as f:
+                            with open('data.txt','w') as f:
                                 f.write(str(array).replace("'",'"'))
                     elif array[val]['a']=='BANNED':
                         bot.sendMessage(chat_id, 'La domanda da te fatta é stata bannata')
                     else :
-                        bot.sendMessage(chat_id, array[val]['a'])
+                        bot.sendMessage(chat_id, array[val]['a'].replace("#","'").replace("$",'"'))
             elif id_command[chat_id]==2 and req_type==0 :
                 req_type=2
                 with lock:
-                    with open('student.txt','a') as f:
-                        f.write("@@@"+txt+"###")
+                    bug_array=[]
+                    with open('student.txt','r') as f:
+                        bug_array=json.load(f)
+                    bug_array.append(txt.replace("'","#").replace('"',"$"))
+                    with open('student.txt','w') as f:
+                        f.write(str(bug_array).replace("'",'"'))
                 bot.sendMessage(chat_id, 'Bug segnalato')
             del id_command[chat_id]
         else:
             req_type=4
             trovata = True
             bot.sendMessage(chat_id, 'Comando non trovato')
-            bot.sendMessage(chat_id, start_string, reply_markup=keyboard)
+            bot.sendMessage(chat_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
         if  not trovata and req_type==1:
-            array[txt]={}
-            array[txt]['id']=[]
-            array[txt]['id'].append(str(chat_id))
-            with open(file_name,'w') as f:
+            txt1=txt.replace("'","#").replace('"',"$")
+            array[txt1]={}
+            array[txt1]['a']=""
+            array[txt1]['id']=[]
+            array[txt1]['id'].append(str(chat_id))
+            with open('data.txt','w') as f:
                 f.write(str(array).replace("'",'"'))
-            array[txt]['a']=''
+            array[txt1]['a']=''
             bot.sendMessage(chat_id, 'Risposta non trovata. Domanda inviata al professore')
             msg=txt
             s.send(msg.encode())
@@ -168,14 +204,30 @@ ShellThread=OutputThread(s)
 ShellThread.start()
 bot = telepot.Bot(TOKEN)
 
-with open(file_name,'r') as json_file:
+with open('data.txt','r') as json_file:
     array=json.load(json_file)
-
-print("student: "+str(array))
 
 bot.message_loop({'chat':on_chat_message,'callback_query':on_callback_query})
 
 print('Listening ...')
 
+mode_change="CHANGE MODE"
+
 while 1:
+    with lockM:
+        with open('mode.txt','r') as f:
+            mode=f.read()
+            if mode=="man":
+                s.send(mode_change.encode())
+                print("Student1 bot ended")
+                for id in id_command:
+                    bot.sendMessage(id, 'Il bot sta entrando in modalitá manutenzione, alcune funzioni potrebbero non essere abilitate')
+                with lockN:
+                    num="0"
+                    with open('num.txt','r') as f:
+                        num=f.read()
+                    num=int(num)+1
+                    with open('num.txt','w') as f:
+                        f.write(str(num))
+                exit()
     time.sleep(10)
