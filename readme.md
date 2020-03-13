@@ -1,4 +1,4 @@
-#Tesi 18/02/2020
+#Tesi 13/03/2020
 * Comandi dello studente
     * Già implementati:
         * /question: permette di inviare domande al professore.
@@ -24,10 +24,12 @@
 * Da fare in un prossimo futuro:
     * Diminuire debito tecnico (anche se basso vorrei ridurlo).
     * Migliorare la struttura dati. (Fatto)
-    * Migliorare e velocizzare il riconoscimento della frase.
-    * Migliorare le keyboards.
+    * Migliorare e velocizzare il riconoscimento della frase. (Fatto)
+    * Migliorare le keyboards. (Fatto)
     * Refactoring.
     * Testare la portabilità del multi processing/threading su linux.
+* Extra:
+    * Aggiunta una modalitá manutenzione nel caso vengano segnalati bug veramente gravi o per rilasciare aggionamenti
 * Idee:
     * Possibilità di bannare lo studente dal bot se fa troppi /revision inutili o domande inopportune.
     * Possibilità di avere solo un numero massimo di revision a domanda.
