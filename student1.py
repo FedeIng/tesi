@@ -14,7 +14,9 @@ id_command=[]
 
 def on_callback_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
-    bot.sendMessage(chat_id, 'Bot in manutenzione, riprovare prossimamente')
+    if from_id not in id_command:
+        id_command.append(from_id)
+    bot.sendMessage(from_id, 'Bot in manutenzione, riprovare prossimamente')
 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
