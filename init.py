@@ -58,6 +58,7 @@ class FileThread (threading.Thread):
                 parse('teacher.txt')
 
 def enable_std(chat_id):
+    global mode
     num_closed="0"
     if mode=="manutention":
         mode="standard"
@@ -81,6 +82,7 @@ def enable_std(chat_id):
         bot.sendMessage(chat_id, "Error: Modalitá standard giá attiva")
 
 def enable_man(chat_id):
+    global mode
     num_closed="0"
     if mode=="standard":
         mode="manutention"
@@ -104,6 +106,7 @@ def enable_man(chat_id):
         bot.sendMessage(chat_id, "Error: Modalitá manutenzione giá attiva")
 
 def restart(chat_id):
+    global mode
     num_closed="0"
     if mode=="standard":
         with lockM:
