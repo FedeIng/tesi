@@ -87,6 +87,21 @@ except socket.error as errore:
     print("Error:"+str(errore))
     sys.exit()
 
+def aswer(txt,y):
+    print("La risposta "+y[0]+" é stata eliminata")
+    if y[1] =='BANNED':
+        for elem in array[y[0]]['id']:
+            bot.sendMessage(elem, "La domanda '"+y[0]+"' é stata bannata")
+    else :
+        for elem in array[y[0]]['id']:
+            bot.sendMessage(elem, "La risposta alla domanda '"+y[0]+"' e' '"+y[1]+"'")
+    for i in array:
+        print(i)
+        if y[0] == i:
+            array[i]['a']=y[1].replace("'","#").replace('"',"$")
+    with open(nameFD,'w') as f:
+        f.write(str(array).replace("'",'"'))
+
 class OutputThread (threading.Thread):
     def __init__(self,s):
       threading.Thread.__init__(self)
@@ -112,19 +127,7 @@ class OutputThread (threading.Thread):
             y[1] = y[1].replace("@",":")
             if y[0] in array:
                 if array[y[0]]['a'] == "":
-                    print("La risposta "+y[0]+" é stata eliminata")
-                    if y[1] =='BANNED':
-                        for elem in array[y[0]]['id']:
-                            bot.sendMessage(elem, "La domanda '"+y[0]+"' é stata bannata")
-                    else :
-                        for elem in array[y[0]]['id']:
-                            bot.sendMessage(elem, "La risposta alla domanda '"+y[0]+"' e' '"+y[1]+"'")
-                    for i in array:
-                        print(i)
-                        if y[0] == i:
-                            array[i]['a']=y[1].replace("'","#").replace('"',"$")
-                    with open(nameFD,'w') as f:
-                        f.write(str(array).replace("'",'"'))
+                   answer(txt,y) 
             else :
                 print("Error: String not found")
             threadLock.release()
