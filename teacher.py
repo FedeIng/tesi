@@ -121,6 +121,16 @@ def ban_list():
     else:
         bot.sendMessage(group_id, StringLVT)
 
+def switch_case(chat_id,txt):
+    if id_command[chat_id]==1:
+        case1(chat_id,txt)
+    elif id_command[chat_id]==2:
+        case2(chat_id,txt)
+    elif id_command[chat_id]==3:
+        case3(chat_id,txt)
+    elif id_command[chat_id]==4:
+        case4(chat_id,txt)
+
 def on_callback_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
     if query_data=='a':
@@ -170,14 +180,7 @@ def on_chat_message(msg):
         elif match(txt,'/ban_list',chat_type,bot_name):
             ban_list()
         elif chat_id in id_command:
-            if id_command[chat_id]==1:
-                case1(chat_id,txt)
-            elif id_command[chat_id]==2:
-                case2(chat_id,txt)
-            elif id_command[chat_id]==3:
-                case3(chat_id,txt)
-            elif id_command[chat_id]==4:
-                case4(chat_id,txt)
+            switch_case(chat_id,txt)
         threadLock.release()
     else :
         bot.sendMessage(chat_id,"Permesso negato")
