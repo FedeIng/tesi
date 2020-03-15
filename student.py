@@ -155,6 +155,16 @@ def match_speech(chat_id,txt):
                 bot.sendMessage(chat_id, array[val]['a'].replace("#","'").replace("$",'"'))
     return trovata
 
+def seg_bug(chat_id,txt):
+    with lock:
+        bug_array=[]
+        with open('student.txt','r') as f:
+            bug_array=json.load(f)
+        bug_array.append(txt.replace("'","#").replace('"',"$"))
+        with open('student.txt','w') as f:
+            f.write(str(bug_array).replace("'",'"'))
+    bot.sendMessage(chat_id, 'Bug segnalato')
+
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     global num
@@ -187,14 +197,6 @@ def on_chat_message(msg):
                 trovata=match_speech(chat_id,txt)
             elif id_command[chat_id]==2 and req_type==0 :
                 req_type=2
-                with lock:
-                    bug_array=[]
-                    with open('student.txt','r') as f:
-                        bug_array=json.load(f)
-                    bug_array.append(txt.replace("'","#").replace('"',"$"))
-                    with open('student.txt','w') as f:
-                        f.write(str(bug_array).replace("'",'"'))
-                bot.sendMessage(chat_id, 'Bug segnalato')
             del id_command[chat_id]
         else:
             req_type=4
