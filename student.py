@@ -165,6 +165,20 @@ def seg_bug(chat_id,txt):
             f.write(str(bug_array).replace("'",'"'))
     bot.sendMessage(chat_id, 'Bug segnalato')
 
+def last_check():
+    if  not trovata and req_type==1:
+        txt1=txt.replace("'","#").replace('"',"$")
+        array[txt1]={}
+        array[txt1]['a']=""
+        array[txt1]['id']=[]
+        array[txt1]['id'].append(str(chat_id))
+        with open(nameFD,'w') as f:
+            f.write(str(array).replace("'",'"'))
+        array[txt1]['a']=''
+        bot.sendMessage(chat_id, 'Risposta non trovata. Domanda inviata al professore')
+        msg=txt
+        s.send(msg.encode())
+
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     global num
@@ -203,18 +217,7 @@ def on_chat_message(msg):
             trovata = True
             bot.sendMessage(chat_id, 'Comando non trovato')
             bot.sendMessage(chat_id, StringBNV, reply_markup=keyboard)
-        if  not trovata and req_type==1:
-            txt1=txt.replace("'","#").replace('"',"$")
-            array[txt1]={}
-            array[txt1]['a']=""
-            array[txt1]['id']=[]
-            array[txt1]['id'].append(str(chat_id))
-            with open(nameFD,'w') as f:
-                f.write(str(array).replace("'",'"'))
-            array[txt1]['a']=''
-            bot.sendMessage(chat_id, 'Risposta non trovata. Domanda inviata al professore')
-            msg=txt
-            s.send(msg.encode())
+        last_check()
         threadLock.release()
 
 TOKEN = '1064330916:AAGjmjJZcEwyudWgPYplyP7OvyFQl4Ju_GI'
