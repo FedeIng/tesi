@@ -30,56 +30,69 @@ keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/an
 
 bot_name="group_oop_bot"
 
+def a():
+    list1=[]
+    for elem in array:
+        if array[elem]=="":
+            list1.append([elem])
+    print(list1)
+    keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
+    bot.sendMessage(group_id, StringSLT,reply_markup=keyboard1)
+    id_command[group_id]=1
+
+def l():
+    stringa=""
+    for elem in array:
+        if array[elem]=="":
+            if stringa == "":
+                stringa=elem
+            else:
+                stringa+=",\n"+elem
+    if stringa !="":
+        bot.sendMessage(group_id, stringa)
+    else:
+        bot.sendMessage(group_id, StringLVT)
+
+def b():
+    list1=[]
+    for elem in array:
+        if array[elem]=="":
+            list1.append([elem])
+    print(list1)
+    keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
+    bot.sendMessage(group_id, StringSLT,reply_markup=keyboard1)
+    id_command[group_id]=3
+
+def bl():
+    stringa=""
+    for elem in array:
+        if array[elem] == 'BANNED':
+            if stringa == "":
+                stringa=elem
+            else:
+                stringa+=",\n"+elem
+            print(stringa)
+    if stringa !="":
+        bot.sendMessage(group_id, stringa)
+    else:
+        bot.sendMessage(group_id, StringLVT)
+
 def on_callback_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
     if query_data=='a':
-        list1=[]
-        for elem in array:
-            if array[elem]=="":
-                list1.append([elem])
-        print(list1)
-        keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
-        bot.sendMessage(group_id, StringSLT,reply_markup=keyboard1)
-        id_command[group_id]=1
+        a()
     if query_data=='r':
         bot.sendMessage(group_id, 'Digitare il bug da segnalare al programmatore:')
         id_command[group_id]=2
     if query_data=='s':
         bot.sendMessage(group_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
     if query_data=='l':
-        stringa=""
-        for elem in array:
-            if array[elem]=="":
-                if stringa == "":
-                    stringa=elem
-                else:
-                    stringa+=",\n"+elem
-        if stringa !="":
-            bot.sendMessage(group_id, stringa)
-        else:
-            bot.sendMessage(group_id, StringLVT)
+        l()
     if query_data=='b':
-        list1=[]
-        for elem in array:
-            if array[elem]=="":
-                list1.append([elem])
-        print(list1)
-        keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
-        bot.sendMessage(group_id, StringSLT,reply_markup=keyboard1)
-        id_command[group_id]=3
+        b()
     if query_data=='bl':
-        stringa=""
-        for elem in array:
-            if array[elem] == 'BANNED':
-                if stringa == "":
-                    stringa=elem
-                else:
-                    stringa+=",\n"+elem
-                print(stringa)
-        if stringa !="":
-            bot.sendMessage(group_id, stringa)
-        else:
-            bot.sendMessage(group_id, StringLVT)
+        bl()
+        
 
 try:
     s=socket.socket()
