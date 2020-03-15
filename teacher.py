@@ -30,7 +30,7 @@ keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/an
 
 bot_name="group_oop_bot"
 
-def a():
+def aBoard():
     list1=[]
     for elem in array:
         if array[elem]=="":
@@ -40,7 +40,7 @@ def a():
     bot.sendMessage(group_id, StringSLT,reply_markup=keyboard1)
     id_command[group_id]=1
 
-def l():
+def lBoard():
     stringa=""
     for elem in array:
         if array[elem]=="":
@@ -53,7 +53,7 @@ def l():
     else:
         bot.sendMessage(group_id, StringLVT)
 
-def b():
+def bBoard():
     list1=[]
     for elem in array:
         if array[elem]=="":
@@ -63,7 +63,7 @@ def b():
     bot.sendMessage(group_id, StringSLT,reply_markup=keyboard1)
     id_command[group_id]=3
 
-def bl():
+def blBoard():
     stringa=""
     for elem in array:
         if array[elem] == 'BANNED':
@@ -80,18 +80,18 @@ def bl():
 def on_callback_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
     if query_data=='a':
-        a()
+        aBoard()
     if query_data=='r':
         bot.sendMessage(group_id, 'Digitare il bug da segnalare al programmatore:')
         id_command[group_id]=2
     if query_data=='s':
         bot.sendMessage(group_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
     if query_data=='l':
-        l()
+        lBoard()
     if query_data=='b':
-        b()
+        bBoard()
     if query_data=='bl':
-        bl()
+        blBoard()
         
 
 try:
