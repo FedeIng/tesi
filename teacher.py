@@ -30,6 +30,48 @@ keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/an
 
 bot_name="group_oop_bot"
 
+def case1(chat_id,txt):
+    markup = ReplyKeyboardRemove()
+    if txt in array:
+        if array[txt]=="":
+            question=txt
+            bot.sendMessage(chat_id,"Digitare la risposta:",reply_markup=markup)
+            id_command[chat_id]=4
+    else:
+        bot.sendMessage(chat_id,"Error: Question not found",reply_markup=markup)
+
+def case2(chat_id,txt):
+    with lock:
+        bug_array=[]
+        with open('teacher.txt','r') as f:
+            bug_array=json.load(f)
+        bug_array.append(txt.replace("'","#").replace('"','$'))
+        with open('teacher.txt','w') as f:
+            f.write(str(bug_array).replace("'",'"'))
+    bot.sendMessage(chat_id, 'Bug segnalato')
+    del id_command[chat_id]
+
+def case3(chat_id,txt):
+    markup = ReplyKeyboardRemove()
+    if txt in array:
+        bot.sendMessage(chat_id,"La domanda '"+txt+"' é stata bannata",reply_markup=markup)
+        array[txt]="BANNED"
+        txt = txt.replace(":","@")
+        txt += ": BANNED"
+        conn.send(txt.encode())
+    else:
+        bot.sendMessage(chat_id,"Error: String not found",reply_markup=markup)
+    del id_command[chat_id]
+
+def case4(chat_id,txt):
+    bot.sendMessage(chat_id,"La risposta a '"+question+"' é '"+txt+"'")
+    array[question]=txt
+    question = question.replace(":","@")
+    txt = txt.replace(":","@")
+    txt = question+": "+txt
+    conn.send(txt.encode())
+    del id_command[chat_id]
+
 def answer():
     list1=[]
     for elem in array:
@@ -127,44 +169,13 @@ def on_chat_message(msg):
             ban_list()
         elif chat_id in id_command:
             if id_command[chat_id]==1:
-                markup = ReplyKeyboardRemove()
-                if txt in array:
-                    if array[txt]=="":
-                        question=txt
-                        bot.sendMessage(chat_id,"Digitare la risposta:",reply_markup=markup)
-                        id_command[chat_id]=4
-                else:
-                    bot.sendMessage(chat_id,"Error: Question not found",reply_markup=markup)
+                case1(chat_id,txt)
             elif id_command[chat_id]==2:
-                with lock:
-                    bug_array=[]
-                    with open('teacher.txt','r') as f:
-                        bug_array=json.load(f)
-                    bug_array.append(txt.replace("'","#").replace('"','$'))
-                    with open('teacher.txt','w') as f:
-                        f.write(str(bug_array).replace("'",'"'))
-                bot.sendMessage(chat_id, 'Bug segnalato')
-                del id_command[chat_id]
+                case2(chat_id,txt)
             elif id_command[chat_id]==3:
-                markup = ReplyKeyboardRemove()
-                if txt in array:
-                    bot.sendMessage(chat_id,"La domanda '"+txt+"' é stata bannata",reply_markup=markup)
-                    array[txt]="BANNED"
-                    txt = txt.replace(":","@")
-                    txt += ": BANNED"
-                    conn.send(txt.encode())
-                    del id_command[chat_id]
-                else:
-                    bot.sendMessage(chat_id,"Error: String not found",reply_markup=markup)
-                    del id_command[chat_id]
+                case3(chat_id,txt)
             elif id_command[chat_id]==4:
-                bot.sendMessage(chat_id,"La risposta a '"+question+"' é '"+txt+"'")
-                array[question]=txt
-                question = question.replace(":","@")
-                txt = txt.replace(":","@")
-                txt = question+": "+txt
-                conn.send(txt.encode())
-                del id_command[chat_id]
+                case4(chat_id,txt)
         threadLock.release()
     else :
         bot.sendMessage(chat_id,"Permesso negato")
