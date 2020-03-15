@@ -31,6 +31,7 @@ keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/an
 bot_name="group_oop_bot"
 
 def case1(chat_id,txt):
+    global question
     markup = ReplyKeyboardRemove()
     if txt in array:
         if array[txt]=="":
@@ -64,6 +65,7 @@ def case3(chat_id,txt):
     del id_command[chat_id]
 
 def case4(chat_id,txt):
+    global question
     bot.sendMessage(chat_id,"La risposta a '"+question+"' é '"+txt+"'")
     array[question]=txt
     question = question.replace(":","@")
