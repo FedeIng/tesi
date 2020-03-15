@@ -77,7 +77,7 @@ def enable_std(chat_id):
         s.start()
         with lockN:
             with open(nameFN,'w') as f:
-                num_closed=f.write("0")
+                f.write("0")
     else:
         bot.sendMessage(chat_id, "Error: Modalitá standard giá attiva")
 
@@ -101,7 +101,7 @@ def enable_man(chat_id):
         s.start()
         with lockN:
             with open(nameFN,'w') as f:
-                num_closed=f.write("0")
+                f.write("0")
     else:
         bot.sendMessage(chat_id, "Error: Modalitá manutenzione giá attiva")
 
@@ -127,7 +127,7 @@ def restart(chat_id):
         bot.sendMessage(chat_id, "Restart complete")
         with lockN:
             with open(nameFN,'w') as f:
-                num_closed=f.write("0")
+                f.write("0")
     elif mode=="manutention":
         with lockM:
             with open(nameFM,'w') as f:
@@ -147,7 +147,7 @@ def restart(chat_id):
         bot.sendMessage(chat_id, "Restart complete")
         with lockN:
             with open(nameFN,'w') as f:
-                num_closed=f.write("0")
+                f.write("0")
     else:
         print("Error: unknown mode")
 
