@@ -165,7 +165,7 @@ def seg_bug(chat_id,txt):
             f.write(str(bug_array).replace("'",'"'))
     bot.sendMessage(chat_id, 'Bug segnalato')
 
-def last_check():
+def last_check(chat_id,txt,trovata,req_type):
     if  not trovata and req_type==1:
         txt1=txt.replace("'","#").replace('"',"$")
         array[txt1]={}
@@ -217,7 +217,7 @@ def on_chat_message(msg):
             trovata = True
             bot.sendMessage(chat_id, 'Comando non trovato')
             bot.sendMessage(chat_id, StringBNV, reply_markup=keyboard)
-        last_check()
+        last_check(chat_id,txt,trovata,req_type)
         threadLock.release()
 
 TOKEN = '1064330916:AAGjmjJZcEwyudWgPYplyP7OvyFQl4Ju_GI'
