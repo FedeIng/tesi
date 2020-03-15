@@ -87,7 +87,7 @@ except socket.error as errore:
     print("Error:"+str(errore))
     sys.exit()
 
-def aswer(txt,y):
+def answer(txt,y):
     print("La risposta "+y[0]+" é stata eliminata")
     if y[1] =='BANNED':
         for elem in array[y[0]]['id']:
