@@ -30,7 +30,7 @@ keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/an
 
 bot_name="group_oop_bot"
 
-def aboard():
+def answer():
     list1=[]
     for elem in array:
         if array[elem]=="":
@@ -40,7 +40,7 @@ def aboard():
     bot.sendMessage(group_id, StringSLT,reply_markup=keyboard1)
     id_command[group_id]=1
 
-def lboard():
+def ans_list():
     stringa=""
     for elem in array:
         if array[elem]=="":
@@ -53,7 +53,7 @@ def lboard():
     else:
         bot.sendMessage(group_id, StringLVT)
 
-def bboard():
+def ban():
     list1=[]
     for elem in array:
         if array[elem]=="":
@@ -63,7 +63,7 @@ def bboard():
     bot.sendMessage(group_id, StringSLT,reply_markup=keyboard1)
     id_command[group_id]=3
 
-def blboard():
+def ban_list():
     stringa=""
     for elem in array:
         if array[elem] == 'BANNED':
@@ -80,18 +80,18 @@ def blboard():
 def on_callback_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
     if query_data=='a':
-        aboard()
+        answer()
     if query_data=='r':
         bot.sendMessage(group_id, 'Digitare il bug da segnalare al programmatore:')
         id_command[group_id]=2
     if query_data=='s':
         bot.sendMessage(group_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
     if query_data=='l':
-        lboard()
+        ans_list()
     if query_data=='b':
-        bboard()
+        ban()
     if query_data=='bl':
-        blboard()
+        ban_list()
         
 
 try:
@@ -115,51 +115,16 @@ def on_chat_message(msg):
         if match(txt,'/start',chat_type,bot_name):
             bot.sendMessage(chat_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
         elif match(txt,'/answer',chat_type,bot_name):
-            list1=[]
-            for elem in array:
-                if array[elem]=="":
-                    list1.append([elem])
-            print(list1)
-            keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
-            bot.sendMessage(group_id, StringSLT,reply_markup=keyboard1)
-            id_command[group_id]=1
+            answer()
         elif match(txt,'/ban',chat_type,bot_name):
-            list1=[]
-            for elem in array:
-                if array[elem] == "":
-                    list1.append([elem])
-            print(list1)
-            keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
-            bot.sendMessage(group_id, StringSLT,reply_markup=keyboard1)
-            id_command[group_id]=3
+            ban()
         elif match(txt,'/report',chat_type,bot_name):
             bot.sendMessage(group_id, 'Digitare il bug da segnalare al programmatore:')
             id_command[group_id]=2
         elif match(txt,'/list',chat_type,bot_name):
-            stringa=""
-            for elem in array:
-                if array[elem]=="":
-                    if stringa == "":
-                        stringa=elem
-                    else:
-                        stringa+=",\n"+elem
-            if stringa !="":
-                bot.sendMessage(chat_id, stringa)
-            else:
-                bot.sendMessage(chat_id, StringLVT)
+            ans_list()
         elif match(txt,'/ban_list',chat_type,bot_name):
-            stringa=""
-            for elem in array:
-                if array[elem] == 'BANNED':
-                    if stringa == "":
-                        stringa=elem
-                    else:
-                        stringa+=",\n"+elem
-                    print(stringa)
-            if stringa !="":
-                bot.sendMessage(group_id, stringa)
-            else:
-                bot.sendMessage(group_id, StringLVT)
+            ban_list()
         elif chat_id in id_command:
             if id_command[chat_id]==1:
                 markup = ReplyKeyboardRemove()
