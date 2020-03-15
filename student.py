@@ -15,6 +15,9 @@ from spacy.lang.it.examples import sentences
 from filelock import Timeout, FileLock
 from gensim.models import Word2Vec
 
+num=0
+sim=0
+
 nameFN="num.txt"
 nameFD="data.txt"
 
@@ -126,8 +129,34 @@ class OutputThread (threading.Thread):
                 print("Error: String not found")
             threadLock.release()
 
+def match_speech(chat_id,txt):
+    global num
+    global sim
+    for i in array:
+        string1=process_text(txt)
+        string2=process_text(i.replace("#","'").replace("$",'"'))
+        num=calculate_similarity(string1,string2)
+        if num>sim:
+            sim=num
+            val=i
+        print(sim)
+        if sim>0.8:
+            trovata = True
+            if array[val]['a'] == '':
+                bot.sendMessage(chat_id, 'Domanda in attesa di risposta')
+                if chat_id not in array[val]['id']:
+                    array[val]['id'].append(str(chat_id))
+                    with open(nameFD,'w') as f:
+                        f.write(str(array).replace("'",'"'))
+            elif array[val]['a']=='BANNED':
+                bot.sendMessage(chat_id, 'La domanda da te fatta é stata bannata')
+            else :
+                bot.sendMessage(chat_id, array[val]['a'].replace("#","'").replace("$",'"'))
+
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
+    global num
+    global sim
     print(msg)
     req_type=0
     sim=0
@@ -154,26 +183,7 @@ def on_chat_message(msg):
         elif chat_id in id_command:
             if id_command[chat_id]==1 :
                 req_type=1
-                for i in array:
-                    string1=process_text(txt)
-                    string2=process_text(i.replace("#","'").replace("$",'"'))
-                    num=calculate_similarity(string1,string2)
-                    if num>sim:
-                        sim=num
-                        val=i
-                print(sim)
-                if sim>0.8:
-                    trovata = True
-                    if array[val]['a'] == '':
-                        bot.sendMessage(chat_id, 'Domanda in attesa di risposta')
-                        if chat_id not in array[val]['id']:
-                            array[val]['id'].append(str(chat_id))
-                            with open(nameFD,'w') as f:
-                                f.write(str(array).replace("'",'"'))
-                    elif array[val]['a']=='BANNED':
-                        bot.sendMessage(chat_id, 'La domanda da te fatta é stata bannata')
-                    else :
-                        bot.sendMessage(chat_id, array[val]['a'].replace("#","'").replace("$",'"'))
+                match_speech(chat_id,txt)
             elif id_command[chat_id]==2 and req_type==0 :
                 req_type=2
                 with lock:
