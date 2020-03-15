@@ -15,13 +15,18 @@ from spacy.lang.it.examples import sentences
 from filelock import Timeout, FileLock
 from gensim.models import Word2Vec
 
+nameFN="num.txt"
+nameFD="data.txt"
+
 lock = FileLock("student.txt.lock")
 lockM = FileLock("mode.txt.lock")
-lockN = FileLock("num.txt.lock")
+lockN = FileLock(nameFN+".lock")
 
 nlp = spacy.load('it_core_news_sm')
 
 model = Word2Vec.load('wiki_iter=5_algorithm=skipgram_window=10_size=300_neg-samples=10.m')
+
+StringBNV='Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo'
 
 keys = []
 for idx in range(733392):
@@ -47,7 +52,7 @@ def on_callback_query(msg):
         bot.sendMessage(from_id, 'Digitare il bug da segnalare al programmatore:')
         id_command[from_id]=2
     if query_data=='s':
-        bot.sendMessage(from_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
+        bot.sendMessage(from_id, StringBNV, reply_markup=keyboard)
 
 def process_text(text):
     doc = nlp(text.lower())
@@ -91,10 +96,10 @@ class OutputThread (threading.Thread):
                 print("Student2 bot ended")
                 with lockN:
                     num="0"
-                    with open('num.txt','r') as f:
+                    with open(nameFN,'r') as f:
                         num=f.read()
                     num=int(num)+1
-                    with open('num.txt','w') as f:
+                    with open(nameFN,'w') as f:
                         f.write(str(num))
                 exit()
             y=y.split(": ")
@@ -115,7 +120,7 @@ class OutputThread (threading.Thread):
                         print(i)
                         if y[0] == i:
                             array[i]['a']=y[1].replace("'","#").replace('"',"$")
-                    with open('data.txt','w') as f:
+                    with open(nameFD,'w') as f:
                         f.write(str(array).replace("'",'"'))
             else :
                 print("Error: String not found")
@@ -135,7 +140,7 @@ def on_chat_message(msg):
         if  match(txt,'/start',chat_type,bot_name) and req_type==0 :
             req_type=3
             trovata = True
-            bot.sendMessage(chat_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
+            bot.sendMessage(chat_id, StringBNV, reply_markup=keyboard)
         elif  match(txt,'/question',chat_type,bot_name) and req_type==0 :
             req_type=3
             trovata = True
@@ -163,7 +168,7 @@ def on_chat_message(msg):
                         bot.sendMessage(chat_id, 'Domanda in attesa di risposta')
                         if chat_id not in array[val]['id']:
                             array[val]['id'].append(str(chat_id))
-                            with open('data.txt','w') as f:
+                            with open(nameFD,'w') as f:
                                 f.write(str(array).replace("'",'"'))
                     elif array[val]['a']=='BANNED':
                         bot.sendMessage(chat_id, 'La domanda da te fatta é stata bannata')
@@ -184,14 +189,14 @@ def on_chat_message(msg):
             req_type=4
             trovata = True
             bot.sendMessage(chat_id, 'Comando non trovato')
-            bot.sendMessage(chat_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
+            bot.sendMessage(chat_id, StringBNV, reply_markup=keyboard)
         if  not trovata and req_type==1:
             txt1=txt.replace("'","#").replace('"',"$")
             array[txt1]={}
             array[txt1]['a']=""
             array[txt1]['id']=[]
             array[txt1]['id'].append(str(chat_id))
-            with open('data.txt','w') as f:
+            with open(nameFD,'w') as f:
                 f.write(str(array).replace("'",'"'))
             array[txt1]['a']=''
             bot.sendMessage(chat_id, 'Risposta non trovata. Domanda inviata al professore')
@@ -204,7 +209,7 @@ ShellThread=OutputThread(s)
 ShellThread.start()
 bot = telepot.Bot(TOKEN)
 
-with open('data.txt','r') as json_file:
+with open(nameFD,'r') as json_file:
     array=json.load(json_file)
 
 bot.message_loop({'chat':on_chat_message,'callback_query':on_callback_query})
@@ -224,10 +229,10 @@ while 1:
                     bot.sendMessage(id, 'Il bot sta entrando in modalitá manutenzione, alcune funzioni potrebbero non essere abilitate')
                 with lockN:
                     num="0"
-                    with open('num.txt','r') as f:
+                    with open(nameFN,'r') as f:
                         num=f.read()
                     num=int(num)+1
-                    with open('num.txt','w') as f:
+                    with open(nameFN,'w') as f:
                         f.write(str(num))
                 exit()
     time.sleep(10)

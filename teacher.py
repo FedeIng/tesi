@@ -16,6 +16,7 @@ array={}
 id_command={}
 threadLock = threading.Lock()
 question=""
+StringSLT='Selezionare la domanda:'
 
 lock = FileLock("teacher.txt.lock")
 lockM = FileLock("mode.txt.lock")
@@ -36,7 +37,7 @@ def on_callback_query(msg):
                 list1.append([elem])
         print(list1)
         keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
-        bot.sendMessage(group_id, 'Selezionare la domanda:',reply_markup=keyboard1)
+        bot.sendMessage(group_id, StringSLT,reply_markup=keyboard1)
         id_command[group_id]=1
     if query_data=='r':
         bot.sendMessage(group_id, 'Digitare il bug da segnalare al programmatore:')
@@ -62,7 +63,7 @@ def on_callback_query(msg):
                 list1.append([elem])
         print(list1)
         keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
-        bot.sendMessage(group_id, 'Selezionare la domanda:',reply_markup=keyboard1)
+        bot.sendMessage(group_id, StringSLT,reply_markup=keyboard1)
         id_command[group_id]=3
     if query_data=='bl':
         stringa=""
@@ -105,7 +106,7 @@ def on_chat_message(msg):
                     list1.append([elem])
             print(list1)
             keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
-            bot.sendMessage(group_id, 'Selezionare la domanda:',reply_markup=keyboard1)
+            bot.sendMessage(group_id, StringSLT,reply_markup=keyboard1)
             id_command[group_id]=1
         elif match(txt,'/ban',chat_type,bot_name):
             list1=[]
@@ -114,7 +115,7 @@ def on_chat_message(msg):
                     list1.append([elem])
             print(list1)
             keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
-            bot.sendMessage(group_id, 'Selezionare la domanda:',reply_markup=keyboard1)
+            bot.sendMessage(group_id, StringSLT,reply_markup=keyboard1)
             id_command[group_id]=3
         elif match(txt,'/report',chat_type,bot_name):
             bot.sendMessage(group_id, 'Digitare il bug da segnalare al programmatore:')

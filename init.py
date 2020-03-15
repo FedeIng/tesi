@@ -11,10 +11,13 @@ from filelock import Timeout, FileLock
 TOKEN = '1045575516:AAF8WKCOlQQbBX6d9ywkKUlyd2h_UvNnmYA'
 bot = telepot.Bot(TOKEN)
 
+nameFM="mode.txt"
+nameFN="num.txt"
+
 lockS = FileLock("student.txt.lock")
 lockT = FileLock("teacher.txt.lock")
-lockM = FileLock("mode.txt.lock")
-lockN = FileLock("num.txt.lock")
+lockM = FileLock(nameFM+".lock")
+lockN = FileLock(nameFN+".lock")
 
 def student():
     os.system("student.py")
@@ -75,12 +78,12 @@ def on_chat_message(msg):
             if mode=="standard":
                 mode="manutention"
                 with lockM:
-                    with open('mode.txt','w') as f:
+                    with open(nameFM,'w') as f:
                         f.write("man")
                 while num_closed!="4":
                     time.sleep(10)
                     with lockN:
-                        with open('num.txt','r') as f:
+                        with open(nameFN,'r') as f:
                             num_closed=f.read()
                 bot.sendMessage(chat_id, "Modalitá manutenzione attivata")
                 t=Process(target=teacher1,args=())
@@ -88,7 +91,7 @@ def on_chat_message(msg):
                 t.start()
                 s.start()
                 with lockN:
-                    with open('num.txt','w') as f:
+                    with open(nameFN,'w') as f:
                         num_closed=f.write("0")
             else:
                 bot.sendMessage(chat_id, "Error: Modalitá manutenzione giá attiva")
@@ -96,12 +99,12 @@ def on_chat_message(msg):
             if mode=="manutention":
                 mode="standard"
                 with lockM:
-                    with open('mode.txt','w') as f:
+                    with open(nameFM,'w') as f:
                         f.write("std")
                 while num_closed!="2":
                     time.sleep(10)
                     with lockN:
-                        with open('num.txt','r') as f:
+                        with open(nameFN,'r') as f:
                             num_closed=f.read()
                 bot.sendMessage(chat_id, "Modalitá standard attivata")
                 t=Process(target=teacher,args=())
@@ -109,22 +112,22 @@ def on_chat_message(msg):
                 t.start()
                 s.start()
                 with lockN:
-                    with open('num.txt','w') as f:
+                    with open(nameFN,'w') as f:
                         num_closed=f.write("0")
             else:
                 bot.sendMessage(chat_id, "Error: Modalitá standard giá attiva")
         elif txt=="/restart":
             if mode=="standard":
                 with lockM:
-                    with open('mode.txt','w') as f:
+                    with open(nameFM,'w') as f:
                         f.write("man")
                 while num_closed!="4":
                     time.sleep(10)
                     with lockN:
-                        with open('num.txt','r') as f:
+                        with open(nameFN,'r') as f:
                             num_closed=f.read()
                 with lockM:
-                    with open('mode.txt','w') as f:
+                    with open(nameFM,'w') as f:
                         f.write("std")
                 t=Process(target=teacher,args=())
                 s=Process(target=student,args=())
@@ -132,19 +135,19 @@ def on_chat_message(msg):
                 s.start()
                 bot.sendMessage(chat_id, "Restart complete")
                 with lockN:
-                    with open('num.txt','w') as f:
+                    with open(nameFN,'w') as f:
                         num_closed=f.write("0")
             elif mode=="manutention":
                 with lockM:
-                    with open('mode.txt','w') as f:
+                    with open(nameFM,'w') as f:
                         f.write("std")
                 while num_closed!="2":
                     time.sleep(10)
                     with lockN:
-                        with open('num.txt','r') as f:
+                        with open(nameFN,'r') as f:
                             num_closed=f.read()
                 with lockM:
-                    with open('mode.txt','w') as f:
+                    with open(nameFM,'w') as f:
                         f.write("man")
                 t=Process(target=teacher1,args=())
                 s=Process(target=student1,args=())
@@ -152,7 +155,7 @@ def on_chat_message(msg):
                 s.start()
                 bot.sendMessage(chat_id, "Restart complete")
                 with lockN:
-                    with open('num.txt','w') as f:
+                    with open(nameFN,'w') as f:
                         num_closed=f.write("0")
             else:
                 print("Error: unknown mode")
@@ -163,10 +166,10 @@ def on_chat_message(msg):
 
 if __name__=='__main__':
     with lockM:
-        with open('mode.txt','w') as f:
+        with open(nameFM,'w') as f:
             f.write("std")
     with lockN:
-        with open('num.txt','w') as f:
+        with open(nameFN,'w') as f:
             f.write("0")
     t.start()
     s.start()
