@@ -17,10 +17,12 @@ id_command={}
 threadLock = threading.Lock()
 question=""
 StringSLT='Selezionare la domanda:'
+StringLVT="Lista vuota"
+nameFN="num.txt"
 
 lock = FileLock("teacher.txt.lock")
 lockM = FileLock("mode.txt.lock")
-lockN = FileLock("num.txt.lock")
+lockN = FileLock(nameFN+".lock")
 
 TOKEN = '1025374826:AAGcMIi_DeOLT986CCSzHfc0nhjFThblRfo'
 bot = telepot.Bot(TOKEN)
@@ -55,7 +57,7 @@ def on_callback_query(msg):
         if stringa !="":
             bot.sendMessage(group_id, stringa)
         else:
-            bot.sendMessage(group_id, "Lista vuota")
+            bot.sendMessage(group_id, StringLVT)
     if query_data=='b':
         list1=[]
         for elem in array:
@@ -77,7 +79,7 @@ def on_callback_query(msg):
         if stringa !="":
             bot.sendMessage(group_id, stringa)
         else:
-            bot.sendMessage(group_id, "Lista vuota")
+            bot.sendMessage(group_id, StringLVT)
 
 try:
     s=socket.socket()
@@ -131,7 +133,7 @@ def on_chat_message(msg):
             if stringa !="":
                 bot.sendMessage(chat_id, stringa)
             else:
-                bot.sendMessage(chat_id, "Lista vuota")
+                bot.sendMessage(chat_id, StringLVT)
         elif match(txt,'/ban_list',chat_type,bot_name):
             stringa=""
             for elem in array:
@@ -144,7 +146,7 @@ def on_chat_message(msg):
             if stringa !="":
                 bot.sendMessage(group_id, stringa)
             else:
-                bot.sendMessage(group_id, "Lista vuota")
+                bot.sendMessage(group_id, StringLVT)
         elif chat_id in id_command:
             if id_command[chat_id]==1:
                 markup = ReplyKeyboardRemove()
@@ -205,10 +207,10 @@ class InputThread (threading.Thread):
                         print("Teacher1 bot ended")
                         with lockN:
                             num="0"
-                            with open('num.txt','r') as f:
+                            with open(nameFN,'r') as f:
                                 num=f.read()
                             num=int(num)+1
-                            with open('num.txt','w') as f:
+                            with open(nameFN,'w') as f:
                                 f.write(str(num))
                         exit()
             time.sleep(10)
@@ -223,10 +225,10 @@ def ricevo() :
                 bot.sendMessage(id, 'Il bot sta entrando in modalitá manutenzione, alcune funzioni potrebbero non essere abilitate')
             with lockN:
                 num="0"
-                with open('num.txt','r') as f:
+                with open(nameFN,'r') as f:
                     num=f.read()
                 num=int(num)+1
-                with open('num.txt','w') as f:
+                with open(nameFN,'w') as f:
                     f.write(str(num))
             exit()
         threadLock.acquire()
