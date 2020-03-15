@@ -132,6 +132,7 @@ class OutputThread (threading.Thread):
 def match_speech(chat_id,txt):
     global num
     global sim
+    trovata=False
     for i in array:
         string1=process_text(txt)
         string2=process_text(i.replace("#","'").replace("$",'"'))
@@ -152,6 +153,7 @@ def match_speech(chat_id,txt):
                 bot.sendMessage(chat_id, 'La domanda da te fatta é stata bannata')
             else :
                 bot.sendMessage(chat_id, array[val]['a'].replace("#","'").replace("$",'"'))
+    return trovata
 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
@@ -160,7 +162,6 @@ def on_chat_message(msg):
     print(msg)
     req_type=0
     sim=0
-    val=0
     num=0
     if content_type == 'text':
         threadLock.acquire()
@@ -183,7 +184,7 @@ def on_chat_message(msg):
         elif chat_id in id_command:
             if id_command[chat_id]==1 :
                 req_type=1
-                match_speech(chat_id,txt)
+                trovata=match_speech(chat_id,txt)
             elif id_command[chat_id]==2 and req_type==0 :
                 req_type=2
                 with lock:
