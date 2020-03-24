@@ -216,14 +216,13 @@ def last_check(chat_id,txt,trovata,req_type):
 
 def switch_case(chat_id,txt,req_type):
     if id_command[chat_id]==1 :
-        trovata=match_speech(chat_id,txt)
-        return 1
+        return 1, match_speech(chat_id,txt)
     elif id_command[chat_id]==2 and req_type==0 :
         seg_bug(chat_id,txt)
-        return 2
+        return 2, False
     elif id_command[chat_id]==3 and req_type==0 :
         seg_rev(chat_id,txt)
-        return 3
+        return 3, False
     del id_command[chat_id]
 
 def on_chat_message(msg):
@@ -255,7 +254,7 @@ def on_chat_message(msg):
         elif  match(txt,'/revision',chat_type,bot_name) and req_type==0 :
             revision(chat_id)
         elif chat_id in id_command:
-            req_type=switch_case(chat_id,txt,req_type)
+            req_type, trovata=switch_case(chat_id,txt,req_type)
         else:
             req_type=4
             trovata = True
