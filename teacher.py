@@ -26,7 +26,7 @@ lockN = FileLock(nameFN+".lock")
 
 TOKEN = '1025374826:AAGcMIi_DeOLT986CCSzHfc0nhjFThblRfo'
 bot = telepot.Bot(TOKEN)
-keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/answer", callback_data='a')],[InlineKeyboardButton(text="/report", callback_data='r')],[InlineKeyboardButton(text="/start", callback_data='s')],[InlineKeyboardButton(text="/list", callback_data='l')],[InlineKeyboardButton(text="/ban", callback_data='b')],[InlineKeyboardButton(text="/ban_list", callback_data='bl')]])
+keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/answer", callback_data='a')],[InlineKeyboardButton(text="/report", callback_data='r')],[InlineKeyboardButton(text="/start", callback_data='s')],[InlineKeyboardButton(text="/list", callback_data='l')],[InlineKeyboardButton(text="/ban", callback_data='b')],[InlineKeyboardButton(text="/ban_list", callback_data='bl')],[InlineKeyboardButton(text="/sban", callback_data='sb')],[InlineKeyboardButton(text="/change", callback_data='c')]])
 
 bot_name="group_oop_bot"
 
@@ -34,7 +34,7 @@ def case1(chat_id,txt):
     global question
     markup = ReplyKeyboardRemove()
     if txt in array:
-        if array[txt]=="":
+        if array[txt]!="BANNED":
             question=txt
             bot.sendMessage(chat_id,"Digitare la risposta:",reply_markup=markup)
             id_command[chat_id]=4
@@ -74,6 +74,18 @@ def case4(chat_id,txt):
     conn.send(txt.encode())
     del id_command[chat_id]
 
+def case5(chat_id,txt):
+    markup = ReplyKeyboardRemove()
+    if txt in array:
+        bot.sendMessage(chat_id,"La domanda '"+txt+"' é stata sbannata",reply_markup=markup)
+        array[txt]=""
+        txt = txt.replace(":","@")
+        txt += ": SBANNED"
+        conn.send(txt.encode())
+    else:
+        bot.sendMessage(chat_id,"Error: String not found",reply_markup=markup)
+    del id_command[chat_id]
+
 def answer(chat_id):
     list1=[]
     for elem in array:
@@ -81,7 +93,23 @@ def answer(chat_id):
             list1.append([elem])
     print(list1)
     keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
-    bot.sendMessage(chat_id, StringSLT,reply_markup=keyboard1)
+    if list1 ==[] :
+        bot.sendMessage(chat_id, StringLVT,reply_markup=keyboard1)
+    else :
+        bot.sendMessage(chat_id, StringSLT,reply_markup=keyboard1)
+    id_command[chat_id]=1
+
+def change(chat_id):
+    list1=[]
+    for elem in array:
+        if array[elem]!="" and array[elem]!="BANNED":
+            list1.append([elem])
+    print(list1)
+    keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
+    if list1 ==[] :
+        bot.sendMessage(chat_id, StringLVT,reply_markup=keyboard1)
+    else :
+        bot.sendMessage(chat_id, StringSLT,reply_markup=keyboard1)
     id_command[chat_id]=1
 
 def ans_list(chat_id):
@@ -97,6 +125,19 @@ def ans_list(chat_id):
     else:
         bot.sendMessage(chat_id, StringLVT)
 
+def sban(chat_id):
+    list1=[]
+    for elem in array:
+        if array[elem]=='BANNED':
+            list1.append([elem])
+    print(list1)
+    keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
+    if list1 ==[] :
+        bot.sendMessage(chat_id, StringLVT,reply_markup=keyboard1)
+    else :
+        bot.sendMessage(chat_id, StringSLT,reply_markup=keyboard1)
+    id_command[chat_id]=5
+
 def ban(chat_id):
     list1=[]
     for elem in array:
@@ -104,7 +145,10 @@ def ban(chat_id):
             list1.append([elem])
     print(list1)
     keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
-    bot.sendMessage(chat_id, StringSLT,reply_markup=keyboard1)
+    if list1 ==[] :
+        bot.sendMessage(chat_id, StringLVT,reply_markup=keyboard1)
+    else :
+        bot.sendMessage(chat_id, StringSLT,reply_markup=keyboard1)
     id_command[chat_id]=3
 
 def ban_list(chat_id):
@@ -130,22 +174,29 @@ def switch_case(chat_id,txt):
         case3(chat_id,txt)
     elif id_command[chat_id]==4:
         case4(chat_id,txt)
+    elif id_command[chat_id]==5:
+        case5(chat_id,txt)
 
 def on_callback_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
+    chat_id=msg["message"]["chat"]["id"]
     if query_data=='a':
-        answer(from_id)
+        answer(chat_id)
     if query_data=='r':
-        bot.sendMessage(group_id, 'Digitare il bug da segnalare al programmatore:')
-        id_command[group_id]=2
+        bot.sendMessage(chat_id, 'Digitare il bug da segnalare al programmatore:')
+        id_command[chat_id]=2
     if query_data=='s':
-        bot.sendMessage(group_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
+        bot.sendMessage(chat_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
     if query_data=='l':
-        ans_list(from_id)
+        ans_list(chat_id)
     if query_data=='b':
-        ban(from_id)
+        ban(chat_id)
     if query_data=='bl':
-        ban_list(from_id)
+        ban_list(chat_id)
+    if query_data=='sb':
+        sban(chat_id)
+    if query_data=='c':
+        change(chat_id)
         
 
 try:
@@ -179,6 +230,10 @@ def on_chat_message(msg):
             ans_list(chat_id)
         elif match(txt,'/ban_list',chat_type,bot_name):
             ban_list(chat_id)
+        elif match(txt,'/sban',chat_type,bot_name):
+            sban(chat_id)
+        elif match(txt,'/change',chat_type,bot_name):
+            change(chat_id)
         elif chat_id in id_command:
             switch_case(chat_id,txt)
         threadLock.release()
@@ -227,7 +282,7 @@ def ricevo() :
             exit()
         threadLock.acquire()
         if x in array:
-            print("Error: String found")
+            bot.sendMessage(-1001143270084,"Revisione richiesta per "+msg.decode())
         else :
             bot.sendMessage(-1001143270084, msg.decode())
             print("Il messaggio inviato è "+msg.decode())

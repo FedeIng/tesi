@@ -4,7 +4,7 @@ import time
 import socket
 import sys
 import spacy
-from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
+from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 from random import seed
 from random import random
 from random import randrange
@@ -40,22 +40,39 @@ nlp.vocab.vectors = spacy.vocab.Vectors(data=model.wv.vectors, keys=keys)
 
 print(nlp.vocab.vectors.shape)
 
-keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/question", callback_data='q')],[InlineKeyboardButton(text="/report", callback_data='r')],[InlineKeyboardButton(text="/start", callback_data='s')]])
+keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/question", callback_data='q')],[InlineKeyboardButton(text="/report", callback_data='r')],[InlineKeyboardButton(text="/start", callback_data='s')],[InlineKeyboardButton(text="/revision", callback_data='rv')]])
 
 id_command={}
 
 bot_name="polito1_bot"
 
+def revision(chat_id):
+    list1=[]
+    for elem in array:
+        if array[elem]!="" and array[elem]!="BANNED":
+            list1.append([elem.replace("#","'").replace("$",'"')])
+    print(list1)
+    keyboard1 = ReplyKeyboardMarkup(keyboard=list1)
+    if list1 ==[] :
+        bot.sendMessage(chat_id, "Lista vuota",reply_markup=keyboard1)
+    else :
+        bot.sendMessage(chat_id,'Selezionare la domanda:',reply_markup=keyboard1)
+    id_command[chat_id]=3
+
 def on_callback_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
+    print(msg)
+    chat_id=msg["message"]["chat"]["id"]
     if query_data=='q':
-        bot.sendMessage(from_id, 'Digitare la domanda da inviare al prof o agli assistenti del corso:')
-        id_command[from_id]=1
+        bot.sendMessage(chat_id, 'Digitare la domanda da inviare al prof o agli assistenti del corso:')
+        id_command[chat_id]=1
     if query_data=='r':
-        bot.sendMessage(from_id, 'Digitare il bug da segnalare al programmatore:')
-        id_command[from_id]=2
+        bot.sendMessage(chat_id, 'Digitare il bug da segnalare al programmatore:')
+        id_command[chat_id]=2
     if query_data=='s':
-        bot.sendMessage(from_id, StringBNV, reply_markup=keyboard)
+        bot.sendMessage(chat_id, StringBNV, reply_markup=keyboard)
+    if query_data=='rv':
+        revision(chat_id)
 
 def process_text(text):
     doc = nlp(text.lower())
@@ -91,14 +108,20 @@ def answer(txt,y):
     print("La risposta "+y[0]+" é stata eliminata")
     if y[1] =='BANNED':
         for elem in array[y[0]]['id']:
-            bot.sendMessage(elem, "La domanda '"+y[0]+"' é stata bannata")
+            bot.sendMessage(elem, "La domanda '"+y[0].replace("#","'").replace("$",'"')+"' é stata bannata")
+    elif y[1] =='SBANNED':
+        for elem in array[y[0]]['id']:
+            bot.sendMessage(elem, "La domanda '"+y[0].replace("#","'").replace("$",'"')+"' é stata sbannata")
     else :
         for elem in array[y[0]]['id']:
-            bot.sendMessage(elem, "La risposta alla domanda '"+y[0]+"' e' '"+y[1]+"'")
+            bot.sendMessage(elem, "La risposta alla domanda '"+y[0].replace("#","'").replace("$",'"')+"' e' '"+y[1].replace("#","'").replace("$",'"')+"'")
     for i in array:
         print(i)
         if y[0] == i:
-            array[i]['a']=y[1].replace("'","#").replace('"',"$")
+            if y[1] =='SBANNED':
+                 array[i]['a']=""
+            else :
+                array[i]['a']=y[1]
     with open(nameFD,'w') as f:
         f.write(str(array).replace("'",'"'))
 
@@ -110,6 +133,7 @@ class OutputThread (threading.Thread):
         while True:
             txt=self.inp.recv(4096)
             y=txt.decode()
+            print(y)
             if y=="CHANGE MODE":
                 print("Student2 bot ended")
                 with lockN:
@@ -123,11 +147,10 @@ class OutputThread (threading.Thread):
             y=y.split(": ")
             print(y)
             threadLock.acquire()
-            y[0] = y[0].replace("@",":")
-            y[1] = y[1].replace("@",":")
+            y[0] = y[0].replace("@",":").replace("'","#").replace('"',"$")
+            y[1] = y[1].replace("@",":").replace("'","#").replace('"',"$")
             if y[0] in array:
-                if array[y[0]]['a'] == "":
-                   answer(txt,y) 
+                answer(txt,y) 
             else :
                 print("Error: String not found")
             threadLock.release()
@@ -157,6 +180,12 @@ def match_speech(chat_id,txt):
             else :
                 bot.sendMessage(chat_id, array[val]['a'].replace("#","'").replace("$",'"'))
     return trovata
+
+def seg_rev(chat_id,txt):
+    markup = ReplyKeyboardRemove()
+    bot.sendMessage(chat_id, 'Revisione richiesta per la domanda: '+txt,reply_markup=markup)
+    msg=txt
+    s.send(msg.encode())
 
 def seg_bug(chat_id,txt):
     with lock:
@@ -208,12 +237,18 @@ def on_chat_message(msg):
             trovata = True
             bot.sendMessage(chat_id, 'Digitare il bug da segnalare al programmatore:')
             id_command[chat_id]=2
+        elif  match(txt,'/revision',chat_type,bot_name) and req_type==0 :
+            revision(chat_id)
         elif chat_id in id_command:
             if id_command[chat_id]==1 :
                 req_type=1
                 trovata=match_speech(chat_id,txt)
             elif id_command[chat_id]==2 and req_type==0 :
                 req_type=2
+                seg_bug(chat_id,txt)
+            elif id_command[chat_id]==3 and req_type==0 :
+                req_type=3
+                seg_rev(chat_id,txt)
             del id_command[chat_id]
         else:
             req_type=4
