@@ -104,6 +104,15 @@ except socket.error as errore:
     print("Error:"+str(errore))
     sys.exit()
 
+def answer_for(txt,y):
+    for i in array:
+        print(i)
+        if y[0] == i:
+            if y[1] =='SBANNED':
+                 array[i]['a']=""
+            else :
+                array[i]['a']=y[1]
+
 def answer(txt,y):
     print("La risposta "+y[0]+" é stata eliminata")
     if y[1] =='BANNED':
@@ -115,13 +124,7 @@ def answer(txt,y):
     else :
         for elem in array[y[0]]['id']:
             bot.sendMessage(elem, "La risposta alla domanda '"+y[0].replace("#","'").replace("$",'"')+"' e' '"+y[1].replace("#","'").replace("$",'"')+"'")
-    for i in array:
-        print(i)
-        if y[0] == i:
-            if y[1] =='SBANNED':
-                 array[i]['a']=""
-            else :
-                array[i]['a']=y[1]
+    answer_for(txt,y)
     with open(nameFD,'w') as f:
         f.write(str(array).replace("'",'"'))
 
@@ -211,6 +214,18 @@ def last_check(chat_id,txt,trovata,req_type):
         msg=txt
         s.send(msg.encode())
 
+def switch_case(chat_id,txt,req_type):
+    if id_command[chat_id]==1 :
+        trovata=match_speech(chat_id,txt)
+        return 1
+    elif id_command[chat_id]==2 and req_type==0 :
+        seg_bug(chat_id,txt)
+        return 2
+    elif id_command[chat_id]==3 and req_type==0 :
+        seg_rev(chat_id,txt)
+        return 3
+    del id_command[chat_id]
+
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     global num
@@ -240,16 +255,7 @@ def on_chat_message(msg):
         elif  match(txt,'/revision',chat_type,bot_name) and req_type==0 :
             revision(chat_id)
         elif chat_id in id_command:
-            if id_command[chat_id]==1 :
-                req_type=1
-                trovata=match_speech(chat_id,txt)
-            elif id_command[chat_id]==2 and req_type==0 :
-                req_type=2
-                seg_bug(chat_id,txt)
-            elif id_command[chat_id]==3 and req_type==0 :
-                req_type=3
-                seg_rev(chat_id,txt)
-            del id_command[chat_id]
+            req_type=switch_case(chat_id,txt,req_type)
         else:
             req_type=4
             trovata = True
