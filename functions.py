@@ -1,4 +1,6 @@
-def match(msg,command,chat_type,bot_name,chat_id,lista,boolean):
+import telepot
+
+def match(msg,command,chat_type,bot_name,chat_id,lista,boolean,bot):
     if (boolean and chat_id not in lista) or ((not boolean) and chat_id in lista):
         if (chat_type=="group" or chat_type=="supergroup") and msg=="/start@"+bot_name:
             bot.sendMessage(chat_id,"Permesso negato")
