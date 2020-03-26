@@ -223,22 +223,22 @@ def on_chat_message(msg):
         global question
         txt=msg['text'].lower()
         threadLock.acquire()
-        if match(txt,'/start',chat_type,bot_name,chat_id,permitted_id,True):
+        if match(txt,'/start',chat_type,bot_name,chat_id,permitted_id,True,bot):
             bot.sendMessage(chat_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
-        elif match(txt,'/answer',chat_type,bot_name,chat_id,permitted_id,True):
+        elif match(txt,'/answer',chat_type,bot_name,chat_id,permitted_id,True,bot):
             answer(chat_id,from_id)
-        elif match(txt,'/ban',chat_type,bot_name,chat_id,permitted_id,True):
+        elif match(txt,'/ban',chat_type,bot_name,chat_id,permitted_id,True,bot):
             ban(chat_id,from_id)
-        elif match(txt,'/report',chat_type,bot_name,chat_id,permitted_id,True):
+        elif match(txt,'/report',chat_type,bot_name,chat_id,permitted_id,True,bot):
             bot.sendMessage(group_id, 'Digitare il bug da segnalare al programmatore:')
             id_command=add_id(id_command,from_id,chat_id,2)
-        elif match(txt,'/list',chat_type,bot_name,chat_id,permitted_id,True):
+        elif match(txt,'/list',chat_type,bot_name,chat_id,permitted_id,True,bot):
             ans_list(chat_id,from_id)
-        elif match(txt,'/ban_list',chat_type,bot_name,chat_id,permitted_id,True):
+        elif match(txt,'/ban_list',chat_type,bot_name,chat_id,permitted_id,True,bot):
             ban_list(chat_id,from_id)
-        elif match(txt,'/sban',chat_type,bot_name,chat_id,permitted_id,True):
+        elif match(txt,'/sban',chat_type,bot_name,chat_id,permitted_id,True,bot):
             sban(chat_id,from_id)
-        elif match(txt,'/change',chat_type,bot_name,chat_id,permitted_id,True):
+        elif match(txt,'/change',chat_type,bot_name,chat_id,permitted_id,True,bot):
             change(chat_id,from_id)
         elif check_id(id_command,from_id,chat_id) != 0:
             switch_case(chat_id,from_id,txt)

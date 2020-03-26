@@ -259,21 +259,21 @@ def on_chat_message(msg):
         threadLock.acquire()
         trovata = False
         txt=msg['text'].lower()
-        if  match(txt,'/start',chat_type,bot_name,chat_id,ban_list,False) and req_type==0 :
+        if  match(txt,'/start',chat_type,bot_name,chat_id,ban_list,False,bot) and req_type==0 :
             req_type=3
             trovata = True
             bot.sendMessage(chat_id, StringBNV, reply_markup=keyboard)
-        elif  match(txt,'/question',chat_type,bot_name,chat_id,ban_list,False) and req_type==0 :
+        elif  match(txt,'/question',chat_type,bot_name,chat_id,ban_list,False,bot) and req_type==0 :
             req_type=3
             trovata = True
             bot.sendMessage(chat_id, 'Digitare la domanda da inviare al prof o agli assistenti del corso:')
             id_command=add_id(id_command,from_id,chat_id,1)
-        elif  match(txt,'/report',chat_type,bot_name,chat_id,ban_list,False) and req_type==0 :
+        elif  match(txt,'/report',chat_type,bot_name,chat_id,ban_list,False,bot) and req_type==0 :
             req_type=3
             trovata = True
             bot.sendMessage(chat_id, 'Digitare il bug da segnalare al programmatore:')
             id_command=add_id(id_command,from_id,chat_id,2)
-        elif  match(txt,'/revision',chat_type,bot_name,chat_id,ban_list,False) and req_type==0 :
+        elif  match(txt,'/revision',chat_type,bot_name,chat_id,ban_list,False,bot) and req_type==0 :
             revision(chat_id,from_id)
         elif check_id(id_command,from_id,chat_id) != 0:
             req_type, trovata=switch_case(chat_id,from_id,txt,req_type)
