@@ -16,7 +16,7 @@ def on_callback_query(msg):
     id_command=callback_man(msg,id_command)
 
 def on_chat_message(msg):
-    id_command=msg_man(msg,array,id_command)
+    id_command=msg_man(msg,array,id_command,bot)
 
 TOKEN = '1064330916:AAGjmjJZcEwyudWgPYplyP7OvyFQl4Ju_GI'
 bot = telepot.Bot(TOKEN)

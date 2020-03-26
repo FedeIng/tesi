@@ -16,14 +16,14 @@ def match(msg,command,chat_type,bot_name,chat_id,lista,boolean,bot):
     print(4)
     return False
 
-def msg_man(msg,array,id_command):
+def msg_man(msg,array,id_command,bot):
     content_type, chat_type, chat_id = telepot.glance(msg)
     if chat_id not in id_command:
         id_command.append(chat_id)
     if content_type == 'text':
         txt=msg['text'].lower()
         for elem in array:
-            if match(txt,elem,chat_type,bot_name):
+            if match(txt,elem,chat_type,bot_name,chat_id,[],False,bot):
                 bot.sendMessage(chat_id, 'Bot in manutenzione, riprovare prossimamente')
     return id_command
 
