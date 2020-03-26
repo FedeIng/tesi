@@ -10,7 +10,7 @@ from random import random
 from random import randrange
 from datetime import datetime
 import threading
-from functions import match
+from functions import match, check_id, add_id, del_id
 from spacy.lang.it.examples import sentences 
 from filelock import Timeout, FileLock
 from gensim.models import Word2Vec
@@ -43,10 +43,28 @@ print(nlp.vocab.vectors.shape)
 keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/question", callback_data='q')],[InlineKeyboardButton(text="/report", callback_data='r')],[InlineKeyboardButton(text="/start", callback_data='s')],[InlineKeyboardButton(text="/revision", callback_data='rv')]])
 
 id_command={}
+array={}
+ban_list=[]
 
 bot_name="polito1_bot"
 
-def revision(chat_id):
+def get_user_banned():
+    vect={}
+    ban_list=[]
+    for question in array:
+        if array[question]["a"]=="BANNED":
+            for elem in array[question]["id"]:
+                if elem in vect:
+                    vect[elem]+=1
+                else :
+                    vect[elem] = 1
+    for elem in vect:
+        if vect[elem] >= 10 :
+            ban_list.append(elem)
+
+    
+
+def revision(chat_id,from_id):
     list1=[]
     for elem in array:
         if array[elem]!="" and array[elem]!="BANNED":
@@ -57,22 +75,25 @@ def revision(chat_id):
         bot.sendMessage(chat_id, "Lista vuota",reply_markup=keyboard1)
     else :
         bot.sendMessage(chat_id,'Selezionare la domanda:',reply_markup=keyboard1)
-    id_command[chat_id]=3
+    id_command=add_id(id_command,from_id,chat_id,3)
 
 def on_callback_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
     print(msg)
     chat_id=msg["message"]["chat"]["id"]
-    if query_data=='q':
-        bot.sendMessage(chat_id, 'Digitare la domanda da inviare al prof o agli assistenti del corso:')
-        id_command[chat_id]=1
-    if query_data=='r':
-        bot.sendMessage(chat_id, 'Digitare il bug da segnalare al programmatore:')
-        id_command[chat_id]=2
-    if query_data=='s':
-        bot.sendMessage(chat_id, StringBNV, reply_markup=keyboard)
-    if query_data=='rv':
-        revision(chat_id)
+    if chat_id not in ban_list:
+        if query_data=='q':
+            bot.sendMessage(chat_id, 'Digitare la domanda da inviare al prof o agli assistenti del corso:')
+            id_command=add_id(id_command,from_id,chat_id,1)
+        elif query_data=='r':
+            bot.sendMessage(chat_id, 'Digitare il bug da segnalare al programmatore:')
+            id_command=add_id(id_command,from_id,chat_id,2)
+        elif query_data=='s':
+            bot.sendMessage(chat_id, StringBNV, reply_markup=keyboard)
+        elif query_data=='rv':
+            revision(chat_id,from_id)
+    else :
+        bot.sendMessage(chat_id,"Permesso negato")
 
 def process_text(text):
     doc = nlp(text.lower())
@@ -93,7 +114,6 @@ def calculate_similarity(text1, text2):
     return base.similarity(compare)
 
 seed(datetime.now())
-array={}
 threadLock = threading.Lock()
 
 try:
@@ -156,6 +176,7 @@ class OutputThread (threading.Thread):
                 answer(txt,y) 
             else :
                 print("Error: String not found")
+            get_user_banned()
             threadLock.release()
 
 def match_speech(chat_id,txt):
@@ -214,21 +235,22 @@ def last_check(chat_id,txt,trovata,req_type):
         msg=txt
         s.send(msg.encode())
 
-def switch_case(chat_id,txt,req_type):
-    if id_command[chat_id]==1 :
+def switch_case(chat_id,from_id,txt,req_type):
+    if check_id(id_command,from_id,chat_id)==1 :
         return 1, match_speech(chat_id,txt)
-    elif id_command[chat_id]==2 and req_type==0 :
+    elif check_id(id_command,from_id,chat_id)==2 and req_type==0 :
         seg_bug(chat_id,txt)
         return 2, False
-    elif id_command[chat_id]==3 and req_type==0 :
+    elif check_id(id_command,from_id,chat_id)==3 and req_type==0 :
         seg_rev(chat_id,txt)
         return 3, False
-    del id_command[chat_id]
+    id_command=del_id(id_command,from_id,chat_id)
 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     global num
     global sim
+    from_id=msg["from"]["id"]
     print(msg)
     req_type=0
     sim=0
@@ -237,24 +259,24 @@ def on_chat_message(msg):
         threadLock.acquire()
         trovata = False
         txt=msg['text'].lower()
-        if  match(txt,'/start',chat_type,bot_name) and req_type==0 :
+        if  match(txt,'/start',chat_type,bot_name,chat_id,ban_list,False) and req_type==0 :
             req_type=3
             trovata = True
             bot.sendMessage(chat_id, StringBNV, reply_markup=keyboard)
-        elif  match(txt,'/question',chat_type,bot_name) and req_type==0 :
+        elif  match(txt,'/question',chat_type,bot_name,chat_id,ban_list,False) and req_type==0 :
             req_type=3
             trovata = True
             bot.sendMessage(chat_id, 'Digitare la domanda da inviare al prof o agli assistenti del corso:')
-            id_command[chat_id]=1
-        elif  match(txt,'/report',chat_type,bot_name) and req_type==0 :
+            id_command=add_id(id_command,from_id,chat_id,1)
+        elif  match(txt,'/report',chat_type,bot_name,chat_id,ban_list,False) and req_type==0 :
             req_type=3
             trovata = True
             bot.sendMessage(chat_id, 'Digitare il bug da segnalare al programmatore:')
-            id_command[chat_id]=2
-        elif  match(txt,'/revision',chat_type,bot_name) and req_type==0 :
-            revision(chat_id)
-        elif chat_id in id_command:
-            req_type, trovata=switch_case(chat_id,txt,req_type)
+            id_command=add_id(id_command,from_id,chat_id,2)
+        elif  match(txt,'/revision',chat_type,bot_name,chat_id,ban_list,False) and req_type==0 :
+            revision(chat_id,from_id)
+        elif check_id(id_command,from_id,chat_id) != 0:
+            req_type, trovata=switch_case(chat_id,from_id,txt,req_type)
         else:
             req_type=4
             trovata = True
