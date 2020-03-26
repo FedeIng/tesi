@@ -236,6 +236,7 @@ def last_check(chat_id,txt,trovata,req_type):
         s.send(msg.encode())
 
 def switch_case(chat_id,from_id,txt,req_type):
+    global id_command
     if check_id(id_command,from_id,chat_id)==1 :
         return 1, match_speech(chat_id,txt)
     elif check_id(id_command,from_id,chat_id)==2 and req_type==0 :
@@ -250,6 +251,7 @@ def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     global num
     global sim
+    global id_command
     from_id=msg["from"]["id"]
     print(msg)
     req_type=0
