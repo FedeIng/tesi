@@ -1,5 +1,5 @@
 import telepot
-from functions import match, MsgMan, CallBackMan
+from functions import match, msg_man, callback_man
 import time
 from filelock import Timeout, FileLock
 
@@ -13,10 +13,10 @@ array=['/start','/answer','/ban','/report','/list','/ban_list']
 id_command=[]
 
 def on_callback_query(msg):
-    id_command=CallBackMan(msg,id_command)
+    id_command=callback_man(msg,id_command)
 
 def on_chat_message(msg):
-    id_command=MsgMan(msg,array,id_command)
+    id_command=msg_man(msg,array,id_command)
 
 TOKEN = '1025374826:AAGcMIi_DeOLT986CCSzHfc0nhjFThblRfo'
 bot = telepot.Bot(TOKEN)
