@@ -66,6 +66,7 @@ def get_user_banned():
 
 def revision(chat_id,from_id):
     list1=[]
+    global id_command
     for elem in array:
         if array[elem]!="" and array[elem]!="BANNED":
             list1.append([elem.replace("#","'").replace("$",'"')])
@@ -75,11 +76,12 @@ def revision(chat_id,from_id):
         bot.sendMessage(chat_id, "Lista vuota",reply_markup=keyboard1)
     else :
         bot.sendMessage(chat_id,'Selezionare la domanda:',reply_markup=keyboard1)
-    id_command=add_id(id_command,from_id,chat_id,3)
+        id_command=add_id(id_command,from_id,chat_id,3)
 
 def on_callback_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
     print(msg)
+    global id_command
     chat_id=msg["message"]["chat"]["id"]
     if chat_id not in ban_list:
         if query_data=='q':
@@ -297,6 +299,8 @@ bot = telepot.Bot(TOKEN)
 
 with open(nameFD,'r') as json_file:
     array=json.load(json_file)
+
+get_user_banned()
 
 bot.message_loop({'chat':on_chat_message,'callback_query':on_callback_query})
 

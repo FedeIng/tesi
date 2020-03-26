@@ -34,6 +34,7 @@ permitted_id=[-1001143270084,297895076]
 
 def case1(chat_id,from_id,txt):
     global question
+    global id_command
     markup = ReplyKeyboardRemove()
     if txt in array:
         if array[txt]!="BANNED":
@@ -44,6 +45,7 @@ def case1(chat_id,from_id,txt):
         bot.sendMessage(chat_id,"Error: Question not found",reply_markup=markup)
 
 def case2(chat_id,from_id,txt):
+    global id_command
     with lock:
         bug_array=[]
         with open('teacher.txt','r') as f:
@@ -56,6 +58,7 @@ def case2(chat_id,from_id,txt):
 
 def case3(chat_id,from_id,txt):
     markup = ReplyKeyboardRemove()
+    global id_command
     if txt in array:
         bot.sendMessage(chat_id,"La domanda '"+txt+"' é stata bannata",reply_markup=markup)
         array[txt]="BANNED"
@@ -68,6 +71,7 @@ def case3(chat_id,from_id,txt):
 
 def case4(chat_id,from_id,txt):
     global question
+    global id_command
     bot.sendMessage(chat_id,"La risposta a '"+question+"' é '"+txt+"'")
     array[question]=txt
     question = question.replace(":","@")
@@ -78,6 +82,7 @@ def case4(chat_id,from_id,txt):
 
 def case5(chat_id,from_id,txt):
     markup = ReplyKeyboardRemove()
+    global id_command
     if txt in array:
         bot.sendMessage(chat_id,"La domanda '"+txt+"' é stata sbannata",reply_markup=markup)
         array[txt]=""
@@ -90,6 +95,7 @@ def case5(chat_id,from_id,txt):
 
 def answer(chat_id,from_id):
     list1=[]
+    global id_command
     for elem in array:
         if array[elem]=="":
             list1.append([elem])
@@ -99,10 +105,11 @@ def answer(chat_id,from_id):
         bot.sendMessage(chat_id, StringLVT,reply_markup=keyboard1)
     else :
         bot.sendMessage(chat_id, StringSLT,reply_markup=keyboard1)
-    id_command=add_id(id_command,from_id,chat_id,1)
+        id_command=add_id(id_command,from_id,chat_id,1)
 
 def change(chat_id,from_id):
     list1=[]
+    global id_command
     for elem in array:
         if array[elem]!="" and array[elem]!="BANNED":
             list1.append([elem])
@@ -112,7 +119,7 @@ def change(chat_id,from_id):
         bot.sendMessage(chat_id, StringLVT,reply_markup=keyboard1)
     else :
         bot.sendMessage(chat_id, StringSLT,reply_markup=keyboard1)
-    id_command=add_id(id_command,from_id,chat_id,1)
+        id_command=add_id(id_command,from_id,chat_id,1)
 
 def ans_list(chat_id,from_id):
     stringa=""
@@ -129,6 +136,7 @@ def ans_list(chat_id,from_id):
 
 def sban(chat_id,from_id):
     list1=[]
+    global id_command
     for elem in array:
         if array[elem]=='BANNED':
             list1.append([elem])
@@ -138,10 +146,11 @@ def sban(chat_id,from_id):
         bot.sendMessage(chat_id, StringLVT,reply_markup=keyboard1)
     else :
         bot.sendMessage(chat_id, StringSLT,reply_markup=keyboard1)
-    id_command=add_id(id_command,from_id,chat_id,5)
+        id_command=add_id(id_command,from_id,chat_id,5)
 
 def ban(chat_id,from_id):
     list1=[]
+    global id_command
     for elem in array:
         if array[elem]=="":
             list1.append([elem])
@@ -151,7 +160,7 @@ def ban(chat_id,from_id):
         bot.sendMessage(chat_id, StringLVT,reply_markup=keyboard1)
     else :
         bot.sendMessage(chat_id, StringSLT,reply_markup=keyboard1)
-    id_command=add_id(id_command,from_id,chat_id,3)
+        id_command=add_id(id_command,from_id,chat_id,3)
 
 def ban_list(chat_id,from_id):
     stringa=""
@@ -168,6 +177,7 @@ def ban_list(chat_id,from_id):
         bot.sendMessage(chat_id, StringLVT)
 
 def switch_case(chat_id,from_id,txt):
+    global id_command
     if check_id(id_command,from_id,chat_id)==1:
         case1(chat_id,from_id,txt)
     elif check_id(id_command,from_id,chat_id)==2:
@@ -181,6 +191,7 @@ def switch_case(chat_id,from_id,txt):
 
 def on_callback_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
+    global id_command
     chat_id=msg["message"]["chat"]["id"]
     if chat_id in permitted_id:
         if query_data=='a':
@@ -217,6 +228,7 @@ conn,c_address=s.accept()
 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
+    print(chat_type)
     global id_command
     from_id=msg["from"]["id"]
     bot_array={}
@@ -246,6 +258,7 @@ def on_chat_message(msg):
             change(chat_id,from_id)
         elif check_id(id_command,from_id,chat_id) != 0:
             switch_case(chat_id,from_id,txt)
+        print(id_command)
         threadLock.release()
 
 

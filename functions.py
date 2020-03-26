@@ -2,7 +2,7 @@ import telepot
 
 def match(msg,command,chat_type,chat_id,lista,boolean,bot):
     if (boolean and chat_id not in lista) or ((not boolean) and chat_id in lista):
-        if ((chat_type=="group" or chat_type=="supergroup") and msg=="/start@"+bot["name"]) or (chat_type=="private" and msg=="/start"):
+        if command=="/start":
             bot["bot"].sendMessage(chat_id,"Permesso negato")
         return False
     print(1)
@@ -39,15 +39,13 @@ def callback_man(msg,id_command,bot):
 
 def add_id(array,from_id,chat_id,val):
     if from_id==chat_id:
-        if chat_id not in array:
-            array[chat_id]=val
+        array[chat_id]=val
     else :
         if chat_id not in array:
             array[chat_id]={}
             array[chat_id][from_id]=val
         else :
-            if from_id not in array[chat_id]:
-                array[chat_id][from_id]=val
+            array[chat_id][from_id]=val
     return array
 
 def check_id(array,from_id,chat_id):
