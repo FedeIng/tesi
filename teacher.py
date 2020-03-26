@@ -217,6 +217,7 @@ conn,c_address=s.accept()
 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
+    global id_command
     from_id=msg["from"]["id"]
     print(msg)
     if content_type == 'text':
