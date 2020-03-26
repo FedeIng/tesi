@@ -16,7 +16,7 @@ def match(msg,command,chat_type,bot_name,chat_id,lista,boolean,bot):
     print(4)
     return False
 
-def msg_man(msg,array,id_command,bot):
+def msg_man(msg,array,id_command,bot,bot_name):
     content_type, chat_type, chat_id = telepot.glance(msg)
     if chat_id not in id_command:
         id_command.append(chat_id)
@@ -27,7 +27,7 @@ def msg_man(msg,array,id_command,bot):
                 bot.sendMessage(chat_id, 'Bot in manutenzione, riprovare prossimamente')
     return id_command
 
-def callback_man(msg,id_command):
+def callback_man(msg,id_command,bot):
     query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
     if from_id not in id_command:
         id_command.append(from_id)

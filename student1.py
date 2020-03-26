@@ -12,11 +12,13 @@ id_command=[]
 
 array=['/start','/question','/report']
 
+bot_name="polito1_bot"
+
 def on_callback_query(msg):
-    id_command=callback_man(msg,id_command)
+    id_command=callback_man(msg,id_command,bot)
 
 def on_chat_message(msg):
-    id_command=msg_man(msg,array,id_command,bot)
+    id_command=msg_man(msg,array,id_command,bot,bot_name)
 
 TOKEN = '1064330916:AAGjmjJZcEwyudWgPYplyP7OvyFQl4Ju_GI'
 bot = telepot.Bot(TOKEN)

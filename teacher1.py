@@ -8,15 +8,17 @@ bot_name="group_oop_bot"
 lockM = FileLock("mode.txt.lock")
 lockN = FileLock("num.txt.lock")
 
+bot_name="group_oop_bot"
+
 array=['/start','/answer','/ban','/report','/list','/ban_list']
 
 id_command=[]
 
 def on_callback_query(msg):
-    id_command=callback_man(msg,id_command)
+    id_command=callback_man(msg,id_command,bot)
 
 def on_chat_message(msg):
-    id_command=msg_man(msg,array,id_command,bot)
+    id_command=msg_man(msg,array,id_command,bot,bot_name)
 
 TOKEN = '1025374826:AAGcMIi_DeOLT986CCSzHfc0nhjFThblRfo'
 bot = telepot.Bot(TOKEN)
