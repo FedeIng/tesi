@@ -219,27 +219,30 @@ def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     global id_command
     from_id=msg["from"]["id"]
+    bot_array={}
+    bot_array["bot"]=bot
+    bot_array["name"]=bot_name
     print(msg)
     if content_type == 'text':
         global question
         txt=msg['text'].lower()
         threadLock.acquire()
-        if match(txt,'/start',chat_type,bot_name,chat_id,permitted_id,True,bot):
+        if match(txt,'/start',chat_type,chat_id,permitted_id,True,bot_array):
             bot.sendMessage(chat_id, 'Benvenuto nel bot di programmazione ad oggetti, selezionare un comando per usarlo', reply_markup=keyboard)
-        elif match(txt,'/answer',chat_type,bot_name,chat_id,permitted_id,True,bot):
+        elif match(txt,'/answer',chat_type,chat_id,permitted_id,True,bot_array):
             answer(chat_id,from_id)
-        elif match(txt,'/ban',chat_type,bot_name,chat_id,permitted_id,True,bot):
+        elif match(txt,'/ban',chat_type,chat_id,permitted_id,True,bot_array):
             ban(chat_id,from_id)
-        elif match(txt,'/report',chat_type,bot_name,chat_id,permitted_id,True,bot):
+        elif match(txt,'/report',chat_type,chat_id,permitted_id,True,bot_array):
             bot.sendMessage(group_id, 'Digitare il bug da segnalare al programmatore:')
             id_command=add_id(id_command,from_id,chat_id,2)
-        elif match(txt,'/list',chat_type,bot_name,chat_id,permitted_id,True,bot):
+        elif match(txt,'/list',chat_type,chat_id,permitted_id,True,bot_array):
             ans_list(chat_id,from_id)
-        elif match(txt,'/ban_list',chat_type,bot_name,chat_id,permitted_id,True,bot):
+        elif match(txt,'/ban_list',chat_type,chat_id,permitted_id,True,bot_array):
             ban_list(chat_id,from_id)
-        elif match(txt,'/sban',chat_type,bot_name,chat_id,permitted_id,True,bot):
+        elif match(txt,'/sban',chat_type,chat_id,permitted_id,True,bot_array):
             sban(chat_id,from_id)
-        elif match(txt,'/change',chat_type,bot_name,chat_id,permitted_id,True,bot):
+        elif match(txt,'/change',chat_type,chat_id,permitted_id,True,bot_array):
             change(chat_id,from_id)
         elif check_id(id_command,from_id,chat_id) != 0:
             switch_case(chat_id,from_id,txt)

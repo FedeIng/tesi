@@ -1,13 +1,13 @@
 import telepot
 
-def match(msg,command,chat_type,bot_name,chat_id,lista,boolean,bot):
+def match(msg,command,chat_type,chat_id,lista,boolean,bot):
     if (boolean and chat_id not in lista) or ((not boolean) and chat_id in lista):
-        if ((chat_type=="group" or chat_type=="supergroup") and msg=="/start@"+bot_name) or (chat_type=="private" and msg=="/start"):
-            bot.sendMessage(chat_id,"Permesso negato")
+        if ((chat_type=="group" or chat_type=="supergroup") and msg=="/start@"+bot["name"]) or (chat_type=="private" and msg=="/start"):
+            bot["bot"].sendMessage(chat_id,"Permesso negato")
         return False
     print(1)
-    print(msg+" : "+command+" : "+chat_type+" : "+bot_name)
-    if (chat_type=="group" or chat_type=="supergroup") and msg==command+"@"+bot_name:
+    print(msg+" : "+command+" : "+chat_type+" : "+bot["name"])
+    if (chat_type=="group" or chat_type=="supergroup") and msg==command+"@"+bot["name"]:
         print(2)
         return True
     elif chat_type=="private" and msg==command:
@@ -18,12 +18,15 @@ def match(msg,command,chat_type,bot_name,chat_id,lista,boolean,bot):
 
 def msg_man(msg,array,id_command,bot,bot_name):
     content_type, chat_type, chat_id = telepot.glance(msg)
+    bot_array={}
+    bot_array["bot"]=bot
+    bot_array["name"]=bot_name
     if chat_id not in id_command:
         id_command.append(chat_id)
     if content_type == 'text':
         txt=msg['text'].lower()
         for elem in array:
-            if match(txt,elem,chat_type,bot_name,chat_id,[],False,bot):
+            if match(txt,elem,chat_type,chat_id,[],False,bot_array):
                 bot.sendMessage(chat_id, 'Bot in manutenzione, riprovare prossimamente')
     return id_command
 
