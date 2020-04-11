@@ -4,42 +4,42 @@ from filelock import Timeout, FileLock
 
 lockM = FileLock("mode.txt.lock")
 
-def post_0(Name,LockName,val):
-    print("Set val "+val+" to "+Name)
-    with LockName:
-        with open(Name,'w') as f:
+def post_0(name,lockname,val):
+    print("Set val "+val+" to "+name)
+    with lockname:
+        with open(name,'w') as f:
             f.write(val)
 
-def post_1(Name,LockName,Vett,bot,socket=None):
+def post_1(name,lockname,vett,bot,socket=None):
     mode_type=""
     mode_change="CHANGE MODE"
     with lockM:
         with open('mode.txt','r') as f:
             mode=f.read()
-            if len(Name)==11:
+            if len(name)==11:
                 mode_type="man"
-            elif len(Name)==10:
+            elif len(name)==10:
                 mode_type="std"
             if mode==mode_type:
                 if socket!=None:
                     socket.send(mode_change.encode())
-                for id in Vett:
-                    if len(Name)==11:
+                for id in vett:
+                    if len(name)==11:
                         bot.sendMessage(id, 'Il bot sta entrando in modalitá manutenzione, alcune funzioni potrebbero non essere abilitate')
-                    elif len(Name)==10:
+                    elif len(name)==10:
                         bot.sendMessage(id, 'Il bot é di nuovo operativo')
                     else :
                         print("Error in post_1")
-                post_0(Name,LockName,"1")
+                post_0(name,lockname,"1")
                 return False
             return True
 
-def wait(Name,LockName):
+def wait(name,lockname):
     num_closed="0"
     while num_closed!="1":
         time.sleep(10)
-        with LockName:
-            with open(Name,'r') as f:
+        with lockname:
+            with open(name,'r') as f:
                 num_closed=f.read()
 
 def match(msg,command,chat_type,chat_id,lista,boolean,bot):
