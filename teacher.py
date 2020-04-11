@@ -268,7 +268,6 @@ class InputThread (threading.Thread):
     def __init__(self):
       threading.Thread.__init__(self)
     def run(self):
-        mode_change="CHANGE MODE"
         bot.message_loop({'chat':on_chat_message,'callback_query':on_callback_query})
         while post_1(nameFT1,lockT1,id_command,bot,conn):
             time.sleep(10)

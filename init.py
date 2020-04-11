@@ -20,18 +20,19 @@ nameFT="mode_t.txt"
 nameFT1="mode_t1.txt"
 nameFT2="mode_t2.txt"
 
+lock_string=".lock"
 
-lockS = FileLock("student.txt.lock")
-lockT = FileLock("teacher.txt.lock")
-lockM = FileLock(nameFM+".lock")
+lockS = FileLock("student.txt"+lock_string)
+lockT = FileLock("teacher.txt"+lock_string)
+lockM = FileLock(nameFM+lock_string)
 
-lockS = FileLock(nameFS+".lock")
-lockS1 = FileLock(nameFS1+".lock")
-lockS2 = FileLock(nameFS2+".lock")
+lockS = FileLock(nameFS+lock_string)
+lockS1 = FileLock(nameFS1+lock_string)
+lockS2 = FileLock(nameFS2+lock_string)
 
-lockT = FileLock(nameFT+".lock")
-lockT1 = FileLock(nameFT1+".lock")
-lockT2 = FileLock(nameFT2+".lock")
+lockT = FileLock(nameFT+lock_string)
+lockT1 = FileLock(nameFT1+lock_string)
+lockT2 = FileLock(nameFT2+lock_string)
 
 def student():
     os.system("student.py")
@@ -73,7 +74,6 @@ class FileThread (threading.Thread):
 
 def enable_std(chat_id):
     global mode
-    num_closed="0"
     if mode=="manutention":
         mode="standard"
         with lockM:
@@ -95,7 +95,6 @@ def enable_std(chat_id):
 
 def enable_man(chat_id):
     global mode
-    num_closed="0"
     if mode=="standard":
         mode="manutention"
         with lockM:
@@ -117,7 +116,6 @@ def enable_man(chat_id):
 
 def restart(chat_id):
     global mode
-    num_closed="0"
     if mode=="standard":
         with lockM:
             with open(nameFM,'w') as f:

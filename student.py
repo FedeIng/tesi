@@ -301,7 +301,5 @@ bot.message_loop({'chat':on_chat_message,'callback_query':on_callback_query})
 
 print('Listening ...')
 
-mode_change="CHANGE MODE"
-
 while post_1(nameFS1,lockS1,id_command,bot,s):
     time.sleep(10)
