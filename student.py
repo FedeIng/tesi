@@ -10,7 +10,7 @@ from random import random
 from random import randrange
 from datetime import datetime
 import threading
-from functions import match, check_id, add_id, del_id
+from functions import match, check_id, add_id, del_id, post_0, post_1
 from spacy.lang.it.examples import sentences 
 from filelock import Timeout, FileLock
 from gensim.models import Word2Vec
@@ -18,12 +18,14 @@ from gensim.models import Word2Vec
 num=0
 sim=0
 
-nameFN="num.txt"
+nameFS1="mode_s1.txt"
+nameFS2="mode_s2.txt"
 nameFD="data.txt"
 
 lock = FileLock("student.txt.lock")
 lockM = FileLock("mode.txt.lock")
-lockN = FileLock(nameFN+".lock")
+lockS1 = FileLock(nameFS1+".lock")
+lockS2 = FileLock(nameFS2+".lock")
 
 nlp = spacy.load('it_core_news_sm')
 
@@ -160,14 +162,7 @@ class OutputThread (threading.Thread):
             y=txt.decode()
             print(y)
             if y=="CHANGE MODE":
-                print("Student2 bot ended")
-                with lockN:
-                    num="0"
-                    with open(nameFN,'r') as f:
-                        num=f.read()
-                    num=int(num)+1
-                    with open(nameFN,'w') as f:
-                        f.write(str(num))
+                post_0(nameFS2,lockS2,"1")
                 exit()
             y=y.split(": ")
             print(y)
@@ -308,21 +303,5 @@ print('Listening ...')
 
 mode_change="CHANGE MODE"
 
-while 1:
-    with lockM:
-        with open('mode.txt','r') as f:
-            mode=f.read()
-            if mode=="man":
-                s.send(mode_change.encode())
-                print("Student1 bot ended")
-                for id in id_command:
-                    bot.sendMessage(id, 'Il bot sta entrando in modalitá manutenzione, alcune funzioni potrebbero non essere abilitate')
-                with lockN:
-                    num="0"
-                    with open(nameFN,'r') as f:
-                        num=f.read()
-                    num=int(num)+1
-                    with open(nameFN,'w') as f:
-                        f.write(str(num))
-                exit()
+while post_1(nameFS1,lockS1,id_command,bot,s):
     time.sleep(10)

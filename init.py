@@ -7,17 +7,31 @@ import threading
 import time
 from multiprocessing import Process
 from filelock import Timeout, FileLock
+from functions import wait, post_0
 
 TOKEN = '1045575516:AAF8WKCOlQQbBX6d9ywkKUlyd2h_UvNnmYA'
 bot = telepot.Bot(TOKEN)
 
 nameFM="mode.txt"
-nameFN="num.txt"
+nameFS="mode_s.txt"
+nameFS1="mode_s1.txt"
+nameFS2="mode_s2.txt"
+nameFT="mode_t.txt"
+nameFT1="mode_t1.txt"
+nameFT2="mode_t2.txt"
+
 
 lockS = FileLock("student.txt.lock")
 lockT = FileLock("teacher.txt.lock")
 lockM = FileLock(nameFM+".lock")
-lockN = FileLock(nameFN+".lock")
+
+lockS = FileLock(nameFS+".lock")
+lockS1 = FileLock(nameFS1+".lock")
+lockS2 = FileLock(nameFS2+".lock")
+
+lockT = FileLock(nameFT+".lock")
+lockT1 = FileLock(nameFT1+".lock")
+lockT2 = FileLock(nameFT2+".lock")
 
 def student():
     os.system("student.py")
@@ -65,19 +79,17 @@ def enable_std(chat_id):
         with lockM:
             with open(nameFM,'w') as f:
                 f.write("std")
-        while num_closed!="2":
-            time.sleep(10)
-            with lockN:
-                with open(nameFN,'r') as f:
-                    num_closed=f.read()
+        wait(nameFS,lockS)
+        wait(nameFT,lockT)
         bot.sendMessage(chat_id, "Modalitá standard attivata")
         t=Process(target=teacher,args=())
         s=Process(target=student,args=())
         t.start()
         s.start()
-        with lockN:
-            with open(nameFN,'w') as f:
-                f.write("0")
+        post_0(nameFS1,lockS1,"0")
+        post_0(nameFS2,lockS2,"0")
+        post_0(nameFT1,lockT1,"0")
+        post_0(nameFT2,lockT2,"0")
     else:
         bot.sendMessage(chat_id, "Error: Modalitá standard giá attiva")
 
@@ -89,19 +101,17 @@ def enable_man(chat_id):
         with lockM:
             with open(nameFM,'w') as f:
                 f.write("man")
-        while num_closed!="4":
-            time.sleep(10)
-            with lockN:
-                with open(nameFN,'r') as f:
-                    num_closed=f.read()
+        wait(nameFS1,lockS1)
+        wait(nameFS2,lockS2)
+        wait(nameFT1,lockT1)
+        wait(nameFT2,lockT2)
         bot.sendMessage(chat_id, "Modalitá manutenzione attivata")
         t=Process(target=teacher1,args=())
         s=Process(target=student1,args=())
         t.start()
         s.start()
-        with lockN:
-            with open(nameFN,'w') as f:
-                f.write("0")
+        post_0(nameFS,lockS,"0")
+        post_0(nameFT,lockT,"0")
     else:
         bot.sendMessage(chat_id, "Error: Modalitá manutenzione giá attiva")
 
@@ -112,11 +122,10 @@ def restart(chat_id):
         with lockM:
             with open(nameFM,'w') as f:
                 f.write("man")
-        while num_closed!="4":
-            time.sleep(10)
-            with lockN:
-                with open(nameFN,'r') as f:
-                    num_closed=f.read()
+        wait(nameFS1,lockS1)
+        wait(nameFS2,lockS2)
+        wait(nameFT1,lockT1)
+        wait(nameFT2,lockT2)
         with lockM:
             with open(nameFM,'w') as f:
                 f.write("std")
@@ -125,18 +134,16 @@ def restart(chat_id):
         t.start()
         s.start()
         bot.sendMessage(chat_id, "Restart complete")
-        with lockN:
-            with open(nameFN,'w') as f:
-                f.write("0")
+        post_0(nameFS1,lockS1,"0")
+        post_0(nameFS2,lockS2,"0")
+        post_0(nameFT1,lockT1,"0")
+        post_0(nameFT2,lockT2,"0")
     elif mode=="manutention":
         with lockM:
             with open(nameFM,'w') as f:
                 f.write("std")
-        while num_closed!="2":
-            time.sleep(10)
-            with lockN:
-                with open(nameFN,'r') as f:
-                    num_closed=f.read()
+        wait(nameFS,lockS)
+        wait(nameFT,lockT)
         with lockM:
             with open(nameFM,'w') as f:
                 f.write("man")
@@ -145,9 +152,8 @@ def restart(chat_id):
         t.start()
         s.start()
         bot.sendMessage(chat_id, "Restart complete")
-        with lockN:
-            with open(nameFN,'w') as f:
-                f.write("0")
+        post_0(nameFS,lockS,"0")
+        post_0(nameFT,lockT,"0")
     else:
         print("Error: unknown mode")
 
@@ -182,9 +188,10 @@ if __name__=='__main__':
     with lockM:
         with open(nameFM,'w') as f:
             f.write("std")
-    with lockN:
-        with open(nameFN,'w') as f:
-            f.write("0")
+    post_0(nameFS1,lockS1,"0")
+    post_0(nameFS2,lockS2,"0")
+    post_0(nameFT1,lockT1,"0")
+    post_0(nameFT2,lockT2,"0")
     t.start()
     s.start()
     bot.sendMessage(297895076, "Bot operativi")

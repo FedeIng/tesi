@@ -7,7 +7,7 @@ import telepot
 import time
 import sys
 from filelock import Timeout, FileLock
-from functions import match, check_id, add_id, del_id
+from functions import match, check_id, add_id, del_id, post_0, post_1
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 
 group_id=-1001143270084
@@ -18,11 +18,13 @@ threadLock = threading.Lock()
 question=""
 StringSLT='Selezionare la domanda:'
 StringLVT="Lista vuota"
-nameFN="num.txt"
+nameFT1="mode_t1.txt"
+nameFT2="mode_t2.txt"
 
 lock = FileLock("teacher.txt.lock")
 lockM = FileLock("mode.txt.lock")
-lockN = FileLock(nameFN+".lock")
+lockT1 = FileLock(nameFT1+".lock")
+lockT2 = FileLock(nameFT2+".lock")
 
 TOKEN = '1025374826:AAGcMIi_DeOLT986CCSzHfc0nhjFThblRfo'
 bot = telepot.Bot(TOKEN)
@@ -268,21 +270,7 @@ class InputThread (threading.Thread):
     def run(self):
         mode_change="CHANGE MODE"
         bot.message_loop({'chat':on_chat_message,'callback_query':on_callback_query})
-        while 1:
-            with lockM:
-                with open('mode.txt','r') as f:
-                    mode=f.read()
-                    if mode=="man":
-                        conn.send(mode_change.encode())
-                        print("Teacher1 bot ended")
-                        with lockN:
-                            num="0"
-                            with open(nameFN,'r') as f:
-                                num=f.read()
-                            num=int(num)+1
-                            with open(nameFN,'w') as f:
-                                f.write(str(num))
-                        exit()
+        while post_1(nameFT1,lockT1,id_command,bot,conn):
             time.sleep(10)
             
 def ricevo() :
@@ -290,16 +278,7 @@ def ricevo() :
         msg=conn.recv(4096)
         x=msg.decode()
         if x=="CHANGE MODE":
-            print("Teacher2 bot ended")
-            for id in id_command:
-                bot.sendMessage(id, 'Il bot sta entrando in modalitá manutenzione, alcune funzioni potrebbero non essere abilitate')
-            with lockN:
-                num="0"
-                with open(nameFN,'r') as f:
-                    num=f.read()
-                num=int(num)+1
-                with open(nameFN,'w') as f:
-                    f.write(str(num))
+            post_0(nameFT2,lockT2,"1")
             exit()
         threadLock.acquire()
         if x in array:
