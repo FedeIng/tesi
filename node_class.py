@@ -168,7 +168,6 @@ class Node:
             data={}
             for lang in self.teachers:
                 if elem not in self.teachers[lang] and len(self.teachers[lang])>0:
-                    data[lang]=[]
                     data[lang]=self.teachers[lang]
                 if elem in self.teachers[lang]:
                     if len(self.teachers[lang])>1:
@@ -185,7 +184,6 @@ class Node:
             data={}
             for lang in self.collaborators:
                 if elem not in self.collaborators[lang] and len(self.collaborators[lang])>0:
-                    data[lang]=[]
                     data[lang]=self.collaborators[lang]
                 if elem in self.collaborators[lang]:
                     if len(self.collaborators[lang])>1:
@@ -203,7 +201,6 @@ class Node:
         for elem in vett:
             for lang in self.students:
                 if elem not in self.students[lang] and len(self.students[lang])>0:
-                    data[lang]=[]
                     data[lang]=self.students[lang]
                 if elem in self.students[lang] and len(self.students[lang])>1:
                     data[lang]=[]
@@ -349,10 +346,10 @@ class Node:
         return None
 
     def substite(self,obj):
-        for son in sons:
+        for son in self.sons:
             if son!=obj:
                 son.change(self,obj)
-        for parent in parents:
+        for parent in self.parents:
             if parent!=obj:
                 parent.change(self,obj)
 
@@ -422,7 +419,6 @@ class Node:
     def calc_distance(self,lang,lang_str):
         data={}
         if lang_str in self.JSON_array:
-            data[0]={}
             data[0]=self.JSON_array[lang_str]
         for elem in parents:
             array=elem.calc_distance(lang_str)

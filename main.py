@@ -865,7 +865,6 @@ def del_bot(topic):
     global bot_student
     bot_id=getIdByTopic(topic)
     if bot_id==None:
-        bot_creation.sendMessage(chat_id,"An error is occurred",reply_markup=ReplyKeyboardRemove())
         return
     del bot_student[bot_id]
     write_del_bot(topic)

@@ -158,7 +158,7 @@ class Tree:
     def getSent(self,lang,text):
         return self.lang.question_sent(lang,text)
 
-    def state_exist(node1,node2):
+    def state_exist(self,node1,node2):
         p1=self.array[node1].getArrays()[0]
         p2=self.array[node2].getArrays()[0]
         for node in list(set(p1).intersection(p2)):
@@ -234,7 +234,7 @@ class Tree:
                     else:
                         new_name="STATE"+str(self.num)
                         self.num+=1
-                        if self.addNode(self,topic,node.getName(),new_name):
+                        if self.addNode(topic,node.getName(),new_name):
                             self.array[new_name].add_question(question,lang,res=txt)
                             self.array[realnode].delete_question(question,lang)
                             self.array[node].delete_question(question,lang)
@@ -466,6 +466,7 @@ class Tree:
             return False
         node1=self.array[name1]
         node2=self.array[name2]
+        new_node=self.array[new_name]
         node1.addParent(new_node)
         node2.addParent(new_node)
         new_node.addSon(node1)
