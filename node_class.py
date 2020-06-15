@@ -420,7 +420,7 @@ class Node:
         data={}
         if lang_str in self.JSON_array:
             data[0]=self.JSON_array[lang_str]
-        for elem in parents:
+        for elem in self.parents:
             array=elem.calc_distance(lang_str)
             for num in array:
                 if num+1 not in array:
