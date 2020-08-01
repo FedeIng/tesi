@@ -1,23 +1,135 @@
 from language_class import *
 import json
 import telepot
+import operator
+import hashlib, binascii, os
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 
 class Node:
 
-    def __init__(self,nodeName,array):
+    def __init__(self,nodeName,database,lang_class):
         self.name=nodeName
-        self.JSON_array={}
-        self.JSON_array=array
-        self.parents=[]
-        self.sons=[]
-        self.id_commands={}
-        self.teachers={}
-        self.collaborators={}
-        self.bannedUser=[]
+        self.JSON_array=database.get_questions_array(nodeName)
+        print(self.JSON_array)
+        #self.parents=[]
+        #self.sons=[]
+        self.lang=lang_class
         self.questions={}
-        self.students={}
-        self.hash=""
+        self.hash=database.get_hash(nodeName)
+        self.database=database
+
+    def verify_password(self,provided_password):
+        stored_password=self.hash
+        salt = stored_password[:64]
+        stored_password = stored_password[64:]
+        pwdhash = hashlib.pbkdf2_hmac('sha512', 
+                                    provided_password.encode('utf-8'), 
+                                    salt.encode('ascii'), 
+                                    100000)
+        pwdhash = binascii.hexlify(pwdhash).decode('ascii')
+        return pwdhash == stored_password
+
+    def change_pwd(self,password):
+        self.hash=password
+        self.database.set_new_pwd(self.name,password)
+
+    def set_teach_ids(self,array,topic,lang):
+        self.database.set_teach_ids(array,topic,lang)
+
+    def set_coll_ids(self,array,topic,lang):
+        self.database.set_coll_ids(array,topic,lang)
+
+    def get_topic_name(self):
+        return self.name
+
+    def getJSONArray(self,lang):
+        if lang not in self.JSON_array:
+            return None
+        return self.JSON_array[lang]
+
+    def getResponse(self,txt,lang):
+        if lang in self.JSON_array:
+            if txt in self.JSON_array[lang]:
+                return self.JSON_array[lang][txt]
+        return None
+
+    def normalize_vect(self,vect):
+        array = sorted(vect.items(), key=operator.itemgetter(1), reverse=True)
+        i=0
+        list1=[]
+        for elem in array:
+            if i==4:
+                break
+            for e in elem:
+                list1.append(e)
+                break
+            i+=1
+        return list1
+
+    def getBestResp(self,txt,lang):
+        list1={}
+        for question in self.JSON_array:
+            num=self.lang.calculate_similarity(txt,question,lang)
+            if num>0.8:
+                list1[question]=num
+        return self.normalize_vect(list1)
+
+    def get_bot_teacher(self):
+        return self.database.get_bot_teacher()
+
+    def setQuestion(self,question,lang,chat_id):
+        if lang not in self.JSON_array:
+            self.JSON_array[lang]={}
+        self.JSON_array[lang][question]={}
+        self.JSON_array[lang][question]["ids"]=[chat_id]
+        self.JSON_array[lang][question]["answer"]=""
+        self.database.set_questions_array(self.JSON_array[lang],self.name,lang)
+
+    def getSent(self,lang,txt):
+        print("1")
+        return self.lang.question_sent(lang,txt)
+
+    def checkLangStr(self,txt,string):
+        return self.lang.checkLangStr(txt,string)
+
+    def set_nlp(self,lang):
+        self.lang.set_nlp(lang)
+
+    def get_lang_by_flag(self,flag):
+        return self.lang.get_lang_by_flag(flag)
+
+    def getQArray(self,chat_id,lang):
+        data=[]
+        for elem in self.JSON_array[lang]:
+            if chat_id in self.JSON_array[lang][elem]["ids"]:
+                data.append(elem)
+        return data
+
+    def set_lang_keyboard(self,array):
+        return self.lang.setKeyboard(array)
+
+    def writeData(self):
+        self.database.writeData()
+
+    def write_stud_lang(self,students,lang):
+        self.database.write_stud_lang(self.name,students,lang)
+
+    def get_lang(self):
+        return self.lang
+
+    def get_database(self):
+        return self.database
+
+    def getString(self,lang,string,xxx=None,yyy=None):
+        return self.lang.getString(lang,string,xxx,yyy)
+
+    def get_questions_array(self,array):
+        data={}
+        lang_array=["it","de","en","es","fr"]
+        for lang in lang_array:
+            if lang in array:
+                data[lang]=array[lang]["questions"]
+        return data
 
     def matchArray(self,txt,lang,vett,lang_class):
         print(vett)
@@ -57,8 +169,8 @@ class Node:
     def add_chat_id(self,question,lang,id):
         if lang in self.JSON_array:
             if question in self.JSON_array[lang]:
-                if id not in self.JSON_array[lang][question]["id"]:
-                    self.JSON_array[lang][question]["id"].append(id)
+                if id not in self.JSON_array[lang][question]["ids"]:
+                    self.JSON_array[lang][question]["ids"].append(id)
                 return True
         for p in self.parents:
             if p.add_chat_id(question,lang,id):
@@ -71,14 +183,31 @@ class Node:
     def getstudentID(self):
         return self.id_commands
 
+    def set_formatted_data():
+        data={}
+        data["banned"]=self.bannedUser
+        data["hash"]=self.hash
+        data["token"]=self.token
+        lang_array=["it","de","en","es","fr"]
+        for lang in lang_array:
+            data[lang]={}
+            if lang in self.students:
+                data[lang]["students"]=self.students[lang]
+            if lang in self.teachers:
+                data[lang]["teachers"]=self.teachers[lang]
+            if lang in self.collaborators:
+                data[lang]["collaborators"]=self.collaborators[lang]
+            data[lang]["questions"]=self.JSON_array[lang]
+        self.database.put("/bots/students", name=self.nodeName, data=data)
+
+
     def setBannedUsers(self,lang):
         users={}
         for lang_str in self.JSON_array:
-            array=self.getJSONArray(self,lang,lang_str)
-            for elem in array:
-                if "a" in array[elem]:
-                    if array[elem]["a"]=="BANNED":
-                        for chat_id in array[elem]["id"]:
+            for elem in self.JSON_array[lang_str]:
+                if "answer" in self.JSON_array[lang_str][elem]:
+                    if self.JSON_array[lang_str][elem]["answer"]=="BANNED":
+                        for chat_id in self.JSON_array[lang_str][elem]["ids"]:
                             if chat_id in users:
                                 users[chat_id]+=1
                             else:
@@ -86,19 +215,44 @@ class Node:
         for chat_id in users:
             if users[chat_id]>10:
                 self.bannedUser.append(chat_id)
-        for p in self.parents:
-            p.setBannedUsers(lang)
         
-    def setQID(self,chat_id,txt):
-        self.questions[chat_id]=txt
-
-    def getQID(self,chat_id):
+    def setQID(self,chat_id,from_id,txt):
         if chat_id not in self.questions:
-            return None
-        return self.questions[chat_id]
+            self.questions[chat_id]={}
+        self.questions[chat_id][from_id]=txt
 
-    def delQID(self,chat_id):
-        del self.questions[chat_id]
+    def setResponse(self,lang,question,txt):
+        print("Question : "+question)
+        print("Lang : "+lang)
+        print("Array : "+str(self.JSON_array))
+        if lang not in self.JSON_array:
+            print("2")
+            return None
+        if question not in self.JSON_array[lang]:
+            print("3")
+            return None
+        self.JSON_array[lang][question]["answer"]=txt
+        self.database.set_questions_array(self.JSON_array[lang],self.name,lang)
+        print("4")
+        return question
+
+    def getQID(self,chat_id,from_id):
+        print("Chat_id : "+str(chat_id))
+        print("From_id : "+str(from_id))
+        print("Array : "+str(self.questions))
+        if chat_id not in self.questions:
+            print("1")
+            return None
+        if from_id not in self.questions[chat_id]:
+            print("2")
+            return None
+        print("3")
+        return self.questions[chat_id][from_id]
+
+    def delQID(self,chat_id,from_id):
+        del self.questions[chat_id][from_id]
+        if len(self.questions[chat_id])==0:
+            del self.questions[chat_id]
 
     def getLangTCArray(self):
         data={}
@@ -134,17 +288,16 @@ class Node:
             data+=self.collaborators[lang]
         return data
         
-    def getResArray(self,lang,lang_class,condition):
+    def getResArray(self,lang,condition):
         data=[]
         if lang not in self.JSON_array:
             return data
-        array=self.getJSONArray(self,lang,lang_class)
         for elem in self.JSON_array[lang]:
-            if condition=="FREE" and self.JSON_array[lang][elem]["a"]=='':
+            if condition=="FREE" and self.JSON_array[lang][elem]["answer"]=='':
                 data.append(elem)
-            elif condition=="BANNED" and self.JSON_array[lang][elem]["a"]=="BANNED":
+            elif condition=="BANNED" and self.JSON_array[lang][elem]["answer"]=="BANNED":
                 data.append(elem)
-            elif condition=="ANSWER" and self.JSON_array[lang][elem]["a"]!='' and self.JSON_array[lang][elem]["a"]!="BANNED":
+            elif condition=="ANSWER" and self.JSON_array[lang][elem]["answer"]!='' and self.JSON_array[lang][elem]["answer"]!="BANNED":
                 data.append(elem)
         return data
 
@@ -391,20 +544,6 @@ class Node:
                 data[e_val]=array2[e_val]
         return data
 
-    def getJSONArray(self,lang,lang_str,recursive=True):
-        data={}
-        if not recursive:
-            if lang_str in self.JSON_array:
-                return self.JSON_array[lang_str]
-            else :
-                return data
-        if lang_str in self.JSON_array:
-            data=self.JSON_array[lang_str]
-        for node in self.parents:
-            data=self.mergeArrays(data,node.getJSONArray(lang,lang_str),lang,lang_str)
-        print(self.name,data)
-        return data
-
     def sendNotification(self,lang,lang_str,bot,new=True):
         string=""
         if new:
@@ -429,7 +568,7 @@ class Node:
         return data
     
     def add_response(self,question,lang,txt):
-        self.JSON_array[lang][question]["a"]=txt
+        self.JSON_array[lang][question]["answer"]=txt
         
     def delete_question(self,question,lang):
         del self.JSON_array[lang][question]
@@ -455,8 +594,8 @@ class Node:
         if lang not in self.JSON_array:
             self.JSON_array[lang]={}
         self.JSON_array[lang][txt]={}
-        self.JSON_array[lang][txt]["a"]=res
-        self.JSON_array[lang][txt]["id"]=[]
+        self.JSON_array[lang][txt]["answer"]=res
+        self.JSON_array[lang][txt]["ids"]=[]
         self.JSON_array[lang][txt]["code"]=len(self.JSON_array[lang])
 
     def crossMatch(self,obj,lang,lang_str):
@@ -551,14 +690,20 @@ class Node:
                 return False
         return True
 
-    def getTransArray(self,lang,src,dst):
-        vett=self.getJSONArray(lang,src)
-        vett1=self.getJSONArray(lang,dst)
+    def retQVett(self,lang):
+        vett=[]
+        if lang in self.JSON_array:
+            vett=self.JSON_array[lang]
+        return vett
+
+    def getTransArray(self,src,dst):
+        vett=self.retQVett(src)
+        vett1=self.retQVett(dst)
         array=[]
         for elem in vett:
             string=lang.translate(elem,src,dst)
-            if vett[elem]["a"] != "BANNED" and vett[elem]["a"] != "" and not self.is_in_array(string,vett1,lang,dst):
-                string="\""+string+"\" -> \""+lang.translate(vett[elem]["a"],src,dst)+"\""
+            if vett[elem]["answer"] != "BANNED" and vett[elem]["answer"] != "" and not self.is_in_array(string,vett1,lang,dst):
+                string="\""+string+"\" -> \""+lang.translate(vett[elem]["answer"],src,dst)+"\""
                 array.append(string)
         return array
 

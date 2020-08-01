@@ -2,50 +2,117 @@ from node_class import *
 from language_class import *
 import json
 import telepot
+import operator
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
+from bot_student_class import * 
 
 class Tree:
 
-    def __init__(self,dataName,fileName,langName,authName):
-        self.lang=Language(langName)
-        self.fileName=fileName
+    def __init__(self,database):
+        print(1)
+        self.lang=Language(database)
+        print(2)
         self.array={}
-        self.dataName=dataName
-        self.authName=authName
+        print(3)
         self.num=0
-        data={}
-        with open(fileName,'r') as json_file:
-            data=json.load(json_file)
-        for elem in data:
-            self.createNode(elem)
-            print("Node "+elem+" create")
-        for down in data:
-            for up in data[down]:
-                node1=self.array[down]
-                if up not in self.array:
-                    self.createNode(up)
-                node2=self.array[up]
-                node1.addParent(node2)
-                node2.addSon(node1)
-        with open(authName,'r') as json_file:
-            data=json.load(json_file)
-        for elem in data:
-            self.array[elem].setHash(data[elem]["hash"])
-            for lang in data[elem]:
-                if lang=="hash":
-                    continue
-                if "students" in data[elem][lang]:
-                    self.array[elem].addStudents(data[elem][lang]["students"],lang)
-                if "teachers" in data[elem][lang]:
-                    self.array[elem].addTeachers(data[elem][lang]["teachers"],lang,self.lang)
-                if "collaborators" in data[elem][lang]:
-                    self.array[elem].addCollaborators(data[elem][lang]["collaborators"],lang,self.lang)
-        self.setnum()
-        self.writeAuth()
+        print(4)
+        self.database=database
+        print(5)
+        #with open(fileName,'r') as json_file:
+            #data=json.load(json_file)
+        data=database.get('/bots/students','')
+        print(6)
+        for topic in data:
+            print("Begin bot "+topic)
+            self.array[topic]=Bot_student(database.get_topic_token(topic),topic,database,self.lang)
+            print("Bot "+topic+" created")
+        #for down in data:
+            #for up in data[down]:
+                #node1=self.array[down]
+                #if up not in self.array:
+                    #self.createNode(up)
+                #node2=self.array[up]
+                #node1.addParent(node2)
+                #node2.addSon(node1)
+        #with open(authName,'r') as json_file:
+            #data=json.load(json_file)
+        #for elem in data:
+            #self.array[elem].setHash(data[elem]["hash"])
+            #for lang in data[elem]:
+                #if lang=="hash":
+                    #continue
+                #if "students" in data[elem][lang]:
+                    #self.array[elem].addStudents(data[elem][lang]["students"],lang)
+                #if "teachers" in data[elem][lang]:
+                    #self.array[elem].addTeachers(data[elem][lang]["teachers"],lang,self.lang)
+                #if "collaborators" in data[elem][lang]:
+                    #self.array[elem].addCollaborators(data[elem][lang]["collaborators"],lang,self.lang)
+        #self.setnum()
+        #self.writeData()
+
+    def send_notification(self,bot):
+        for topic in self.array:
+            self.array[topic].send_notification(bot,self.lang)
+
+    def read_ban(self):
+        return self.database.read_ban()
+
+    def get_lang(self):
+        return self.lang
+
+    def get_database(self):
+        return self.database
+
+    def checkLangStr(self,txt,string):
+        return self.lang.checkLangStr(txt,string)
+
+    def getBestResp(self,txt,lang,topic):
+        list1={}
+        JSONarray=self.array[topic].getJSONArray(self.lang,lang)
+        for question in JSONarray:
+            num=self.lang.calculate_similarity(txt,question,lang)
+            if num>0.8:
+                list1[question]=num
+        return self.normalize_vect(list1)
+
+    def normalize_vect(self,vect):
+        array = sorted(vect.items(), key=operator.itemgetter(1), reverse=True)
+        i=0
+        list1=[]
+        for elem in array:
+            if i==4:
+                break
+            for e in elem:
+                list1.append(e)
+                break
+            i+=1
+        return list1
 
     def setnum(self):
         while "STATE"+str(self.num) in self.array:
             self.num+=1
+
+    def delete_bot(self,topic):
+        self.database.del_bot(topic)
+        del self.array[topic]
+
+    def write_pwd(self,array):
+        self.database.write_pwd(array)
+
+    def get_banned_users(self):
+        return self.database.get_banned_users()
+
+    def get_username_by_topic(self,topic):
+        return self.array[topic].get_username()
+
+    def get_creation_keyboard(self,topic):
+        return InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Go to the teacher bot", url="https://t.me/"+self.database.get_bot_teacher().get_bot().getMe()["username"]+"?start=foo")],[InlineKeyboardButton(text="Go to the student "+topic+" bot", url="https://t.me/"+self.get_username_by_topic(topic)+"?start=foo")]])
+
+    def read_pwd(self):
+        return self.database.read_pwd()
+
+    def change_pwd(self,topic,pwd):
+        self.array[topic].change_pwd(pwd)
 
     def sendNotification(self,teacher,student,topic):
         self.array[topic].sendRestartNotify(teacher,student,self.lang)
@@ -53,15 +120,14 @@ class Tree:
     def setChooseLang(self,topic):
         return self.lang.setKeyboard(self.array[topic].getLang(),True)
 
-    def addCollaborators(self,vett,topic,lang,bot):
-        self.array[topic].addCollaborators(vett,lang,self.lang,bot)
-        self.writeAuth()
+    def addCollaborators(self,vett,topic,lang):
+        self.array[topic].addCollaborators(lang,vett)
 
     def getHint(self,topic,lang):
         vett=[]
         for elem in ["it","de","en","es","fr"]:
             if elem != lang:
-                vett+=self.array[topic].getTransArray(self.lang,elem,lang)
+                vett+=self.array[topic].getTransArray(elem,lang)
         return vett
 
     def getstudentID(self):
@@ -72,42 +138,65 @@ class Tree:
                 data[elem]=vett
         return data
 
+    def new_bot(self,token,topic,hash):
+        self.database.new_topic(token,topic,hash)
+        self.array[topic]=Bot_student(token,topic,self.database,self.lang)
+        print("Bot "+topic+" created")
+
+    def get_pwd_admin(self):
+        return self.database.get_pwd_admin()
+
+    def getTokenList(self):
+        list1=[]
+        for topic in self.array:
+            list1.append(self.array[topic].get_token())
+        return list1
+
+    def get_topic_list(self):
+        list1=[]
+        for topic in self.array:
+            list1.append(topic)
+        return list1
+
+    def get_flag_list(self):
+        return self.lang.get_flag_list()
+
+    def switcherflag(self,flag):
+        return self.lang.get_lang_by_flag(flag)
+
     def setstudentID(self,vett):
         for elem in vett:
             self.array[elem].setstudentID(vett[elem])
 
-    def add_question_by_hint(self,lang,question,response,chat_id,topic):
+    def verify_password(self,topic,password):
+        return self.array[topic].verify_password(password)
+
+    def add_question_by_hint(self,lang,question,response,chat_id,from_id,topic):
         self.setQuestion(question,lang,topic,chat_id)
-        self.setQID(chat_id,question,topic)
+        self.setQID(chat_id,from_id,question,topic)
         self.setRes(chat_id,response,lang,topic)
 
-    def deleteTC(self,chat_id,bot):
-        for elem in self.array:
-            self.array[elem].delTeachers([chat_id],self.lang,bot)
-            self.array[elem].delCollaborators([chat_id],self.lang,bot)
-        self.writeAuth()
+    def topicKeyboard(self):
+        return createReplyKeyboard(array_to_matrix(self.get_topic_list()))
 
-    def addTeachers(self,vett,topic,lang,bot):
-        self.array[topic].addTeachers(vett,lang,self.lang,bot)
-        self.writeAuth()
+    def deleteTC(self,chat_id,topic):
+        self.array[topic].delTeachers([chat_id])
+        self.array[topic].delCollaborators([chat_id])
 
-    def writeAuth(self):
-        data={}
-        for elem in self.array:
-            data[elem]=self.array[elem].retStruct()
-        with open(self.authName,"w") as jfile:
-            json.dump(data,jfile)
+    def addTeachers(self,vett,topic,lang):
+        self.array[topic].addTeachers(lang,vett)
+
+    def get_bot_by_topic(self,topic):
+        return self.array[topic].get_bot()
+
+    def get_bot_pwd(self):
+        return self.database.get_bot_pwd().get_bot()
 
     def getIdsArray(self,topic,lang,txt):
-        array=self.array[topic].getJSONArray(self.lang,lang)
-        return array[txt]["id"]
-
-    def writeNode(self):
-        data={}
-        for elem in self.array:
-            data[elem]=self.array[elem].getArrays()[0]
-        with open(self.fileName,"w") as jfile:
-            json.dump(data,jfile)
+        array=self.array[topic].getJSONArray(lang)
+        print(array)
+        print(array[txt])
+        return array[txt]["ids"]
 
     def addAdmins(self,lang,vett):
         self.lang.addAdmins(lang,vett)
@@ -117,10 +206,10 @@ class Tree:
 
     def setHash(self,topic,hash):
         self.array[topic].setHash(hash)
-        self.writeAuth()
+        self.writeData()
 
-    def setQID(self,chat_id,txt,topic):
-        self.array[topic].setQID(chat_id,txt)
+    def setQID(self,chat_id,from_id,txt,topic):
+        self.array[topic].setQID(chat_id,from_id,txt)
 
     def gethashlist(self):
         hashlist=[]
@@ -138,7 +227,7 @@ class Tree:
         val1=0
         for elem in vett:
             num=self.lang.calculate_similarity(question,elem,lang)
-            num1=self.lang.calculate_similarity(txt,vett[elem]["a"],lang)
+            num1=self.lang.calculate_similarity(txt,vett[elem]["answer"],lang)
             if (num+num1)/2 > (val+val1)/2:
                 val=num
                 val1=num1
@@ -196,86 +285,50 @@ class Tree:
             self.array[node1].addJSON(self.array[node2],self.lang)
             del self.array[node2]
 
+    def getQArray(self,chat_id,lang,topic):
+        list_q=self.array[topic].getJSONArray(self.lang,lang,True)
+        list_u=[]
+        for elem in list_q:
+            if chat_id in list_q[elem]["id"]:
+                list_u.append(elem)
+        return list_u
 
-    def setRes(self,chat_id,txt,lang,topic):
-        question=self.array[topic].getQID(chat_id)
-        free=True
-        if question==None:
-            return None
-        realnode,realQ=self.array[topic].getrealnode(lang,question,self.lang)
-        if realnode==None or realQ==None:
-            return None
-        Anc=self.array[realnode].getAncestors()
-        Heirs=self.array[realnode].getHeirs()
-        for node in self.array:
-            if node==topic:
-                continue
-            if self.array[node] in Anc:
-                elem=self.contains(self.array[node],question,txt,lang)
-                if elem != None:
-                    self.array[node].add_question(elem,lang,res=txt)
-                    self.array[realnode].delete_question(realQ,lang)
-                    free=False
-            elif self.array[node] in Heirs:
-                elem=self.contains(self.array[node],question,txt,lang)
-                if elem != None:
-                    self.array[realnode].add_question(realQ,lang,res=txt)
-                    self.array[node].delete_question(elem,lang)
-                    free=False
-            else:
-                elem=self.contains(self.array[node],question,txt,lang)
-                if elem != None:
-                    free=False
-                    node1, var_bool=self.state_exist(realnode,node)
-                    if var_bool:
-                        self.array[node1].add_question(question,lang,res=txt)
-                        self.array[realnode].delete_question(question,lang)
-                        self.array[node].delete_question(question,lang)
-                    else:
-                        new_name="STATE"+str(self.num)
-                        self.num+=1
-                        if self.addNode(topic,node.getName(),new_name):
-                            self.array[new_name].add_question(question,lang,res=txt)
-                            self.array[realnode].delete_question(question,lang)
-                            self.array[node].delete_question(question,lang)
-                        self.normalizeTree(realnode,node)
-        if free:
-            self.array[realnode].add_response(question,lang,txt)
-        self.array[topic].delQID(chat_id)
-        self.writeNode()
-        self.writeAuth()
-        self.writeData()
-        return question
+    def getQID(self,chat_id,from_id,topic):
+        return self.array[topic].getQID(chat_id,from_id)
+    
+    def delQID(self,chat_id,from_id,topic):
+        self.array[topic].delQID(chat_id,from_id)
+
+    def setRes(self,chat_id,from_id,txt,lang,topic):
+        question=self.array[topic].getQID(chat_id,from_id)
+        if question != None:
+            print("1")
+            return self.array[topic].setResponse(lang,question,txt)
+        print("0")
+        return None
 
     def setBan(self,txt,lang,topic):
-        nodes=self.array[topic].getAncestors()
-        for node in nodes:
-            jarray=node.getJSONArray(self.lang,lang,False)
-            for elem in jarray:
-                e=self.matchArray1(txt,lang,jarray)
-                if e != None:
-                    if jarray[e]["a"]=="":
-                        node.add_response(e,lang,"BANNED")
+        jarray=self.array[topic].getJSONArray(lang)
+        for elem in jarray:
+            e=self.matchArray1(txt,lang,jarray)
+            if e != None:
+                if jarray[e]["answer"]=="":
+                    self.array[topic].setResponse(lang,e,"BANNED")
         self.array[topic].setBannedUsers(self.lang)
-        self.writeData()
+        #self.writeData()
 
     def setSban(self,txt,lang,topic):
-        nodes=self.array[topic].getAncestors()
-        for node in nodes:
-            jarray=node.getJSONArray(self.lang,lang,False)
-            for elem in jarray:
-                e=self.matchArray1(txt,lang,jarray)
-                if e != None:
-                    if jarray[e]["a"]=="BANNED":
-                        node.add_response(e,lang,"")
+        jarray=self.array[topic].getJSONArray(lang)
+        for elem in jarray:
+            e=self.matchArray1(txt,lang,jarray)
+            if e != None:
+                if jarray[e]["answer"]=="BANNED":
+                    self.array[topic].setResponse(lang,e,"")
         self.array[topic].setBannedUsers(self.lang)
-        self.writeData()
+        #self.writeData()
 
     def set_nlp(self,lang):
         self.lang.set_nlp(lang)
-    
-    def del_nlp(self):
-        self.lang.del_nlp()
 
     def setLangResp(self,id,lang,bot):
         self.lang.setLangResp(id,lang,bot)
@@ -284,7 +337,7 @@ class Tree:
         return self.array[topic].add_id(from_id,chat_id,num)
 
     def getResArray(self,topic,lang,condition):
-        return self.array[topic].getResArray(lang,self.lang,condition)
+        return self.array[topic].getResArray(lang,condition)
 
     def check_id(self,from_id,chat_id,topic):
         return self.array[topic].check_id(from_id,chat_id)
@@ -320,7 +373,7 @@ class Tree:
         e=''
         val=0
         for elem in vett:
-            num=self.lang.calculate_similarity(txt,elem,lang)
+            num=self.calculate_similarity(txt,elem,lang)
             if num > val:
                 val=num
                 e=elem
@@ -346,15 +399,8 @@ class Tree:
             return None
 
     def writeData(self):
-        vett={}
         for elem in self.array:
-            vett[elem]={}
-            for lang in ["it","de","en","es","fr"]:
-                data=self.array[elem].getJSONArray(self.lang,lang,False)
-                if len(data)>0:
-                    vett[elem][lang]=data
-        with open(self.dataName,"w") as jfile:
-            json.dump(vett,jfile)
+            self.array[elem].set_formatted_data()
 
     def setQuestion(self,txt,lang,topic,chat_id):
         self.array[topic].add_question(txt,lang)
@@ -362,7 +408,7 @@ class Tree:
         self.writeData()
 
     def getResponse(self,txt,lang,topic,chat_id=None):
-        JSONarray=self.array[topic].getJSONArray(self.lang,lang)
+        JSONarray=self.array[topic].getJSONArray(lang)
         val=0
         q=""
         for question in JSONarray:
@@ -374,7 +420,7 @@ class Tree:
             if chat_id != None:
                 self.array[topic].add_chat_id(q,lang,chat_id)
                 self.writeData()
-            return JSONarray[q]["a"]
+            return JSONarray[q]["answer"]
         else:
             return None
 
@@ -406,7 +452,7 @@ class Tree:
 
     def setUserLang(self,id,lang,topic):
         self.array[topic].addStudents([id],lang)
-        self.writeAuth()
+        self.writeData()
 
     def getString(self, lang, string, xxx=None, yyy=None):
         return self.lang.getString(lang,string,xxx,yyy)
@@ -433,8 +479,6 @@ class Tree:
                 del self.array[parent]
         del self.array[name]
         self.writeData()
-        self.writeNode()
-        self.writeAuth()
 
     def checkColl(self,lang,text):
         return self.lang.checkColl(lang,text)
@@ -455,8 +499,6 @@ class Tree:
         self.array[new_name]=new_node
         if w:
             self.writeData()
-            self.writeNode()
-            self.writeAuth()
         return True
 
     def addNode(self,name1,name2,new_name):
@@ -472,8 +514,6 @@ class Tree:
         new_node.addSon(node1)
         new_node.addSon(node2)
         self.writeData()
-        self.writeNode()
-        self.writeAuth()
         return True
 
     def mergeNode(self,name1,name2):

@@ -11,6 +11,10 @@ from telepot.loop import MessageLoop
 from tree_class import *
 from urllib.request import urlopen
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
+from firebase import firebase
+from database_class import *
+
+database = Database()
 admin_pwd=None
 bot_pwd=None
 lang_bool={}
@@ -29,14 +33,14 @@ bot_admin=None
 bot_teacher=None
 bot_getlink=None
 bot_student={}
-tree=Tree("data.txt","nodes.txt","lang.txt","auth.txt")
+tree=Tree(database)
 bots_info={}
 flag_list=["\U0001F1EE\U0001F1F9 IT \U0001F1EE\U0001F1F9","\U0001F1E9\U0001F1EA DE \U0001F1E9\U0001F1EA","\U0001F1EB\U0001F1F7 FR \U0001F1EB\U0001F1F7","\U0001F1EC\U0001F1E7 EN \U0001F1EC\U0001F1E7","\U0001F1EA\U0001F1F8 ES \U0001F1EA\U0001F1F8"]
 id_command={}
 id_creation={}
 unconfirmed_bot={}
 unc_del={}
-key_st = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/question", callback_data='q')],[InlineKeyboardButton(text="/report", callback_data='r')],[InlineKeyboardButton(text="/start", callback_data='s')],[InlineKeyboardButton(text="/revision", callback_data='rv')],[InlineKeyboardButton(text="/change_lang", callback_data='cl')]])
+key_st = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/list", callback_data='l')],[InlineKeyboardButton(text="/question", callback_data='q')],[InlineKeyboardButton(text="/report", callback_data='r')],[InlineKeyboardButton(text="/start", callback_data='s')],[InlineKeyboardButton(text="/revision", callback_data='rv')],[InlineKeyboardButton(text="/change_lang", callback_data='cl')]])
 key_te = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/answer", callback_data='a')],[InlineKeyboardButton(text="/report", callback_data='r')],[InlineKeyboardButton(text="/start", callback_data='s')],[InlineKeyboardButton(text="/list", callback_data='l')],[InlineKeyboardButton(text="/free_list", callback_data='fl')],[InlineKeyboardButton(text="/ban", callback_data='b')],[InlineKeyboardButton(text="/ban_list", callback_data='bl')],[InlineKeyboardButton(text="/sban", callback_data='sb')],[InlineKeyboardButton(text="/change", callback_data='c')],[InlineKeyboardButton(text="/delete", callback_data='d')],[InlineKeyboardButton(text="/hints", callback_data='h')],[InlineKeyboardButton(text="/add_hint", callback_data='ah')]])
 key_cr = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/new_bot", callback_data='n')],[InlineKeyboardButton(text="/delete_bot", callback_data='d')],[InlineKeyboardButton(text="/start", callback_data='s')],[InlineKeyboardButton(text="/change_pwd", callback_data='c')]])
 i=0
@@ -54,13 +58,25 @@ def sendNotification():
 
 def write_ban():
     global banned_user
-    with open("ban.txt","w") as jfile:
-        json.dump(banned_user,jfile)
+    global database
+    data={}
+    for elem in banned_user:
+        data[str(elem)]=banned_user[elem]
+    result=database.put('/bots/teachers', name="banned", data=data)
+    print(result)
+    #with open("ban.txt","w") as jfile:
+        #json.dump(banned_user,jfile)
         
 def read_ban():
     global banned_user
-    with open("ban.txt","r") as json_file:
-        banned_user=json.load(json_file)
+    global database
+    #with open("ban.txt","r") as json_file:
+        #banned_user=json.load(json_file)
+    result=database.get('/bots/teachers/banned','')
+    data={}
+    for elem in result:
+        data[int(elem)]=result[elem]
+    banned_user=data
 
 def matrix_to_key(matrix):
     data=[]
@@ -83,40 +99,39 @@ def createReplyKeyboard(matrix,only_one=True):
 
 def write_bug():
     global bug_array
-    data={}
-    for elem in bug_array:
-        if len(bug_array[elem])>0:
-            data[elem]={}
-            if "student" in bug_array[elem]:
-                if len(bug_array[elem]["student"])>0:
-                    data[elem]["student"]={}
-                    for e in bug_array[elem]["student"]:
-                        data[elem]["student"][e]=bug_array[elem]["student"][e].isoformat()
-            if "teacher" in bug_array[elem]:
-                if len(bug_array[elem]["teacher"])>0:
-                    data[elem]["teacher"]={}
-                    for e in bug_array[elem]["teacher"]:
-                        data[elem]["teacher"][e]=bug_array[elem]["teacher"][e].isoformat()
-    with open("bug.txt","w") as jfile:
-        json.dump(data,jfile)
+    global database
+    global lang_array
+    role_array=["students","teachers"]
+    for lang in bug_array:
+        for role in bug_array[lang]:
+            data={}
+            for e in bug_array[elem][role]:
+                data[e]=bug_array[lang][role][e].isoformat()
+            if len(data)>0:
+                result=database.put('/bots/admin/'+lang, name=role, data=data)
+    #with open("bug.txt","w") as jfile:
+        #json.dump(data,jfile)
 
 def read_bug():
     global bug_array
+    global database
+    global lang_array
+    role_array=["students","teachers"]
     data={}
-    with open("bug.txt","r") as json_file:
-        data=json.load(json_file)
-    for elem in data:
-        bug_array[elem]={}
-        if "student" in data[elem]:
-            bug_array[elem]["student"]={}
-            for e in data[elem]["student"]:
-                date=datetime.datetime.fromisoformat(data[elem]["student"][e])
-                bug_array[elem]["student"][e]=date
-        if "teacher" in data[elem]:
-            bug_array[elem]["teacher"]={}
-            for e in data[elem]["teacher"]:
-                date=datetime.datetime.fromisoformat(data[elem]["teacher"][e])
-                bug_array[elem]["teacher"][e]=date
+    #with open("bug.txt","r") as json_file:
+        #data=json.load(json_file)
+    for lang in lang_array:
+        for role in role_array:
+            result=database.get('/bots/admin/'+lang+'/'+role+'','')
+            if result!=None:
+                if lang not in data:
+                    data[lang]={}
+                if role not in data[lang]:
+                    data[lang][role]={}
+                for e in data[lang][role]:
+                    date=datetime.datetime.fromisoformat(data[elem][role][e])
+                    data[lang][role][e]=date
+    bug_array=data
 
 def write_pwd():
     global user_request
@@ -126,20 +141,24 @@ def write_pwd():
             data[str(elem)]=[]
             for e in user_request[elem]:
                 data[str(elem)].append(e.isoformat())
-    with open("pwd.txt","w") as jfile:
-        json.dump(data,jfile)
+    result=database.put('/bots/pwd',name='requests',data=data)
+    #with open("pwd.txt","w") as jfile:
+        #json.dump(data,jfile)
 
 def read_pwd():
     global user_request
+    global database
     data={}
-    with open("pwd.txt","r") as json_file:
-        data=json.load(json_file)
-    for elem in data:
-        user_request[int(elem)]=[]
-        for e in data[elem]:
+    #with open("pwd.txt","r") as json_file:
+        #data=json.load(json_file)
+    result=database.get('/bots/pwd/requests','')
+    for elem in result:
+        data[int(elem)]=[]
+        for e in result[elem]:
             print(e)
             date=datetime.datetime.fromisoformat(e)
-            user_request[int(elem)].append(date)
+            data[int(elem)].append(date)
+    user_request=data
 
 def delete_req(time,vett):
     data=[]
@@ -220,7 +239,7 @@ def case1(chat_id,from_id,txt,lang,topic,chat_type):
     user=bot_teacher.getChat(from_id)
     res=tree.getResponse(txt,lang,topic)
     if res!=None:
-        tree.setQID(chat_id,txt,topic)
+        tree.setQID(chat_id,from_id,txt,topic)
         bot_teacher.sendMessage(chat_id,tagGroup(chat_type,user)+tree.getString(lang,"answer",xxx=txt),reply_markup=ReplyKeyboardRemove(selective=True))
         add_id(from_id,chat_id,4)
     else:
@@ -240,7 +259,7 @@ def case3(chat_id,from_id,txt,lang,topic,chat_type):
 def case4(chat_id,from_id,txt,lang,topic,chat_type):
     global tree
     user=bot_teacher.getChat(from_id)
-    question=tree.setRes(chat_id,txt,lang,topic)
+    question=tree.setRes(chat_id,from_id,txt,lang,topic)
     if question==None:
         return
     topic_id=getIdByTopic(topic)
@@ -265,7 +284,7 @@ def case6(chat_id,from_id,txt,lang,topic,chat_type):
     global tree
     user=bot_teacher.getChat(from_id)
     splitted=txt[1:-1].split("\" -> \"")
-    tree.add_question_by_hint(lang,splitted[0],splitted[1],chat_id,topic)
+    tree.add_question_by_hint(lang,splitted[0],splitted[1],chat_id,from_id,topic)
     bot_teacher.sendMessage(chat_id,tagGroup(chat_type,user)+tree.getString(lang,"answer_q",xxx=splitted[0],yyy=splitted[1]),reply_markup=ReplyKeyboardRemove(selective=True))
     del_id(from_id,chat_id)
 
@@ -414,7 +433,6 @@ def switch_teacher(chat_id,from_id,txt,lang,topic,chat_type):
         case5(chat_id,from_id,txt,lang,topic,chat_type)
     elif check_id(from_id,chat_id)==6:
         case6(chat_id,from_id,txt,lang,topic,chat_type)
-    tree.del_nlp()
 
 def teacher_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
@@ -651,21 +669,27 @@ def set_lang(chat_id,from_id,topic,lang,bot,chat_type):
 def match_speech(chat_id,from_id,txt,lang,bot_id,chat_type):
     global bot_student
     global tree
+    is_new=tree.checkLangStr(txt,"new_q")
+    if not is_new:
+        tree.setQID(chat_id,from_id,txt,bot_student[bot_id]["topic"])
     user=bot_student[bot_id]["bot"].getChat(from_id)
-    for elem in tree.getSent(lang,txt):
+    elem=tree.getQID(chat_id,from_id,bot_student[bot_id]["topic"])
+    response=None
+    if not is_new:
         response=tree.getResponse(elem,lang,bot_student[bot_id]["topic"],chat_id)
-        if response == None:
-            tree.setQuestion(elem,lang,bot_student[bot_id]["topic"],chat_id)
-            bot_student[bot_id]["bot"].sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"q_not_found",xxx=elem),reply_markup=ReplyKeyboardRemove(selective=True))
-            teacher_array=tree.getResID(lang,bot_student[bot_id]["topic"])
-            for teacher_id in teacher_array:
-                bot_teacher.sendMessage(teacher_id, tree.getString(lang,"revision",xxx=elem),reply_markup=ReplyKeyboardRemove(selective=True))
-        elif response == "BANNED":
-            bot_student[bot_id]["bot"].sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"banned_q",xxx=elem),reply_markup=ReplyKeyboardRemove(selective=True))
-        elif response == "":
-            bot_student[bot_id]["bot"].sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"wait_q",xxx=elem),reply_markup=ReplyKeyboardRemove(selective=True))
-        else:
-            bot_student[bot_id]["bot"].sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"answer_q",xxx=elem,yyy=response),reply_markup=ReplyKeyboardRemove(selective=True))
+    if response == None:
+        tree.setQuestion(elem,lang,bot_student[bot_id]["topic"],chat_id)
+        bot_student[bot_id]["bot"].sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"q_not_found",xxx=elem),reply_markup=ReplyKeyboardRemove(selective=True))
+        teacher_array=tree.getResID(lang,bot_student[bot_id]["topic"])
+        for teacher_id in teacher_array:
+            bot_teacher.sendMessage(teacher_id, tree.getString(lang,"revision",xxx=elem),reply_markup=ReplyKeyboardRemove(selective=True))
+    elif response == "BANNED":
+        bot_student[bot_id]["bot"].sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"banned_q",xxx=elem),reply_markup=ReplyKeyboardRemove(selective=True))
+    elif response == "":
+        bot_student[bot_id]["bot"].sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"wait_q",xxx=elem),reply_markup=ReplyKeyboardRemove(selective=True))
+    else:
+        bot_student[bot_id]["bot"].sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"answer_q",xxx=elem,yyy=response),reply_markup=ReplyKeyboardRemove(selective=True))
+    tree.delQID(chat_id,from_id,bot_student[bot_id]["topic"])
 
 def final_set(chat_id,from_id,txt,lang,bot_id,chat_type):
     global switcher
@@ -675,19 +699,58 @@ def final_set(chat_id,from_id,txt,lang,bot_id,chat_type):
     tree.setUserLang(chat_id,set_lang,bot_student[bot_id]["topic"])
     bot_student[bot_id]["bot"].sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(set_lang,"setted_lang"),reply_markup=ReplyKeyboardRemove(selective=True))
 
+def sel_question(chat_id,from_id,txt,lang,bot_id,chat_type):
+    global tree
+    list_val=tree.getSent(lang,txt)
+    user=bot_student[bot_id]["bot"].getChat(from_id)
+    if len(list_val)!=1:
+        bot_student[bot_id]["bot"].sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"error_q"),reply_markup=ReplyKeyboardRemove(selective=True))
+        tree.del_id(from_id,chat_id,bot_student[bot_id]["topic"])
+        return
+    txt=list_val[0]
+    BRes=tree.getBestResp(txt,lang,bot_student[bot_id]["topic"])
+    tree.setQID(chat_id,from_id,txt,bot_student[bot_id]["topic"])
+    if BRes==[]:
+        match_speech(chat_id,from_id,tree.getString(lang,"new_q"),lang,bot_id,chat_type)
+        tree.del_id(from_id,chat_id,bot_student[bot_id]["topic"])
+    elif txt in BRes:
+        match_speech(chat_id,from_id,txt,lang,bot_id,chat_type)
+        tree.del_id(from_id,chat_id,bot_student[bot_id]["topic"])
+    else:
+        BRes.append(tree.getString(lang,"new_q"))
+        bot_student[bot_id]["bot"].sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"select_q"),reply_markup=createReplyKeyboard(array_to_matrix(BRes)))
+        tree.add_id(from_id,chat_id,1,bot_student[bot_id]["topic"])
+
 def switch_student(chat_id,from_id,txt,lang,bot_id,chat_type):
     global tree
     tree.set_nlp(lang)
     if tree.check_id(from_id,chat_id,bot_student[bot_id]["topic"])==1:
         match_speech(chat_id,from_id,txt,lang,bot_id,chat_type)
+        tree.del_id(from_id,chat_id,bot_student[bot_id]["topic"])
     elif tree.check_id(from_id,chat_id,bot_student[bot_id]["topic"])==2:
         seg_bug(chat_id,from_id,txt,lang,chat_type,bot_id)
+        tree.del_id(from_id,chat_id,bot_student[bot_id]["topic"])
     elif tree.check_id(from_id,chat_id,bot_student[bot_id]["topic"])==3:
         seg_rev(chat_id,from_id,txt,lang,bot_id,chat_type)
+        tree.del_id(from_id,chat_id,bot_student[bot_id]["topic"])
     elif tree.check_id(from_id,chat_id,bot_student[bot_id]["topic"])==4:
         final_set(chat_id,from_id,txt,lang,bot_id,chat_type)
-    tree.del_id(from_id,chat_id,bot_student[bot_id]["topic"])
-    tree.del_nlp()
+        tree.del_id(from_id,chat_id,bot_student[bot_id]["topic"])
+    elif tree.check_id(from_id,chat_id,bot_student[bot_id]["topic"])==5:
+        sel_question(chat_id,from_id,txt,lang,bot_id,chat_type)
+
+def list_by_user(chat_id,from_id,lang,bot_id,chat_type):
+    list1=[]
+    bot=None
+    global bot_student
+    global tree
+    bot=bot_student[bot_id]["bot"]
+    user=bot.getChat(from_id)
+    list1=tree.getQArray(chat_id,lang,bot_student[bot_id]["topic"])
+    if list1 ==[] :
+        bot.sendMessage(chat_id,tagGroup(chat_type,user)+tree.getString(lang,"empty"),reply_markup=ReplyKeyboardRemove(selective=True))
+    else :
+        bot.sendMessage(chat_id,tagGroup(chat_type,user)+list_to_str(list1),reply_markup=ReplyKeyboardRemove(selective=True))
 
 def student_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
@@ -704,9 +767,10 @@ def student_query(msg):
     elif query_data=='s':
         bot_student[bot_id]["bot"].sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"start",xxx=bot_student[bot_id]["topic"]), reply_markup=ReplyKeyboardRemove(selective=True))
         bot_student[bot_id]["bot"].sendMessage(chat_id, tree.getString(lang,"command"), reply_markup=key_st)
+        tree.del_id(from_id,chat_id,bot_student[bot_id]["topic"])
     elif query_data=='q':
         bot_student[bot_id]["bot"].sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"question"),reply_markup=ReplyKeyboardRemove(selective=True))
-        tree.add_id(from_id,chat_id,1,bot_student[bot_id]["topic"])
+        tree.add_id(from_id,chat_id,5,bot_student[bot_id]["topic"])
     elif query_data=='r':
         bot_student[bot_id]["bot"].sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"report"),reply_markup=ReplyKeyboardRemove(selective=True))
         tree.add_id(from_id,chat_id,2,bot_student[bot_id]["topic"])
@@ -716,6 +780,9 @@ def student_query(msg):
     elif query_data=='cl':
         set_lang(chat_id,from_id,bot_student[bot_id]["topic"],lang,bot_student[bot_id]["bot"],chat_type)
         tree.add_id(from_id,chat_id,4,bot_student[bot_id]["topic"])
+    elif query_data=='l':
+        list_by_user(chat_id,from_id,lang,bot_id,chat_type)
+        tree.del_id(from_id,chat_id,bot_student[bot_id]["topic"])
 
 def student_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
@@ -735,9 +802,10 @@ def student_message(msg):
         elif tree.matchCommand(chat_id,'/start',msg,bot_student[bot.getMe()["id"]],lang):
             bot.sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"start",xxx=bot_student[bot.getMe()["id"]]["topic"]), reply_markup=ReplyKeyboardRemove(selective=True))
             bot.sendMessage(chat_id, tree.getString(lang,"command"), reply_markup=key_st)
+            tree.del_id(from_id,chat_id,bot_student[bot.getMe()["id"]]["topic"])
         elif tree.matchCommand(chat_id,'/question',msg,bot_student[bot.getMe()["id"]],lang):
             bot.sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"question"),reply_markup=ReplyKeyboardRemove(selective=True))
-            tree.add_id(from_id,chat_id,1,bot_student[bot.getMe()["id"]]["topic"])
+            tree.add_id(from_id,chat_id,5,bot_student[bot.getMe()["id"]]["topic"])
         elif tree.matchCommand(chat_id,'/report',msg,bot_student[bot.getMe()["id"]],lang):
             bot.sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"report"),reply_markup=ReplyKeyboardRemove(selective=True))
             tree.add_id(from_id,chat_id,2,bot_student[bot.getMe()["id"]]["topic"])
@@ -747,7 +815,10 @@ def student_message(msg):
         elif tree.matchCommand(chat_id,'/change_lang',msg,bot_student[bot.getMe()["id"]],lang):
             set_lang(chat_id,from_id,bot_student[bot.getMe()["id"]]["topic"],lang,bot_student[bot.getMe()["id"]]["bot"],chat_type)
             tree.add_id(from_id,chat_id,4,bot_student[bot.getMe()["id"]]["topic"])
-        elif tree.check_id(from_id,chat_id,bot_student[bot.getMe()["id"]]["topic"]) != 0:
+        elif tree.matchCommand(chat_id,'/list',msg,bot_student[bot.getMe()["id"]],lang):
+            list_by_user(from_id,chat_id,lang,bot.getMe()["id"],chat_type)
+            tree.del_id(from_id,chat_id,bot_student[bot.getMe()["id"]]["topic"])
+        elif tree.check_id(chat_id,from_id,bot_student[bot.getMe()["id"]]["topic"]) != 0:
             switch_student(chat_id,from_id,msg["text"],lang,bot.getMe()["id"],chat_type)
 
 def create_hash(chat_id,pwd,topic=None):
@@ -813,12 +884,13 @@ def empty(msg):
     return
 
 def write_bot(chat_id):
-    data={}
-    with open("tokens.txt","r") as jfile:
-        data=json.load(jfile)
-    data["student"][unconfirmed_bot[chat_id]["topic"]]=unconfirmed_bot[chat_id]["token"]
-    with open("tokens.txt","w") as jfile:
-        json.dump(data,jfile)
+    result=database.put('/bots/students/'+unconfirmed_bot[chat_id]["topic"],name='token',data=unconfirmed_bot[chat_id]["token"])
+    #data={}
+    #with open("tokens.txt","r") as jfile:
+        #data=json.load(jfile)
+    #data["student"][unconfirmed_bot[chat_id]["topic"]]=unconfirmed_bot[chat_id]["token"]
+    #with open("tokens.txt","w") as jfile:
+        #json.dump(data,jfile)
 
 def delPastCreation(chat_id):
     global unconfirmed_bot
@@ -847,12 +919,13 @@ def select_topic(chat_id,text):
     id_creation[chat_id]=2
 
 def write_del_bot(topic):
-    data={}
-    with open("tokens.txt","r") as jfile:
-        data=json.load(jfile)
-    del data["student"][topic]
-    with open("tokens.txt","w") as jfile:
-        json.dump(data,jfile)
+    result=database.delete('/bots/students/'+topic,'token')
+    #data={}
+    #with open("tokens.txt","r") as jfile:
+        #data=json.load(jfile)
+    #del data["student"][topic]
+    #with open("tokens.txt","w") as jfile:
+        #json.dump(data,jfile)
 
 def getIdByTopic(txt):
     global bot_student
@@ -1028,6 +1101,26 @@ def link_message(msg):
         if msg["text"]=='/start':
             bot_getlink.sendMessage(chat_id,"Select a bot:",reply_markup=createUrlInlineQuery())
 
+def read_tokens():
+    global database
+    global lang_array
+    data={}
+    data["teacher"]=database.get('/bots/teachers/token','')
+    stud_dict=database.get('/bots/students','')
+    data["student"]={}
+    for elem in stud_dict:
+        data["student"][elem]=stud_dict[elem]["token"]
+    data["admin"]={}
+    data["admin"]["token"]=database.get('/bots/admin/token','')
+    for lang in lang_array:
+        data["admin"][lang]=database.get('/bots/admin/'+lang+'/ids','')
+    data["creation"]=database.get('/bots/creation','')
+    data["getlink"]=database.get('/bots/getlink','')
+    data["pwd"]={}
+    data["pwd"]["bot"]=database.get('/bots/pwd/bot','')
+    data["pwd"]["admin"]=database.get('/bots/pwd/admin','')
+    return data
+
 def initialize():
     global bot_admin
     global bot_student
@@ -1039,46 +1132,46 @@ def initialize():
     global bot_pwd
     global user_request
     global tokens
-    read_bug()
-    read_pwd()
-    read_ban()
-    with open("tokens.txt","r") as jfile:
-        data={}
-        data=json.load(jfile)
-        bot_admin=telepot.Bot(data["admin"]["token"])
-        tokens.append(data["admin"]["token"])
-        bot_admin.message_loop({'chat':empty,'callback_query':empty})
-        print("admin: "+str(bot_admin.getMe()["id"]))
-        for lang in lang_array:
-            tree.addAdmins(lang,data["admin"][lang])
-        bot_teacher=telepot.Bot(data["teacher"])
-        tokens.append(data["teacher"])
-        bot_teacher.message_loop({'chat':teacher_message,'callback_query':teacher_query})
-        print("teacher: "+str(bot_teacher.getMe()["id"]))
-        bot_creation=telepot.Bot(data["creation"])
-        tokens.append(data["creation"])
-        bot_creation.message_loop({'chat':creation_message,'callback_query':creation_query})
-        print("creation: "+str(bot_creation.getMe()["id"]))
-        bot_getlink=telepot.Bot(data["getlink"])
-        tokens.append(data["getlink"])
-        bot_getlink.message_loop({'chat':link_message,'callback_query':empty})
-        print("link: "+str(bot_creation.getMe()["id"]))
-        admin_pwd=int(data["pwd"]["admin"])
-        bot_pwd=telepot.Bot(data["pwd"]["bot"])
-        tokens.append(data["pwd"]["bot"])
-        bot_pwd.message_loop({'chat':empty,'callback_query':empty})
-        print("pwd: "+str(bot_pwd.getMe()["id"]))
-        for elem in data["student"]:
-            bot=None
-            bot=telepot.Bot(data["student"][elem])
-            bot_id=bot.getMe()['id']
-            bot_student[bot_id]={}
-            bot_student[bot_id]["bot"]=bot
-            bot_student[bot_id]["topic"]=elem
-            bot_student[bot_id]["token"]=data["student"][elem]
-            bot_student[bot_id]["bot"].message_loop({'chat':student_message,'callback_query':student_query})
-        sendNotification()
-        print(type(bot_student))
+    global bug_array
+    bug_array=database.read_bug()
+    user_request=database.read_pwd()
+    banned_user=database.read_ban()
+    data={}
+    data=read_tokens()
+    bot_admin=telepot.Bot(data["admin"]["token"])
+    tokens.append(data["admin"]["token"])
+    bot_admin.message_loop({'chat':empty,'callback_query':empty})
+    print("admin: "+str(bot_admin.getMe()["id"]))
+    for lang in lang_array:
+        tree.addAdmins(lang,data["admin"][lang])
+    bot_teacher=telepot.Bot(data["teacher"])
+    tokens.append(data["teacher"])
+    bot_teacher.message_loop({'chat':teacher_message,'callback_query':teacher_query})
+    print("teacher: "+str(bot_teacher.getMe()["id"]))
+    bot_creation=telepot.Bot(data["creation"])
+    tokens.append(data["creation"])
+    bot_creation.message_loop({'chat':creation_message,'callback_query':creation_query})
+    print("creation: "+str(bot_creation.getMe()["id"]))
+    bot_getlink=telepot.Bot(data["getlink"])
+    tokens.append(data["getlink"])
+    bot_getlink.message_loop({'chat':link_message,'callback_query':empty})
+    print("link: "+str(bot_creation.getMe()["id"]))
+    admin_pwd=int(data["pwd"]["admin"])
+    bot_pwd=telepot.Bot(data["pwd"]["bot"])
+    tokens.append(data["pwd"]["bot"])
+    bot_pwd.message_loop({'chat':empty,'callback_query':empty})
+    print("pwd: "+str(bot_pwd.getMe()["id"]))
+    for elem in data["student"]:
+        bot=None
+        bot=telepot.Bot(data["student"][elem])
+        bot_id=bot.getMe()['id']
+        bot_student[bot_id]={}
+        bot_student[bot_id]["bot"]=bot
+        bot_student[bot_id]["topic"]=elem
+        bot_student[bot_id]["token"]=data["student"][elem]
+        bot_student[bot_id]["bot"].message_loop({'chat':student_message,'callback_query':student_query})
+    sendNotification()
+    print(type(bot_student))
 
 if __name__=='__main__':
     initialize()

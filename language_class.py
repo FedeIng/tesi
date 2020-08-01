@@ -8,14 +8,20 @@ from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, Reply
 
 class Language:
 
-    def __init__(self,fileName):
+    def __init__(self,database):
+        print("Lang")
+        self.database=database
+        print(1)
         self.admins={}
-        with open('lang.txt','r') as json_file:
-            self.lang_strings=json.load(json_file)
+        print(2)
+        self.setted_lang=None
+        print(3)
         self.nlp=None
-        self.file=fileName
-        with open (fileName,"r") as jfile:
-            self.user_lang=json.load(jfile)
+        print(4)
+        #with open (fileName,"r") as jfile:
+            #self.user_lang=json.load(jfile)
+        self.lang_strings=database.get_trans()
+        print(5)
         self.switcher={
             "it":"\U0001F1EE\U0001F1F9 IT \U0001F1EE\U0001F1F9",
             "de":"\U0001F1E9\U0001F1EA DE \U0001F1E9\U0001F1EA",
@@ -66,18 +72,53 @@ class Language:
     def es(self):
         self.nlp = spacy.load('es_core_news_md')
 
+    def get_lang_by_flag(self,flag):
+        for elem in self.switcher:
+            if flag == self.switcher.get(elem,""):
+                return elem
+        return None
+
+    def get_flag_list(self):
+        return ["\U0001F1EE\U0001F1F9 IT \U0001F1EE\U0001F1F9",
+            "\U0001F1E9\U0001F1EA DE \U0001F1E9\U0001F1EA",
+            "\U0001F1EB\U0001F1F7 FR \U0001F1EB\U0001F1F7",
+            "\U0001F1EC\U0001F1E7 EN \U0001F1EC\U0001F1E7",
+            "\U0001F1EA\U0001F1F8 ES \U0001F1EA\U0001F1F8"]
+
+    def matchArray(self,txt,lang,vett):
+        print(vett)
+        e=''
+        val=0
+        for elem in vett:
+            num=self.calculate_similarity(txt,elem,lang)
+            if num > val:
+                val=num
+                e=elem
+                print(elem)
+        if val>0.8:
+            return vett[e]
+        else:
+            return None
+
     def set_nlp(self,lang):
-        self.switch_nlp.get(lang,None)()
-        
-    def del_nlp(self):
-        self.nlp=None
+        if self.setted_lang != lang:
+            self.switch_nlp.get(lang,None)()
+            self.setted_lang=lang
+
+    def checkLangStr(self,txt,string):
+        for lang in self.lang_strings:
+            if self.lang_strings[lang][string] == txt:
+                return True
+        return False
 
     def question_sent(self,lang,text):
         data=[]
         print(lang)
+        print("2")
         trans=Translator()
         for elem in self.nlp(text).sents:
             string=elem.text
+            print("3 : "+string)
             if string.endswith("?") and lang==trans.translate(string).src:
                 data.append(string)
         return data
@@ -93,6 +134,7 @@ class Language:
         array1=[]
         if xxx!=None:
             array=string.split("XXX")
+            print(array)
         else:
             return string
         if yyy!=None:
@@ -118,7 +160,7 @@ class Language:
     def createButton(self,lang):
         return InlineKeyboardButton(text=self.switcher.get(lang,""),callback_data=lang)
 
-    def setKeyboard(self,lang_array,bool_var):
+    def setKeyboard(self,lang_array,bool_var=True):
         i=0
         data=[]
         l=0
