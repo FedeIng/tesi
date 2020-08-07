@@ -105,7 +105,7 @@ def write_bug():
     for lang in bug_array:
         for role in bug_array[lang]:
             data={}
-            for e in bug_array[elem][role]:
+            for e in bug_array[lang][role]:
                 data[e]=bug_array[lang][role][e].isoformat()
             if len(data)>0:
                 result=database.put('/bots/admin/'+lang, name=role, data=data)
