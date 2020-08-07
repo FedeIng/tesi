@@ -703,7 +703,7 @@ class Node:
         for elem in vett:
             string=self.lang.translate(elem,src,dst)
             if vett[elem]["answer"] != "BANNED" and vett[elem]["answer"] != "" and not self.is_in_array(string,vett1,self.lang,dst):
-                string="\""+string+"\" -> \""+lang.translate(vett[elem]["answer"],src,dst)+"\""
+                string="\""+string+"\" -> \""+self.lang.translate(vett[elem]["answer"],src,dst)+"\""
                 array.append(string)
         return array
 
