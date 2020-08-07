@@ -247,11 +247,11 @@ class Bot_student:
         user=self.bot.getChat(from_id)
         self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"revision",xxx=txt),reply_markup=ReplyKeyboardRemove(selective=True))
         response=self.node.getResponse(txt,lang)
-        if response != None and response != "" and lang in self.teachers:
-            for teacher_id in self.teachers[lang]:
+        for teacher_id in self.teachers[lang]:
+            if response != None and response != "" and lang in self.teachers:
                 self.node.get_bot_teacher().get_bot().sendMessage(teacher_id, tagGroup(chat_type,user)+self.node.getString(lang,"revision",xxx=txt),reply_markup=ReplyKeyboardRemove(selective=True))
-        else:
-            self.node.get_bot_teacher().get_bot().sendMessage(teacher_id, tagGroup(chat_type,user)+self.node.getString(lang,"error"),reply_markup=ReplyKeyboardRemove(selective=True))
+            else:
+                self.node.get_bot_teacher().get_bot().sendMessage(teacher_id, tagGroup(chat_type,user)+self.node.getString(lang,"error"),reply_markup=ReplyKeyboardRemove(selective=True))
 
     def remove_stud_lang(self,chat_id):
         for lang in self.students:
