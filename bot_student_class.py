@@ -3,7 +3,7 @@ from library import *
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 from node_class import *
 
-class Bot_student:
+class BotStudent:
 
     def __init__(self,token,topic,database,lang_class):
 

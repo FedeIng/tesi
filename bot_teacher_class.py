@@ -2,7 +2,7 @@ import telepot
 from library import *
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 
-class Bot_teacher:
+class BotTeacher:
 
     def __init__(self,token,tree):
 

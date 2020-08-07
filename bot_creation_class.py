@@ -9,7 +9,7 @@ import random
 from library import *
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 
-class Bot_creation:
+class BotCreation:
 
     def __init__(self,token,tree):
 

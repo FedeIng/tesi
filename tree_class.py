@@ -25,7 +25,7 @@ class Tree:
         print(6)
         for topic in data:
             print("Begin bot "+topic)
-            self.array[topic]=Bot_student(database.get_topic_token(topic),topic,database,self.lang)
+            self.array[topic]=BotStudent(database.get_topic_token(topic),topic,database,self.lang)
             print("Bot "+topic+" created")
         #for down in data:
             #for up in data[down]:
@@ -141,7 +141,7 @@ class Tree:
 
     def new_bot(self,token,topic,hash):
         self.database.new_topic(token,topic,hash)
-        self.array[topic]=Bot_student(token,topic,self.database,self.lang)
+        self.array[topic]=BotStudent(token,topic,self.database,self.lang)
         print("Bot "+topic+" created")
 
     def get_pwd_admin(self):
