@@ -129,7 +129,7 @@ def read_bug():
                 if role not in data[lang]:
                     data[lang][role]={}
                 for e in data[lang][role]:
-                    date=datetime.datetime.fromisoformat(data[elem][role][e])
+                    date=datetime.datetime.fromisoformat(data[lang][role][e])
                     data[lang][role][e]=date
     bug_array=data
 
