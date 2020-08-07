@@ -183,7 +183,7 @@ class Node:
     def getstudentID(self):
         return self.id_commands
 
-    def set_formatted_data():
+    def set_formatted_data(self):
         data={}
         data["banned"]=self.bannedUser
         data["hash"]=self.hash
@@ -701,7 +701,7 @@ class Node:
         vett1=self.retQVett(dst)
         array=[]
         for elem in vett:
-            string=lang.translate(elem,src,dst)
+            string=self.lang.translate(elem,src,dst)
             if vett[elem]["answer"] != "BANNED" and vett[elem]["answer"] != "" and not self.is_in_array(string,vett1,lang,dst):
                 string="\""+string+"\" -> \""+lang.translate(vett[elem]["answer"],src,dst)+"\""
                 array.append(string)
