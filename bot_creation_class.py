@@ -3,6 +3,7 @@ import re
 import hashlib, binascii, os
 from urllib.request import urlopen
 import json
+import datetime
 import string
 import random
 from library import *
@@ -164,8 +165,8 @@ class Bot_creation:
         self.bot.sendMessage(chat_id,"This is the password to be enabled to answer questions: "+pwd,reply_markup=ReplyKeyboardRemove())
         self.tree.new_bot(txt,self.unconfirmed_bot[chat_id]["topic"],self.hash_password(pwd))
         self.teach_board_topic(self.unconfirmed_bot[chat_id]["topic"],chat_id)
-        del id_creation[chat_id]
-        del unconfirmed_bot[chat_id]
+        del self.id_creation[chat_id]
+        del self.unconfirmed_bot[chat_id]
 
     def cond_hash(self,chat_id,text):
         if text=="Forgot password?":
