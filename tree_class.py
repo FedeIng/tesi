@@ -174,7 +174,7 @@ class Tree:
     def add_question_by_hint(self,lang,question,response,chat_id,from_id,topic):
         self.setQuestion(question,lang,topic,chat_id)
         self.setQID(chat_id,from_id,question,topic)
-        self.setRes(chat_id,response,lang,topic)
+        self.setRes(chat_id,from_id,response,lang,topic)
 
     def topicKeyboard(self):
         return createReplyKeyboard(array_to_matrix(self.get_topic_list()))
