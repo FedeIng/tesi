@@ -9,6 +9,8 @@ class Database:
         self.bot_admin=None
         self.bot_pwd=None
         self.bot_teacher=None
+        self.stud_str="/bots/students/"
+        self.admin_str="/bots/admin/"
 
     def get_banned_users(self):
         return self.database.get('/bots/teachers/banned','')
@@ -17,7 +19,7 @@ class Database:
         data={}
         data["token"]=token
         data["hash"]=hash
-        self.database.put('/bots/students', name=topic, data=data)
+        self.database.put(self.stud_str, name=topic, data=data)
 
     def get_trans(self):
         return self.database.get('/translate','')
@@ -58,7 +60,7 @@ class Database:
         return data
 
     def write_stud_lang(self,topic,students,lang):
-        self.database.put('/bots/students/'+topic+'/'+lang,name="students",data=students)
+        self.database.put(self.stud_str+topic+'/'+lang,name="students",data=students)
 
     def write_bug(self,bug_array):
         for lang in bug_array:
@@ -67,10 +69,10 @@ class Database:
                 for e in bug_array[lang][role]:
                     data[e]=bug_array[lang][role][e].isoformat()
                 if len(data)>0:
-                    self.database.put('/bots/admin/'+lang, name=role, data=data)
+                    self.database.put(self.admin_str+lang, name=role, data=data)
     
     def getAdmins(self,lang):
-        return self.database.get('/bots/admin/'+lang+'/ids','')
+        return self.database.get(self.admin_str+lang+'/ids','')
 
     def write_pwd(self,user_request):
         data={}
@@ -86,7 +88,7 @@ class Database:
         data={}
         for lang in self.lang_array:
             for role in role_array:
-                result=self.database.get('/bots/admin/'+lang+'/'+role+'','')
+                result=self.database.get(self.admin_str+lang+'/'+role+'','')
                 if result!=None:
                     if lang not in data:
                         data[lang]={}
@@ -99,7 +101,7 @@ class Database:
 
     def get_array_by_topic(self,topic):
         data={}
-        result=self.database.get('/bots/students/'+topic,'')
+        result=self.database.get(self.stud_str+topic,'')
         for lang in self.lang_array:
             if lang in result:
                 data[lang]=result[lang]
@@ -110,56 +112,56 @@ class Database:
     def get_stud_ids(self,topic):
         data={}
         for lang in self.lang_array:
-            result=self.database.get('/bots/students/'+topic+'/'+lang+'/students','')
+            result=self.database.get(self.stud_str+topic+'/'+lang+'/students','')
             if result!=None:
                 data[lang]=result
         return data
 
     def set_coll_ids(self,array,topic,lang):
-        self.database.put('/bots/students/'+topic+'/'+lang,name='collaborators',data=array)
+        self.database.put(self.stud_str+topic+'/'+lang,name='collaborators',data=array)
 
     def get_coll_ids(self,topic):
         data={}
         for lang in self.lang_array:
-            result=self.database.get('/bots/students/'+topic+'/'+lang+'/collaborators','')
+            result=self.database.get(self.stud_str+topic+'/'+lang+'/collaborators','')
             if result!=None:
                 data[lang]=result
         return data
 
     def get_hash(self,topic):
-        return self.database.get('/bots/students/'+topic+'/hash','')
+        return self.database.get(self.stud_str+topic+'/hash','')
 
     def get_questions_array(self,topic):
         data={}
         for lang in self.lang_array:
-            result=self.database.get('/bots/students/'+topic+'/'+lang+'/questions','')
+            result=self.database.get(self.stud_str+topic+'/'+lang+'/questions','')
             if result!=None:
                 data[lang]=result
         return data
     
     def set_questions_array(self,array,topic,lang):
-        self.database.put('/bots/students/'+topic+'/'+lang,name='questions',data=array)
+        self.database.put(self.stud_str+topic+'/'+lang,name='questions',data=array)
 
     def set_teach_ids(self,array,topic,lang):
-        self.database.put('/bots/students/'+topic+'/'+lang,name='teachers',data=array)
+        self.database.put(self.stud_str+topic+'/'+lang,name='teachers',data=array)
 
     def get_teach_ids(self,topic):
         data={}
         for lang in self.lang_array:
-            result=self.database.get('/bots/students/'+topic+'/'+lang+'/teachers','')
+            result=self.database.get(self.stud_str+topic+'/'+lang+'/teachers','')
             if result!=None:
                 data[lang]=result
         return data
 
     def get_topic_token(self,topic):
-        return self.database.get('/bots/students/'+topic+'/token','')
+        return self.database.get(self.stud_str+topic+'/token','')
 
     def get_banned_user(self,topic):
-        return self.database.get('/bots/students/'+topic+'/banned','')
+        return self.database.get(self.stud_str+topic+'/banned','')
 
     def get_admin(self):
         data={}
-        result=self.database.get('/bots/admin','')
+        result=self.database.get(self.admin_str,'')
         data["token"]=result["token"]
         data["admins"]={}
         for lang in self.lang_array:
@@ -171,7 +173,7 @@ class Database:
         return self.database.get('/bots/creation','')
 
     def del_bot(self,topic):
-        self.database.delete('/bots/students',topic)
+        self.database.delete(self.stud_str,topic)
 
     def get_getlink(self):
         return self.database.get('/bots/getlink','')
@@ -199,7 +201,7 @@ class Database:
         return data
 
     def set_new_pwd(self,topic,pwd):
-        self.database.put('/bots/students/'+topic,name='hash',data=pwd)
+        self.database.put(self.stud_str+topic,name='hash',data=pwd)
 
     def get(self,string,string1):
         return self.database.get(string,string1)
