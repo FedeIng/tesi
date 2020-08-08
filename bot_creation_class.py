@@ -17,7 +17,6 @@ class BotCreation:
 
         def message(msg):
             content_type, chat_type, chat_id = telepot.glance(msg)
-            from_id=msg["from"]["id"]
             if chat_id in self.banned_user:
                 if self.banned_user[chat_id]>99:
                     self.bot.sendMessage(chat_id,"You are banned from this bot", reply_markup=self.tree.topicKeyboard())
@@ -146,12 +145,10 @@ class BotCreation:
         return (salt + pwdhash).decode('ascii')
 
     def save_token(self,chat_id,txt):
-        bot=None
         print("Token:")
         try:
             if self.token_valid(txt):
                 print(1)
-                bot=telepot.Bot(txt)
                 self.unconfirmed_bot[chat_id]["token"]=txt
             else:
                 print(2)

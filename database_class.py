@@ -17,8 +17,7 @@ class Database:
         data={}
         data["token"]=token
         data["hash"]=hash
-        result=self.database.put('/bots/students', name=topic, data=data)
-        print(result)
+        self.database.put('/bots/students', name=topic, data=data)
 
     def get_trans(self):
         return self.database.get('/translate','')
@@ -45,8 +44,7 @@ class Database:
         data={}
         for elem in banned_user:
             data[str(elem)]=banned_user[elem]
-        result=self.database.put('/bots/teachers', name="banned", data=data)
-        print(result)
+        self.database.put('/bots/teachers', name="banned", data=data)
         #with open("ban.txt","w") as jfile:
             #json.dump(banned_user,jfile)
         
@@ -54,25 +52,22 @@ class Database:
         #with open("ban.txt","r") as json_file:
             #banned_user=json.load(json_file)
         result=self.database.get('/bots/teachers/banned','')
-        print(result)
         data={}
         for elem in result:
             data[int(elem)]=result[elem]
         return data
 
     def write_stud_lang(self,topic,students,lang):
-        result=self.database.put('/bots/students/'+topic+'/'+lang,name="students",data=students)
+        self.database.put('/bots/students/'+topic+'/'+lang,name="students",data=students)
 
     def write_bug(self,bug_array):
-        role_array=["students","teachers"]
         for lang in bug_array:
             for role in bug_array[lang]:
                 data={}
                 for e in bug_array[lang][role]:
                     data[e]=bug_array[lang][role][e].isoformat()
                 if len(data)>0:
-                    result=self.database.put('/bots/admin/'+lang, name=role, data=data)
-                    print(result)
+                    self.database.put('/bots/admin/'+lang, name=role, data=data)
     
     def getAdmins(self,lang):
         return self.database.get('/bots/admin/'+lang+'/ids','')
@@ -84,8 +79,7 @@ class Database:
                 data[str(elem)]=[]
                 for e in user_request[elem]:
                     data[str(elem)].append(e.isoformat())
-        result=self.database.put('/bots/pwd',name='requests',data=data)
-        print(result)
+        self.database.put('/bots/pwd',name='requests',data=data)
 
     def read_bug(self):
         role_array=["students","teachers"]
@@ -93,7 +87,6 @@ class Database:
         for lang in self.lang_array:
             for role in role_array:
                 result=self.database.get('/bots/admin/'+lang+'/'+role+'','')
-                print(result)
                 if result!=None:
                     if lang not in data:
                         data[lang]={}
@@ -123,7 +116,7 @@ class Database:
         return data
 
     def set_coll_ids(self,array,topic,lang):
-        result=self.database.put('/bots/students/'+topic+'/'+lang,name='collaborators',data=array)
+        self.database.put('/bots/students/'+topic+'/'+lang,name='collaborators',data=array)
 
     def get_coll_ids(self,topic):
         data={}
@@ -145,10 +138,10 @@ class Database:
         return data
     
     def set_questions_array(self,array,topic,lang):
-        result=self.database.put('/bots/students/'+topic+'/'+lang,name='questions',data=array)
+        self.database.put('/bots/students/'+topic+'/'+lang,name='questions',data=array)
 
     def set_teach_ids(self,array,topic,lang):
-        result=self.database.put('/bots/students/'+topic+'/'+lang,name='teachers',data=array)
+        self.database.put('/bots/students/'+topic+'/'+lang,name='teachers',data=array)
 
     def get_teach_ids(self,topic):
         data={}
@@ -206,7 +199,7 @@ class Database:
         return data
 
     def set_new_pwd(self,topic,pwd):
-        result=self.database.put('/bots/students/'+topic,name='hash',data=pwd)
+        self.database.put('/bots/students/'+topic,name='hash',data=pwd)
 
     def get(self,string,string1):
         return self.database.get(string,string1)
