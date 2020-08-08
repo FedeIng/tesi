@@ -134,7 +134,7 @@ class BotCreation:
 
     def randomStringwithDigitsAndSymbols(self,stringLength=10):
         password_characters = string.ascii_letters + string.digits + string.punctuation
-        return ''.join(random.choice(password_characters) for i in range(stringLength))
+        return ''.join(random.choice(password_characters) for _ in range(stringLength))
 
     def hash_password(self,password):
         """Hash a password for storing."""
