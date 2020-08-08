@@ -27,7 +27,7 @@ class BotCreation:
                     self.bot.sendMessage(chat_id,"Click on a command below:", reply_markup=self.keyboard)
                     self.delPastCreation(chat_id)
                 elif msg["text"]=='/delete_bot':
-                    self.bot.sendMessage(chat_id,"Please select a topic:", reply_markup=self.tree.topicKeyboard())
+                    self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
                     self.delPastCreation(chat_id)
                     self.id_creation[chat_id]=4
                     self.boolvett[chat_id]=False
@@ -39,7 +39,7 @@ class BotCreation:
                     if not self.req_pwd(chat_id):
                         self.bot.sendMessage(chat_id,"You made too many requests, command aborted", reply_markup=self.tree.topicKeyboard())
                         return
-                    self.bot.sendMessage(chat_id,"Please select a topic:", reply_markup=self.tree.topicKeyboard())
+                    self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
                     self.delPastCreation(chat_id)
                     self.id_creation[chat_id]=4
                     self.boolvett[chat_id]=True
@@ -64,7 +64,7 @@ class BotCreation:
                 self.delPastCreation(chat_id)
                 self.id_creation[chat_id]=1
             elif query_data=='d':
-                self.bot.sendMessage(chat_id,"Please select a topic:", reply_markup=self.tree.topicKeyboard())
+                self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
                 self.delPastCreation(chat_id)
                 self.id_creation[chat_id]=4
                 self.boolvett[chat_id]=False
@@ -72,7 +72,7 @@ class BotCreation:
                 if not self.req_pwd(chat_id):
                     self.bot.sendMessage(chat_id,"You made too many requests, command aborted",reply_markup=ReplyKeyboardRemove())
                     return
-                self.bot.sendMessage(chat_id,"Please select a topic:", reply_markup=self.tree.topicKeyboard())
+                self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
                 self.delPastCreation(chat_id)
                 self.id_creation[chat_id]=4
                 self.boolvett[chat_id]=True
@@ -85,6 +85,7 @@ class BotCreation:
         self.tree=tree
         self.banned_user=self.get_banned_dict()
         self.admin_pwd=self.tree.get_pwd_admin()
+        self.select_str="Please select a topic:"
         self.bot=telepot.Bot(token)
         self.bot.message_loop({'chat':message,'callback_query':query})
 
