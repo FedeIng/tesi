@@ -11,8 +11,6 @@ class Node:
         self.name=nodeName
         self.JSON_array=database.get_questions_array(nodeName)
         print(self.JSON_array)
-        #self.parents=[]
-        #self.sons=[]
         self.lang=lang_class
         self.questions={}
         self.hash=database.get_hash(nodeName)
