@@ -1,4 +1,4 @@
-from language_class import *
+from language_class import Language
 import json
 import telepot
 import operator

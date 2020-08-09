@@ -8,16 +8,16 @@ import random
 import string
 import datetime
 from telepot.loop import MessageLoop
-from tree_class import *
+from tree_class import Tree
 from urllib.request import urlopen
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 from firebase import firebase
-from database_class import *
-from bot_admin_class import * 
-from bot_creation_class import * 
-from bot_getlink_class import * 
-from bot_pwd_class import * 
-from bot_teacher_class import * 
+from database_class import Database
+from bot_admin_class import BotAdmin
+from bot_creation_class import BotCreation
+from bot_getlink_class import BotGetlink
+from bot_pwd_class import BotPwd
+from bot_teacher_class import BotTeacher
 
 database = Database()
 print("Database created")

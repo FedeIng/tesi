@@ -1,5 +1,5 @@
-from node_class import *
-from language_class import *
+from node_class import Node
+from language_class import Language
 from library import *
 import json
 import telepot
