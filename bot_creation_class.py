@@ -2,6 +2,7 @@ import telepot
 import re
 import hashlib, binascii, os
 from urllib.request import urlopen
+from library import createReplyKeyboard
 import json
 import datetime
 import string
