@@ -1,4 +1,5 @@
 import telepot
+from library import add_id, check_id, matchCommand, tagGroup, del_id, selection, list_to_str, array_to_matrix, createReplyKeyboard, seg_bug
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 
 class BotTeacher:
