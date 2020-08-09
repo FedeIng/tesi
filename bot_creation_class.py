@@ -6,7 +6,6 @@ import json
 import datetime
 import string
 import random
-from library import *
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 
 class BotCreation:
