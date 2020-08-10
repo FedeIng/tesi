@@ -334,23 +334,27 @@ class Node:
         for elem in vett:
             data={}
             for lang in self.teachers:
-                self.sub_delTeachers(data,elem,lang,lang_class,bot)
+                data=self.sub_delTeachers(data,elem,lang,lang_class,bot)
             self.teachers=data
+
+    def sub_delCollaborators(self,data,elem,lang,lang_class,bot):
+        if elem not in self.collaborators[lang] and len(self.collaborators[lang])>0:
+            data[lang]=self.collaborators[lang]
+        if elem in self.collaborators[lang]:
+            if len(self.collaborators[lang])>1:
+                data[lang]=[]
+                for id in self.collaborators[lang]:
+                    if id!=elem:
+                        data[lang].append(id)
+            else:
+                self.sendNotification(lang_class,lang,bot,False)
+        return data
 
     def delCollaborators(self,vett,lang_class,bot):
         for elem in vett:
             data={}
             for lang in self.collaborators:
-                if elem not in self.collaborators[lang] and len(self.collaborators[lang])>0:
-                    data[lang]=self.collaborators[lang]
-                if elem in self.collaborators[lang]:
-                    if len(self.collaborators[lang])>1:
-                        data[lang]=[]
-                        for id in self.collaborators[lang]:
-                            if id!=elem:
-                                data[lang].append(id)
-                    else:
-                        self.sendNotification(lang_class,lang,bot,False)
+                data=self.sub_delCollaborators(data,elem,lang,lang_class,bot)
             self.collaborators=data
         
     
