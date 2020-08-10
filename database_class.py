@@ -83,20 +83,24 @@ class Database:
                     data[str(elem)].append(e.isoformat())
         self.database.put('/bots/pwd',name='requests',data=data)
 
+    def sub_read_bug(self,data,lang,role):
+        result=self.database.get(self.admin_str+lang+'/'+role+'','')
+        if result!=None:
+            if lang not in data:
+                data[lang]={}
+            if role not in data[lang]:
+                data[lang][role]={}
+            for e in result:
+                date=datetime.datetime.fromisoformat(result[e])
+                data[lang][role][e]=date
+        return data
+
     def read_bug(self):
         role_array=["students","teachers"]
         data={}
         for lang in self.lang_array:
             for role in role_array:
-                result=self.database.get(self.admin_str+lang+'/'+role+'','')
-                if result!=None:
-                    if lang not in data:
-                        data[lang]={}
-                    if role not in data[lang]:
-                        data[lang][role]={}
-                    for e in result:
-                        date=datetime.datetime.fromisoformat(result[e])
-                        data[lang][role][e]=date
+                data=self.sub_read_bug(data,lang,role)
         return data
 
     def get_array_by_topic(self,topic):
