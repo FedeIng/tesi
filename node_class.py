@@ -317,20 +317,24 @@ class Node:
         print("Lang: "+str(lang_vett))
         return lang_vett
 
+    def sub_delTeachers(self,data,elem,lang,lang_class,bot):
+        if elem not in self.teachers[lang] and len(self.teachers[lang])>0:
+            data[lang]=self.teachers[lang]
+        if elem in self.teachers[lang]:
+            if len(self.teachers[lang])>1:
+                data[lang]=[]
+                for id in self.teachers[lang]:
+                    if id!=elem:
+                        data[lang].append(id)
+            else:
+                self.sendNotification(lang_class,lang,bot,False)
+        return data
+
     def delTeachers(self,vett,lang_class,bot):
         for elem in vett:
             data={}
             for lang in self.teachers:
-                if elem not in self.teachers[lang] and len(self.teachers[lang])>0:
-                    data[lang]=self.teachers[lang]
-                if elem in self.teachers[lang]:
-                    if len(self.teachers[lang])>1:
-                        data[lang]=[]
-                        for id in self.teachers[lang]:
-                            if id!=elem:
-                                data[lang].append(id)
-                    else:
-                        self.sendNotification(lang_class,lang,bot,False)
+                self.sub_delTeachers(data,elem,lang,lang_class,bot)
             self.teachers=data
 
     def delCollaborators(self,vett,lang_class,bot):
