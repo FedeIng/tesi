@@ -198,18 +198,21 @@ class Node:
             data[lang]["questions"]=self.JSON_array[lang]
         self.database.put("/bots/students", name=self.nodeName, data=data)
 
+    def sub_setBannedUsers(self,lang,lang_str,elem,users):
+        if "answer" in self.JSON_array[lang_str][elem]:
+            if self.JSON_array[lang_str][elem]["answer"]=="BANNED":
+                for chat_id in self.JSON_array[lang_str][elem]["ids"]:
+                    if chat_id in users:
+                        users[chat_id]+=1
+                    else:
+                        users[chat_id]=1
+        return users
 
     def setBannedUsers(self,lang):
         users={}
         for lang_str in self.JSON_array:
             for elem in self.JSON_array[lang_str]:
-                if "answer" in self.JSON_array[lang_str][elem]:
-                    if self.JSON_array[lang_str][elem]["answer"]=="BANNED":
-                        for chat_id in self.JSON_array[lang_str][elem]["ids"]:
-                            if chat_id in users:
-                                users[chat_id]+=1
-                            else:
-                                users[chat_id]=1
+                users=self.sub_setBannedUsers(lang,lang_str,elem,users)
         for chat_id in users:
             if users[chat_id]>10:
                 self.bannedUser.append(chat_id)
