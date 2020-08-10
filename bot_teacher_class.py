@@ -163,30 +163,35 @@ class BotTeacher:
             self.lang_bool[chat_id]=True
         print("16")
 
-    def branch_three(self,msg,chat_id,from_id,topic):
+    def sub_branch_three(self,msg,chat_id,from_id,topic):
         lang_array=["it","de","en","es","fr"]
+        if self.isLogged[chat_id]:
+            print("20")
+            if msg["text"] in self.tree.get_topic_list():
+                print("21")
+                self.bot.sendMessage(chat_id,"Copy/paste the password:",reply_markup=ReplyKeyboardRemove())
+                self.topic_name[chat_id]=msg["text"]
+                self.isLogged[chat_id]=False
+                return False
+        else:
+            print("22")
+            if self.tree.verify_password(self.topic_name[chat_id], msg["text"]):
+                print("23")
+                if chat_id in self.banned_user:
+                    print("24")
+                    del self.banned_user[chat_id]
+                print("25")
+                self.bot.sendMessage(chat_id,"Choose a language:",reply_markup=self.tree.setKeyboard(lang_array))
+                self.query_bool[chat_id]=True
+                self.tree.write_ban()
+                return False
+        return True
+
+    def branch_three(self,msg,chat_id,from_id,topic):
         if chat_id in self.isLogged:
             print("19")
-            if self.isLogged[chat_id]:
-                print("20")
-                if msg["text"] in self.tree.get_topic_list():
-                    print("21")
-                    self.bot.sendMessage(chat_id,"Copy/paste the password:",reply_markup=ReplyKeyboardRemove())
-                    self.topic_name[chat_id]=msg["text"]
-                    self.isLogged[chat_id]=False
-                    return False
-            else:
-                print("22")
-                if self.tree.verify_password(self.topic_name[chat_id], msg["text"]):
-                    print("23")
-                    if chat_id in self.banned_user:
-                        print("24")
-                        del self.banned_user[chat_id]
-                    print("25")
-                    self.bot.sendMessage(chat_id,"Choose a language:",reply_markup=self.tree.setKeyboard(lang_array))
-                    self.query_bool[chat_id]=True
-                    self.tree.write_ban()
-                    return False
+            if self.sub_branch_three(msg,chat_id,from_id,topic)==False:
+                return False
             print("26")
             if chat_id in self.banned_user:
                 print("27")
@@ -207,7 +212,6 @@ class BotTeacher:
             self.bot.sendMessage(chat_id,"Please select the topic:",reply_markup=self.tree.topicKeyboard())
             self.isLogged[chat_id]=True
         print("32")
-        return False
 
     def verify_user(self,msg,chat_id,from_id,topic):
         print("1")
@@ -239,6 +243,7 @@ class BotTeacher:
         if topic==None:
             print("18")
             self.branch_three(msg,chat_id,from_id,topic)
+            return False
         return True
 
     def case1(self,chat_id,from_id,txt,lang,topic,chat_type):
