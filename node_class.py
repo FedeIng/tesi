@@ -357,20 +357,22 @@ class Node:
                 data=self.sub_delCollaborators(data,elem,lang,lang_class,bot)
             self.collaborators=data
         
-    
+    def sub_delStudents(self,data,elem,lang,lang_class,bot):
+        if elem not in self.students[lang] and len(self.students[lang])>0:
+            data[lang]=self.students[lang]
+        if elem in self.students[lang] and len(self.students[lang])>1:
+            data[lang]=[]
+            for id in self.students[lang]:
+                if id!=elem:
+                    data[lang].append(id)
+        return data
+
     def delStudents(self,vett):
-        data={}
         for elem in vett:
+            data={}
             for lang in self.students:
-                if elem not in self.students[lang] and len(self.students[lang])>0:
-                    data[lang]=self.students[lang]
-                if elem in self.students[lang] and len(self.students[lang])>1:
-                    data[lang]=[]
-                    for id in self.students[lang]:
-                        if id!=elem:
-                            data[lang].append(id)
-        self.students={}
-        self.students=data
+                data=self.sub_delStudents(data,elem,lang,lang_class,bot)
+            self.students=data
 
     def addTeachers(self,vett,lang_str,lang,bot=None):
         if bot != None:
