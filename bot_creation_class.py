@@ -166,6 +166,40 @@ class BotCreation:
         del self.id_creation[chat_id]
         del self.unconfirmed_bot[chat_id]
 
+    def cond_hash_first_branch(self,chat_id,text):
+        if self.tree.verify_password(self.unc_del[chat_id], text):
+            if chat_id in self.banned_user:
+                del self.banned_user[chat_id]
+            pwd=self.randomStringwithDigitsAndSymbols()
+            self.tree.change_pwd(self.unc_del[chat_id],self.hash_password(pwd))
+            bot_pwd=self.tree.get_bot_pwd()
+            bot_pwd.sendMessage(self.admin_pwd,"The new password for the "+self.unc_del[chat_id]+" topic is "+pwd)
+            self.bot.sendMessage(chat_id,"This is the password to be enabled to answer questions: "+pwd,reply_markup=ReplyKeyboardRemove())
+            self.teach_board_topic(self.unc_del[chat_id],chat_id)
+        else :
+            if chat_id in self.banned_user:
+                self.banned_user[chat_id]+=1
+            else:
+                self.banned_user[chat_id]=1
+            self.bot.sendMessage(chat_id,"Incorrect password. Command aborted.",reply_markup=ReplyKeyboardRemove())
+        del self.unc_del[chat_id]
+        del self.id_creation[chat_id]
+
+    def cond_hash_second_branch(self,chat_id,text):
+        if self.tree.verify_password(self.unc_del[chat_id], text):
+            if chat_id in self.banned_user:
+                del self.banned_user[chat_id]
+            self.tree.delete_bot(self.unc_del[chat_id])
+            self.bot.sendMessage(chat_id,"Topic deleted",reply_markup=ReplyKeyboardRemove())
+        else :
+            if chat_id in self.banned_user:
+                self.banned_user[chat_id]+=1
+            else:
+                self.banned_user[chat_id]=1
+            self.bot.sendMessage(chat_id,"Incorrect password. Command aborted.",reply_markup=ReplyKeyboardRemove())
+        del self.unc_del[chat_id]
+        del self.id_creation[chat_id]
+
     def cond_hash(self,chat_id,text):
         if text=="Forgot password?":
             user=self.bot.getChat(chat_id)
@@ -176,37 +210,9 @@ class BotCreation:
             del self.id_creation[chat_id]
             return
         if self.boolvett[chat_id]:
-            if self.tree.verify_password(self.unc_del[chat_id], text):
-                if chat_id in self.banned_user:
-                    del self.banned_user[chat_id]
-                pwd=self.randomStringwithDigitsAndSymbols()
-                self.tree.change_pwd(self.unc_del[chat_id],self.hash_password(pwd))
-                bot_pwd=self.tree.get_bot_pwd()
-                bot_pwd.sendMessage(self.admin_pwd,"The new password for the "+self.unc_del[chat_id]+" topic is "+pwd)
-                self.bot.sendMessage(chat_id,"This is the password to be enabled to answer questions: "+pwd,reply_markup=ReplyKeyboardRemove())
-                self.teach_board_topic(self.unc_del[chat_id],chat_id)
-            else :
-                if chat_id in self.banned_user:
-                    self.banned_user[chat_id]+=1
-                else:
-                    self.banned_user[chat_id]=1
-                self.bot.sendMessage(chat_id,"Incorrect password. Command aborted.",reply_markup=ReplyKeyboardRemove())
-            del self.unc_del[chat_id]
-            del self.id_creation[chat_id]
+            self.cond_hash_first_branch(chat_id,text)
         else:
-            if self.tree.verify_password(self.unc_del[chat_id], text):
-                if chat_id in self.banned_user:
-                    del self.banned_user[chat_id]
-                self.tree.delete_bot(self.unc_del[chat_id])
-                self.bot.sendMessage(chat_id,"Topic deleted",reply_markup=ReplyKeyboardRemove())
-            else :
-                if chat_id in self.banned_user:
-                    self.banned_user[chat_id]+=1
-                else:
-                    self.banned_user[chat_id]=1
-                self.bot.sendMessage(chat_id,"Incorrect password. Command aborted.",reply_markup=ReplyKeyboardRemove())
-            del self.unc_del[chat_id]
-            del self.id_creation[chat_id]
+            self.cond_hash_second_branch(chat_id,text)
         #self.tree.write_ban()
 
     def choose_topic(self,chat_id,text):
