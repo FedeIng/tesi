@@ -140,20 +140,29 @@ class BotStudent:
     def getResArray(self,lang,condition):
         return self.node.getResArray(lang,condition)
 
+    def send_not_stud(self,lang,lang_class):
+        if lang in self.students:
+            for stud in self.students[lang]:
+                print("Stud:"+str(stud))
+                self.bot.sendMessage(stud,lang_class.getString(lang,"restart"),reply_markup=ReplyKeyboardRemove(selective=False))
+
+    def send_not_teach(self,bot_teacher,lang,lang_class):
+        if lang in self.teachers:
+            for teach in self.teachers[lang]:
+                print("Teach:"+str(teach))
+                bot_teacher.sendMessage(teach,lang_class.getString(lang,"restart"),reply_markup=ReplyKeyboardRemove(selective=False))
+
+    def send_not_coll(self,bot_teacher,lang,lang_class):
+        if lang in self.collaborators:
+            for coll in self.collaborators[lang]:
+                print("Coll:"+str(coll))
+                bot_teacher.sendMessage(coll,lang_class.getString(lang,"restart"),reply_markup=ReplyKeyboardRemove(selective=False))
+
     def send_notification(self,bot_teacher,lang_class):
         for lang in self.students:
-            if lang in self.students:
-                for stud in self.students[lang]:
-                    print("Stud:"+str(stud))
-                    self.bot.sendMessage(stud,lang_class.getString(lang,"restart"),reply_markup=ReplyKeyboardRemove(selective=False))
-            if lang in self.teachers:
-                for teach in self.teachers[lang]:
-                    print("Teach:"+str(teach))
-                    bot_teacher.sendMessage(teach,lang_class.getString(lang,"restart"),reply_markup=ReplyKeyboardRemove(selective=False))
-            if lang in self.collaborators:
-                for coll in self.collaborators[lang]:
-                    print("Coll:"+str(coll))
-                    bot_teacher.sendMessage(coll,lang_class.getString(lang,"restart"),reply_markup=ReplyKeyboardRemove(selective=False))
+            self.send_not_stud(lang,lang_class)
+            self.send_not_teach(bot_teacher,lang,lang_class)
+            self.send_not_coll(bot_teacher,lang,lang_class)
 
     def list_by_user(self,chat_id,from_id,lang,chat_type):
         user=self.bot.getChat(from_id)
