@@ -425,26 +425,6 @@ class Tree:
         else:
             return None
 
-    def matchCommand(self,id,command,msg,bot,lang):
-        name=""
-        if type(bot) is dict:
-            name=bot["bot"].getMe()["username"]
-            if id in self.array[bot["topic"]].getBannedUser():
-                if command=="/start":
-                    bot["bot"].sendMessage(id,self.getString(lang,"stop"))
-                return False
-        elif type(bot) is telepot.Bot:
-            name=bot.getMe()["username"]
-            if id not in self.getTeacherIDs():
-                if command=="/start":
-                    bot.sendMessage(id,self.getString(lang,"stop"),reply_markup=ReplyKeyboardRemove(selective=True))
-                return False
-        if (msg["chat"]["type"]=="group" or msg["chat"]["type"]=="supergroup") and msg["text"]==command+"@"+name:
-            return True
-        elif msg["chat"]["type"]=="private" and msg["text"]==command:
-            return True
-        return False
-
     def getLangBoard(self,lang,array):
         return self.lang.getLangBoard(lang,array)
 
