@@ -35,7 +35,7 @@ def check_id(from_id,chat_id,array):
             ret_val=array[chat_id][from_id]
     return ret_val
 
-def tagGroup(chat_type,user):
+def tag_group(chat_type,user):
     string=""
     if chat_type=="group" or chat_type=="supergroup":
         string="@"+user["username"]+": "
@@ -46,12 +46,12 @@ def selection(chat_id,from_id,lang,list1,chat_type,bot,lang_class):
     data=[]
     for elem in list1:
         data.append([elem])
-        createReplyKeyboard(data)
-    keyboard1 = createReplyKeyboard(data)
+        create_reply_keyboard(data)
+    keyboard1 = create_reply_keyboard(data)
     if list1 ==[] :
-        bot.sendMessage(chat_id,tagGroup(chat_type,user)+lang_class.getString(lang,"empty"),reply_markup=ReplyKeyboardRemove(selective=True))
+        bot.sendMessage(chat_id,tag_group(chat_type,user)+lang_class.getString(lang,"empty"),reply_markup=ReplyKeyboardRemove(selective=True))
     else :
-        bot.sendMessage(chat_id,tagGroup(chat_type,user)+lang_class.getString(lang,"select"),reply_markup=keyboard1)
+        bot.sendMessage(chat_id,tag_group(chat_type,user)+lang_class.getString(lang,"select"),reply_markup=keyboard1)
 
 def list_to_str(data):
     stringa=""
@@ -75,7 +75,7 @@ def array_to_matrix(array):
         data.append([elem])
     return data
 
-def createReplyKeyboard(matrix,only_one=True):
+def create_reply_keyboard(matrix,only_one=True):
     return ReplyKeyboardMarkup(keyboard=matrix_to_key(matrix),resize_keyboard=True,one_time_keyboard=True,selective=only_one)
 
 def delete_bug(t,time,lang,bug_array):
@@ -106,10 +106,10 @@ def seg_bug(chat_id,from_id,txt,lang,chat_type,bot_type,bot,database,lang_class)
         bug_array[lang][bot_type][txt]=time+datetime.timedelta(days=14)
         for a_id in database.getAdmins(lang):
             database.get_bot_admin().get_bot().sendMessage(a_id,bot_type+": "+txt)
-    bot.sendMessage(chat_id, tagGroup(chat_type,user)+lang_class.getString(lang,"bug"),reply_markup=ReplyKeyboardRemove(selective=True))
+    bot.sendMessage(chat_id, tag_group(chat_type,user)+lang_class.getString(lang,"bug"),reply_markup=ReplyKeyboardRemove(selective=True))
     database.write_bug(bug_array)
 
-def matchCommand(command,msg,chat_type,username):
+def match_command(command,msg,chat_type,username):
     print(command+" : "+msg)
     if chat_type=="private":
         print("case1: "+str(msg==command))
