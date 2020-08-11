@@ -178,7 +178,7 @@ class Tree:
         self.setRes(chat_id,from_id,response,lang,topic)
 
     def topicKeyboard(self):
-        return createReplyKeyboard(array_to_matrix(self.get_topic_list()))
+        return create_reply_keyboard(array_to_matrix(self.get_topic_list()))
 
     def deleteTC(self,chat_id,topic):
         self.array[topic].delTeachers([chat_id])
