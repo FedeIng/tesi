@@ -105,7 +105,7 @@ class Language:
             self.switch_nlp.get(lang,None)()
             self.setted_lang=lang
 
-    def checkLangStr(self,txt,string):
+    def check_lang_str(self,txt,string):
         for lang in self.lang_strings:
             if self.lang_strings[lang][string] == txt:
                 return True
@@ -123,10 +123,10 @@ class Language:
                 data.append(string)
         return data
         
-    def checkTeach(self,lang,text):
+    def check_teach(self,lang,text):
         return text==self.switch_teach.get(lang)
     
-    def checkColl(self,lang,text):
+    def check_coll(self,lang,text):
         return text==self.switch_coll.get(lang)
 
     def printx(self, string, xxx=None, yyy=None):
@@ -143,13 +143,13 @@ class Language:
             return array[0]+xxx+array[1]
         return array[0]+xxx+array1[0]+yyy+array1[1]
 
-    def addAdmins(self, lang, vett):
+    def add_admins(self, lang, vett):
         self.admins[lang]=vett
 
-    def getAdmins(self, lang):
+    def get_admins(self, lang):
         return self.admins[lang]
 
-    def getString(self, lang, string, xxx=None, yyy=None):
+    def get_string(self, lang, string, xxx=None, yyy=None):
         if string=="start":
             xxx=self.translate(xxx,"en",lang)
         if lang in self.lang_strings:
@@ -157,10 +157,10 @@ class Language:
                 return self.printx(self.lang_strings[lang][string],xxx,yyy)
         return ""
 
-    def createButton(self,lang):
+    def create_button(self,lang):
         return InlineKeyboardButton(text=self.switcher.get(lang,""),callback_data=lang)
 
-    def setKeyboard(self,lang_array,bool_var=True):
+    def set_keyboard(self,lang_array,bool_var=True):
         i=0
         data=[]
         l=0
@@ -173,11 +173,11 @@ class Language:
             i%=2
         return ReplyKeyboardMarkup(keyboard=data,resize_keyboard=True,one_time_keyboard=True,selective=bool_var)
 
-    def getLangBoard(self,lang,array,num=1):
+    def get_lang_board(self,lang,array,num=1):
         data=[[KeyboardButton(text=self.switch_coll.get(lang))],[KeyboardButton(text=self.switch_teach.get(lang))]]
         return ReplyKeyboardMarkup(keyboard=data,resize_keyboard=True,one_time_keyboard=True,selective=False)
 
-    def setLangResp(self,id,lang,bot):
+    def set_lang_resp(self,id,lang,bot):
         if bot["topic"] not in self.user_lang:
             self.user_lang[bot["topic"]]={}
         self.user_lang[bot["topic"]][id]=lang
