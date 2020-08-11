@@ -584,6 +584,15 @@ class Node:
     def delete_question(self,question,lang):
         del self.JSON_array[lang][question]
 
+    def sub_deleteDoubleQuestion(self,lang,lang_str,data,elem):
+        for question in data[elem]:
+            vett=[]
+            for question1 in self.JSON_array[lang_str]:
+                if lang.calculate_similarity(question,question1,lang_str) > 0.8:
+                    vett.append(question1)
+            for question1 in vett:
+                del self.JSON_array[lang_str][question1]
+
     def deleteDoubleQuestion(self,lang,lang_str):
         if lang_str not in self.JSON_array:
             return
@@ -592,13 +601,7 @@ class Node:
         for elem in data:
             if elem==0:
                 continue
-            for question in data[elem]:
-                vett=[]
-                for question1 in self.JSON_array[lang_str]:
-                    if lang.calculate_similarity(question,question1,lang_str) > 0.8:
-                        vett.append(question1)
-                for question1 in vett:
-                    del self.JSON_array[lang_str][question1]
+            self.sub_deleteDoubleQuestion(lang,lang_str,data,elem)
         return
 
     def add_question(self,txt,lang,res=""):
