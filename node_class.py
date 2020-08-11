@@ -357,7 +357,7 @@ class Node:
                 data=self.sub_delCollaborators(data,elem,lang,lang_class,bot)
             self.collaborators=data
         
-    def sub_delStudents(self,data,elem,lang,lang_class,bot):
+    def sub_delStudents(self,data,elem,lang):
         if elem not in self.students[lang] and len(self.students[lang])>0:
             data[lang]=self.students[lang]
         if elem in self.students[lang] and len(self.students[lang])>1:
@@ -371,7 +371,7 @@ class Node:
         for elem in vett:
             data={}
             for lang in self.students:
-                data=self.sub_delStudents(data,elem,lang,lang_class,bot)
+                data=self.sub_delStudents(data,elem,lang)
             self.students=data
 
     def addTeachers(self,vett,lang_str,lang,bot=None):
