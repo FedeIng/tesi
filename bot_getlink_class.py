@@ -9,7 +9,7 @@ class BotGetlink:
             content_type, chat_type, chat_id = telepot.glance(msg)
             if content_type == 'text' and chat_type=="private":
                 if msg["text"]=='/start':
-                    self.bot.sendMessage(chat_id,"Select a bot:",reply_markup=self.createUrlInlineQuery())
+                    self.bot.sendMessage(chat_id,"Select a bot:",reply_markup=self.create_url_inline_query())
 
         def query(msg):
             return None
@@ -18,11 +18,11 @@ class BotGetlink:
         self.bot.message_loop({'chat':message,'callback_query':query})
         self.tree=tree
 
-    def createUrlButton(self,topic):
+    def create_url_button(self,topic):
         return InlineKeyboardButton(text=topic,url="https://t.me/"+self.tree.get_username_by_topic(topic)+"?start=foo")
 
-    def createUrlInlineQuery(self):
+    def create_url_inline_query(self):
         data=[]
         for elem in self.tree.get_topic_list():
-            data.append([self.createUrlButton(elem)])
+            data.append([self.create_url_button(elem)])
         return  InlineKeyboardMarkup(inline_keyboard=data)
