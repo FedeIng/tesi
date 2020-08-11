@@ -25,22 +25,22 @@ class BotCreation:
                 if msg["text"]=='/start':
                     self.bot.sendMessage(chat_id,"Hi, this is the bot to create a new subject.", reply_markup=ReplyKeyboardRemove())
                     self.bot.sendMessage(chat_id,"Click on a command below:", reply_markup=self.keyboard)
-                    self.delPastCreation(chat_id)
+                    self.del_past_creation(chat_id)
                 elif msg["text"]=='/delete_bot':
                     self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
-                    self.delPastCreation(chat_id)
+                    self.del_past_creation(chat_id)
                     self.id_creation[chat_id]=4
                     self.boolvett[chat_id]=False
                 elif msg["text"]=='/new_bot':
                     self.bot.sendMessage(chat_id,"Please select a new topic, please write the name in english:", reply_markup=self.tree.topicKeyboard())
-                    self.delPastCreation(chat_id)
+                    self.del_past_creation(chat_id)
                     self.id_creation[chat_id]=1
                 elif msg["text"]=='/change_pwd':
                     if not self.req_pwd(chat_id):
                         self.bot.sendMessage(chat_id,"You made too many requests, command aborted", reply_markup=self.tree.topicKeyboard())
                         return
                     self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
-                    self.delPastCreation(chat_id)
+                    self.del_past_creation(chat_id)
                     self.id_creation[chat_id]=4
                     self.boolvett[chat_id]=True
                 elif chat_id in self.id_creation:
@@ -58,14 +58,14 @@ class BotCreation:
             if query_data=='s':
                 self.bot.sendMessage(chat_id,"Hi, this is the bot to create a new subject.", reply_markup=ReplyKeyboardRemove())
                 self.bot.sendMessage(chat_id,"Click on a command below:", reply_markup=self.keyboard)
-                self.delPastCreation(chat_id)
+                self.del_past_creation(chat_id)
             elif query_data=='n':
                 self.bot.sendMessage(chat_id,"Please select a new topic, please write the name in english:",reply_markup=ReplyKeyboardRemove())
-                self.delPastCreation(chat_id)
+                self.del_past_creation(chat_id)
                 self.id_creation[chat_id]=1
             elif query_data=='d':
                 self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
-                self.delPastCreation(chat_id)
+                self.del_past_creation(chat_id)
                 self.id_creation[chat_id]=4
                 self.boolvett[chat_id]=False
             elif query_data=='c':
@@ -73,7 +73,7 @@ class BotCreation:
                     self.bot.sendMessage(chat_id,"You made too many requests, command aborted",reply_markup=ReplyKeyboardRemove())
                     return
                 self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
-                self.delPastCreation(chat_id)
+                self.del_past_creation(chat_id)
                 self.id_creation[chat_id]=4
                 self.boolvett[chat_id]=True
 
@@ -133,9 +133,9 @@ class BotCreation:
             print(3)
             return False
 
-    def randomStringwithDigitsAndSymbols(self,stringLength=10):
+    def rand_string(self,string_length=10):
         password_characters = string.ascii_letters + string.digits + string.punctuation
-        return ''.join(random.choice(password_characters) for _ in range(stringLength))
+        return ''.join(random.choice(password_characters) for _ in range(string_length))
 
     def hash_password(self,password):
         """Hash a password for storing."""
@@ -159,7 +159,7 @@ class BotCreation:
             print(3)
             self.bot.sendMessage(chat_id,"The token is already used or is not valid. Retry with another token. Please retry.",reply_markup=ReplyKeyboardRemove())
             return
-        pwd=self.randomStringwithDigitsAndSymbols()
+        pwd=self.rand_string()
         self.bot.sendMessage(chat_id,"This is the password to be enabled to answer questions: "+pwd,reply_markup=ReplyKeyboardRemove())
         self.tree.new_bot(txt,self.unconfirmed_bot[chat_id]["topic"],self.hash_password(pwd))
         self.teach_board_topic(self.unconfirmed_bot[chat_id]["topic"],chat_id)
@@ -170,7 +170,7 @@ class BotCreation:
         if self.tree.verify_password(self.unc_del[chat_id], text):
             if chat_id in self.banned_user:
                 del self.banned_user[chat_id]
-            pwd=self.randomStringwithDigitsAndSymbols()
+            pwd=self.rand_string()
             self.tree.change_pwd(self.unc_del[chat_id],self.hash_password(pwd))
             bot_pwd=self.tree.get_bot_pwd()
             bot_pwd.sendMessage(self.admin_pwd,"The new password for the "+self.unc_del[chat_id]+" topic is "+pwd)
@@ -245,7 +245,7 @@ class BotCreation:
             return False
         return True
 
-    def delPastCreation(self,chat_id):
+    def del_past_creation(self,chat_id):
         if chat_id in self.unconfirmed_bot:
             del self.unconfirmed_bot[chat_id]
         if chat_id in self.id_creation:
