@@ -44,15 +44,15 @@ class Language:
             "es":"profesor"
         }
         self.switch_nlp={
-            "it":self.it,
-            "de":self.de,
-            "fr":self.fr,
-            "en":self.en,
-            "es":self.es
+            "it":self.it_fun,
+            "de":self.de_fun,
+            "fr":self.fr_fun,
+            "en":self.en_fun,
+            "es":self.es_fun
         }
         print("lang setted")
 
-    def it(self):
+    def it_fun(self):
         self.nlp = spacy.load('it_core_news_sm')
         model = Word2Vec.load('wiki_iter=5_algorithm=skipgram_window=10_size=300_neg-samples=10.m')
         keys = []
@@ -60,16 +60,16 @@ class Language:
             keys.append(model.wv.index2word[idx])
         self.nlp.vocab.vectors = spacy.vocab.Vectors(data=model.wv.vectors, keys=keys)
 
-    def de(self):
+    def de_fun(self):
         self.nlp = spacy.load('de_core_news_md')
 
-    def fr(self):
+    def fr_fun(self):
         self.nlp = spacy.load('fr_core_news_md')
 
-    def en(self):
+    def en_fun(self):
         self.nlp = spacy.load('en_core_web_lg')
 
-    def es(self):
+    def es_fun(self):
         self.nlp = spacy.load('es_core_news_md')
 
     def get_lang_by_flag(self,flag):
@@ -85,7 +85,7 @@ class Language:
             "\U0001F1EC\U0001F1E7 EN \U0001F1EC\U0001F1E7",
             "\U0001F1EA\U0001F1F8 ES \U0001F1EA\U0001F1F8"]
 
-    def matchArray(self,txt,lang,vett):
+    def match_array(self,txt,lang,vett):
         print(vett)
         e=''
         val=0
