@@ -125,7 +125,7 @@ class BotTeacher:
         self.query_bool={}
         self.prev_lang={}
         self.topic_name={}
-        self.isLogged={}
+        self.is_logged={}
         self.banned_user=self.tree.read_ban()
         self.tree.send_notification(self.bot)
 
@@ -165,13 +165,13 @@ class BotTeacher:
 
     def sub_branch_three(self,msg,chat_id,from_id,topic):
         lang_array=["it","de","en","es","fr"]
-        if self.isLogged[chat_id]:
+        if self.is_logged[chat_id]:
             print("20")
             if msg["text"] in self.tree.get_topic_list():
                 print("21")
                 self.bot.sendMessage(chat_id,"Copy/paste the password:",reply_markup=ReplyKeyboardRemove())
                 self.topic_name[chat_id]=msg["text"]
-                self.isLogged[chat_id]=False
+                self.is_logged[chat_id]=False
                 return False
         else:
             print("22")
@@ -188,7 +188,7 @@ class BotTeacher:
         return True
 
     def branch_three(self,msg,chat_id,from_id,topic):
-        if chat_id in self.isLogged:
+        if chat_id in self.is_logged:
             print("19")
             if self.sub_branch_three(msg,chat_id,from_id,topic)==False:
                 return False
@@ -202,7 +202,7 @@ class BotTeacher:
             print("29")
             self.bot.sendMessage(chat_id,"Error, retry:",reply_markup=ReplyKeyboardRemove())
             self.bot.sendMessage(chat_id,"Please select the topic:",reply_markup=self.tree.topicKeyboard())
-            self.isLogged[chat_id]=True
+            self.is_logged[chat_id]=True
             self.tree.write_ban()
             if chat_id in self.topic_name:
                 print("30")
@@ -210,7 +210,7 @@ class BotTeacher:
         else:
             print("31")
             self.bot.sendMessage(chat_id,"Please select the topic:",reply_markup=self.tree.topicKeyboard())
-            self.isLogged[chat_id]=True
+            self.is_logged[chat_id]=True
         print("32")
 
     def verify_user(self,msg,chat_id,from_id,topic):
