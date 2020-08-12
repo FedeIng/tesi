@@ -602,7 +602,6 @@ class Node:
             if elem==0:
                 continue
             self.sub_delete_double_question(lang,lang_str,data,elem)
-        return
 
     def add_question(self,txt,lang,res=""):
         if lang not in self.json_array:
