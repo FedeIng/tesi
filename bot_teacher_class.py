@@ -5,119 +5,10 @@ from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, Reply
 class BotTeacher:
 
     def __init__(self,token,tree):
-
         self.keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/answer", callback_data='a')],[InlineKeyboardButton(text="/report", callback_data='r')],[InlineKeyboardButton(text="/start", callback_data='s')],[InlineKeyboardButton(text="/list", callback_data='l')],[InlineKeyboardButton(text="/free_list", callback_data='fl')],[InlineKeyboardButton(text="/ban", callback_data='b')],[InlineKeyboardButton(text="/ban_list", callback_data='bl')],[InlineKeyboardButton(text="/sban", callback_data='sb')],[InlineKeyboardButton(text="/change", callback_data='c')],[InlineKeyboardButton(text="/delete", callback_data='d')],[InlineKeyboardButton(text="/hints", callback_data='h')],[InlineKeyboardButton(text="/add_hint", callback_data='ah')]])
-
-        def message(msg):
-            content_type, chat_type, chat_id = telepot.glance(msg)
-            from_id=msg["from"]["id"]
-            topic=self.tree.getTopic(chat_id)
-            user=self.bot.getChat(from_id)
-            txt=msg["text"]
-            if content_type == 'text' and self.verify_user(msg,chat_id,from_id,topic):
-                lang=self.tree.getSuperUserLang(chat_id,topic)
-                if matchCommand('/start',txt,chat_type,self.bot.getMe()["username"]):
-                    self.bot.sendMessage(chat_id,tagGroup(chat_type,user)+tree.getString(lang,"start",xxx=topic), reply_markup=ReplyKeyboardRemove(selective=True))
-                    self.bot.sendMessage(chat_id, self.tree.getString(lang,"command"), reply_markup=self.keyboard)
-                    self.id_commands=del_id(from_id,chat_id,self.id_commands)
-                elif matchCommand('/answer',txt,chat_type,self.bot.getMe()["username"]):
-                    selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"FREE"),chat_type,self.bot,self.tree.get_lang())
-                    self.id_commands=add_id(from_id,chat_id,self.id_commands,1)
-                elif matchCommand('/ban',txt,chat_type,self.bot.getMe()["username"]):
-                    selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"FREE"),chat_type,self.bot,self.tree.get_lang())
-                    self.id_commands=add_id(from_id,chat_id,self.id_commands,3)
-                elif matchCommand('/report',txt,chat_type,self.bot.getMe()["username"]):
-                    self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"report"),reply_markup=ReplyKeyboardRemove(selective=True))
-                    self.id_commands=add_id(from_id,chat_id,self.id_commands,2)
-                elif matchCommand('/list',txt,chat_type,self.bot.getMe()["username"]):
-                    self.list_sel(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"ANSWER"),chat_type)
-                    self.id_commands=del_id(from_id,chat_id,self.id_commands)
-                elif matchCommand('/ban_list',txt,chat_type,self.bot.getMe()["username"]):
-                    self.list_sel(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"BANNED"),chat_type)
-                    self.id_commands=del_id(from_id,chat_id,self.id_commands)
-                elif matchCommand('/free_list',txt,chat_type,self.bot.getMe()["username"]):
-                    self.list_sel(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"FREE"),chat_type)
-                    self.id_commands=del_id(from_id,chat_id,self.id_commands)
-                elif matchCommand('/sban',txt,chat_type,self.bot.getMe()["username"]):
-                    selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"BANNED"),chat_type,self.bot,self.tree.get_lang())
-                    self.id_commands=add_id(from_id,chat_id,self.id_commands,5)
-                elif matchCommand('/change',txt,chat_type,self.bot.getMe()["username"]):
-                    selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"ANSWER"),chat_type,self.bot,self.tree.get_lang())
-                    self.id_commands=add_id(from_id,chat_id,self.id_commands,1)
-                elif matchCommand('/delete',txt,chat_type,self.bot.getMe()["username"]):
-                    self.tree.deleteTC(chat_id,self.node.get_topic_name())
-                    self.bot.sendMessage(chat_id, "Permission deleted",reply_markup=ReplyKeyboardRemove())
-                    self.id_commands=del_id(from_id,chat_id,self.id_commands)
-                elif matchCommand('/hints',txt,chat_type,self.bot.getMe()["username"]):
-                    self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+list_to_str(self.tree.getHint(topic,lang)),reply_markup=ReplyKeyboardRemove(selective=True))
-                    self.id_commands=del_id(from_id,chat_id,self.id_commands)
-                elif matchCommand('/add_hint',txt,chat_type,self.bot.getMe()["username"]):
-                    self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"select_hint"),reply_markup=createReplyKeyboard(array_to_matrix(tree.getHint(topic,lang))))
-                    self.id_commands=add_id(from_id,chat_id,self.id_commands,6)
-                elif check_id(from_id,chat_id,self.id_commands) != 0:
-                    self.switcher(chat_id,from_id,txt,lang,topic,chat_type)
-
-        def query(msg):
-            query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
-            chat_id=msg["message"]["chat"]["id"]
-            chat_type=msg["message"]["chat"]["type"]
-            topic=self.tree.getTopic(chat_id)
-            user=self.bot.getChat(from_id)
-            print(msg)
-            if not self.verify_user(msg,chat_id,from_id,topic):
-                return
-            lang=self.tree.getSuperUserLang(chat_id,topic)
-            if query_data=='s':
-                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"start",xxx=topic), reply_markup=ReplyKeyboardRemove(selective=True))
-                self.bot.sendMessage(chat_id, self.tree.getString(lang,"command"), reply_markup=self.keyboard)
-                self.id_commands=del_id(from_id,chat_id,self.id_commands)
-            elif query_data=='a':
-                selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"FREE"),chat_type,self.bot,self.tree.get_lang())
-                self.id_commands=add_id(from_id,chat_id,self.id_commands,1)
-            elif query_data=='b':
-                selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"FREE"),chat_type,self.bot,self.tree.get_lang())
-                self.id_commands=add_id(from_id,chat_id,self.id_commands,3)
-            elif query_data=='r':
-                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"report"),reply_markup=ReplyKeyboardRemove(selective=True))
-                self.id_commands=add_id(from_id,chat_id,self.id_commands,2)
-            elif query_data=='l':
-                self.list_sel(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"ANSWER"),chat_type)
-                self.id_commands=del_id(from_id,chat_id,self.id_commands)
-            elif query_data=='fl':
-                self.list_sel(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"FREE"),chat_type)
-                self.id_commands=del_id(from_id,chat_id,self.id_commands)
-            elif query_data=='bl':
-                self.list_sel(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"BANNED"),chat_type)
-                self.id_commands=del_id(from_id,chat_id,self.id_commands)
-            elif query_data=='sb':
-                selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"BANNED"),chat_type,self.bot,self.tree.get_lang())
-                self.id_commands=add_id(from_id,chat_id,self.id_commands,5)
-            elif query_data=='c':
-                selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"ANSWER"),chat_type,self.bot,self.tree.get_lang())
-                self.id_commands=add_id(from_id,chat_id,self.id_commands,1)
-            elif query_data=='d':
-                self.tree.deleteTC(chat_id,topic)
-                self.bot.sendMessage(chat_id, "Permission deleted",reply_markup=ReplyKeyboardRemove())
-                self.id_commands=del_id(from_id,chat_id,self.id_commands)
-            elif query_data=='h':
-                vett=self.tree.getHint(topic,lang)
-                if vett!=[]:
-                    self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+list_to_str(vett),reply_markup=ReplyKeyboardRemove(selective=True))
-                else:
-                    self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"empty"),reply_markup=ReplyKeyboardRemove(selective=True))
-                self.id_commands=del_id(from_id,chat_id,self.id_commands)
-            elif query_data=='ah':
-                hints=self.tree.getHint(topic,lang)
-                if len(hints)>0:
-                    self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"select_hint"),reply_markup=createReplyKeyboard(array_to_matrix(tree.getHint(topic,lang))))
-                    self.id_commands=add_id(from_id,chat_id,self.id_commands,6)
-                else :
-                    self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"empty"),reply_markup=createReplyKeyboard(array_to_matrix(tree.getHint(topic,lang))))
-                    self.id_commands=del_id(from_id,chat_id,self.id_commands)
-        
         print("Token: "+token)
         self.bot=telepot.Bot(token)
-        self.bot.message_loop({'chat':message,'callback_query':query})
+        self.bot.message_loop({'chat':self.message,'callback_query':self.query})
         self.tree=tree
         self.id_commands={}
         self.query_bool={}
@@ -129,6 +20,113 @@ class BotTeacher:
         self.banned_user=self.tree.read_ban()
         self.tree.send_notification(self.bot)
 
+    def message(self,msg):
+        content_type, chat_type, chat_id = telepot.glance(msg)
+        from_id=msg["from"]["id"]
+        topic=self.tree.getTopic(chat_id)
+        user=self.bot.getChat(from_id)
+        txt=msg["text"]
+        if content_type == 'text' and self.verify_user(msg,chat_id,from_id,topic):
+            lang=self.tree.getSuperUserLang(chat_id,topic)
+            if matchCommand('/start',txt,chat_type,self.bot.getMe()["username"]):
+                self.bot.sendMessage(chat_id,tagGroup(chat_type,user)+tree.getString(lang,"start",xxx=topic), reply_markup=ReplyKeyboardRemove(selective=True))
+                self.bot.sendMessage(chat_id, self.tree.getString(lang,"command"), reply_markup=self.keyboard)
+                self.id_commands=del_id(from_id,chat_id,self.id_commands)
+            elif matchCommand('/answer',txt,chat_type,self.bot.getMe()["username"]):
+                selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"FREE"),chat_type,self.bot,self.tree.get_lang())
+                self.id_commands=add_id(from_id,chat_id,self.id_commands,1)
+            elif matchCommand('/ban',txt,chat_type,self.bot.getMe()["username"]):
+                selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"FREE"),chat_type,self.bot,self.tree.get_lang())
+                self.id_commands=add_id(from_id,chat_id,self.id_commands,3)
+            elif matchCommand('/report',txt,chat_type,self.bot.getMe()["username"]):
+                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"report"),reply_markup=ReplyKeyboardRemove(selective=True))
+                self.id_commands=add_id(from_id,chat_id,self.id_commands,2)
+            elif matchCommand('/list',txt,chat_type,self.bot.getMe()["username"]):
+                self.list_sel(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"ANSWER"),chat_type)
+                self.id_commands=del_id(from_id,chat_id,self.id_commands)
+            elif matchCommand('/ban_list',txt,chat_type,self.bot.getMe()["username"]):
+                self.list_sel(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"BANNED"),chat_type)
+                self.id_commands=del_id(from_id,chat_id,self.id_commands)
+            elif matchCommand('/free_list',txt,chat_type,self.bot.getMe()["username"]):
+                self.list_sel(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"FREE"),chat_type)
+                self.id_commands=del_id(from_id,chat_id,self.id_commands)
+            elif matchCommand('/sban',txt,chat_type,self.bot.getMe()["username"]):
+                selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"BANNED"),chat_type,self.bot,self.tree.get_lang())
+                self.id_commands=add_id(from_id,chat_id,self.id_commands,5)
+            elif matchCommand('/change',txt,chat_type,self.bot.getMe()["username"]):
+                selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"ANSWER"),chat_type,self.bot,self.tree.get_lang())
+                self.id_commands=add_id(from_id,chat_id,self.id_commands,1)
+            elif matchCommand('/delete',txt,chat_type,self.bot.getMe()["username"]):
+                self.tree.deleteTC(chat_id,self.node.get_topic_name())
+                self.bot.sendMessage(chat_id, "Permission deleted",reply_markup=ReplyKeyboardRemove())
+                self.id_commands=del_id(from_id,chat_id,self.id_commands)
+            elif matchCommand('/hints',txt,chat_type,self.bot.getMe()["username"]):
+                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+list_to_str(self.tree.getHint(topic,lang)),reply_markup=ReplyKeyboardRemove(selective=True))
+                self.id_commands=del_id(from_id,chat_id,self.id_commands)
+            elif matchCommand('/add_hint',txt,chat_type,self.bot.getMe()["username"]):
+                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"select_hint"),reply_markup=createReplyKeyboard(array_to_matrix(tree.getHint(topic,lang))))
+                self.id_commands=add_id(from_id,chat_id,self.id_commands,6)
+            elif check_id(from_id,chat_id,self.id_commands) != 0:
+                self.switcher(chat_id,from_id,txt,lang,topic,chat_type)
+
+    def query(self,msg):
+        query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
+        chat_id=msg["message"]["chat"]["id"]
+        chat_type=msg["message"]["chat"]["type"]
+        topic=self.tree.getTopic(chat_id)
+        user=self.bot.getChat(from_id)
+        print(msg)
+        if not self.verify_user(msg,chat_id,from_id,topic):
+            return
+        lang=self.tree.getSuperUserLang(chat_id,topic)
+        if query_data=='s':
+            self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"start",xxx=topic), reply_markup=ReplyKeyboardRemove(selective=True))
+            self.bot.sendMessage(chat_id, self.tree.getString(lang,"command"), reply_markup=self.keyboard)
+            self.id_commands=del_id(from_id,chat_id,self.id_commands)
+        elif query_data=='a':
+            selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"FREE"),chat_type,self.bot,self.tree.get_lang())
+            self.id_commands=add_id(from_id,chat_id,self.id_commands,1)
+        elif query_data=='b':
+            selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"FREE"),chat_type,self.bot,self.tree.get_lang())
+            self.id_commands=add_id(from_id,chat_id,self.id_commands,3)
+        elif query_data=='r':
+            self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"report"),reply_markup=ReplyKeyboardRemove(selective=True))
+            self.id_commands=add_id(from_id,chat_id,self.id_commands,2)
+        elif query_data=='l':
+            self.list_sel(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"ANSWER"),chat_type)
+            self.id_commands=del_id(from_id,chat_id,self.id_commands)
+        elif query_data=='fl':
+            self.list_sel(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"FREE"),chat_type)
+            self.id_commands=del_id(from_id,chat_id,self.id_commands)
+        elif query_data=='bl':
+            self.list_sel(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"BANNED"),chat_type)
+            self.id_commands=del_id(from_id,chat_id,self.id_commands)
+        elif query_data=='sb':
+            selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"BANNED"),chat_type,self.bot,self.tree.get_lang())
+            self.id_commands=add_id(from_id,chat_id,self.id_commands,5)
+        elif query_data=='c':
+            selection(chat_id,from_id,lang,self.tree.getResArray(topic,lang,"ANSWER"),chat_type,self.bot,self.tree.get_lang())
+            self.id_commands=add_id(from_id,chat_id,self.id_commands,1)
+        elif query_data=='d':
+            self.tree.deleteTC(chat_id,topic)
+            self.bot.sendMessage(chat_id, "Permission deleted",reply_markup=ReplyKeyboardRemove())
+            self.id_commands=del_id(from_id,chat_id,self.id_commands)
+        elif query_data=='h':
+            vett=self.tree.getHint(topic,lang)
+            if vett!=[]:
+                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+list_to_str(vett),reply_markup=ReplyKeyboardRemove(selective=True))
+            else:
+                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"empty"),reply_markup=ReplyKeyboardRemove(selective=True))
+            self.id_commands=del_id(from_id,chat_id,self.id_commands)
+        elif query_data=='ah':
+            hints=self.tree.getHint(topic,lang)
+            if len(hints)>0:
+                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"select_hint"),reply_markup=createReplyKeyboard(array_to_matrix(tree.getHint(topic,lang))))
+                self.id_commands=add_id(from_id,chat_id,self.id_commands,6)
+            else :
+                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"empty"),reply_markup=createReplyKeyboard(array_to_matrix(tree.getHint(topic,lang))))
+                self.id_commands=del_id(from_id,chat_id,self.id_commands)
+        
     def list_sel(self,chat_id,from_id,lang,list1,chat_type):
         user=self.bot.getChat(from_id)
         if list1 ==[] :

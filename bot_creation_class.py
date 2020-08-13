@@ -12,71 +12,7 @@ from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, Reply
 class BotCreation:
 
     def __init__(self,token,tree):
-
         self.keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/new_bot", callback_data='n')],[InlineKeyboardButton(text="/delete_bot", callback_data='d')],[InlineKeyboardButton(text="/start", callback_data='s')],[InlineKeyboardButton(text="/change_pwd", callback_data='c')]])
-
-        def message(msg):
-            content_type, chat_type, chat_id = telepot.glance(msg)
-            if chat_id in self.banned_user:
-                if self.banned_user[chat_id]>99:
-                    self.bot.sendMessage(chat_id,"You are banned from this bot", reply_markup=self.tree.topicKeyboard())
-                    return
-            if content_type == 'text' and chat_type=="private":
-                if msg["text"]=='/start':
-                    self.bot.sendMessage(chat_id,"Hi, this is the bot to create a new subject.", reply_markup=ReplyKeyboardRemove())
-                    self.bot.sendMessage(chat_id,"Click on a command below:", reply_markup=self.keyboard)
-                    self.del_past_creation(chat_id)
-                elif msg["text"]=='/delete_bot':
-                    self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
-                    self.del_past_creation(chat_id)
-                    self.id_creation[chat_id]=4
-                    self.boolvett[chat_id]=False
-                elif msg["text"]=='/new_bot':
-                    self.bot.sendMessage(chat_id,"Please select a new topic, please write the name in english:", reply_markup=self.tree.topicKeyboard())
-                    self.del_past_creation(chat_id)
-                    self.id_creation[chat_id]=1
-                elif msg["text"]=='/change_pwd':
-                    if not self.req_pwd(chat_id):
-                        self.bot.sendMessage(chat_id,"You made too many requests, command aborted", reply_markup=self.tree.topicKeyboard())
-                        return
-                    self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
-                    self.del_past_creation(chat_id)
-                    self.id_creation[chat_id]=4
-                    self.boolvett[chat_id]=True
-                elif chat_id in self.id_creation:
-                    self.switch_creation(chat_id,msg["text"])
-                else :
-                    self.bot.sendMessage(chat_id,"Unknown command or bot restarted.", reply_markup=self.tree.topicKeyboard())
-
-        def query(msg):
-            query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
-            chat_id=msg["message"]["chat"]["id"]
-            if chat_id in self.banned_user:
-                if self.banned_user[chat_id]>99:
-                    self.bot.sendMessage(chat_id,"You are banned from this bot",reply_markup=ReplyKeyboardRemove())
-                    return
-            if query_data=='s':
-                self.bot.sendMessage(chat_id,"Hi, this is the bot to create a new subject.", reply_markup=ReplyKeyboardRemove())
-                self.bot.sendMessage(chat_id,"Click on a command below:", reply_markup=self.keyboard)
-                self.del_past_creation(chat_id)
-            elif query_data=='n':
-                self.bot.sendMessage(chat_id,"Please select a new topic, please write the name in english:",reply_markup=ReplyKeyboardRemove())
-                self.del_past_creation(chat_id)
-                self.id_creation[chat_id]=1
-            elif query_data=='d':
-                self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
-                self.del_past_creation(chat_id)
-                self.id_creation[chat_id]=4
-                self.boolvett[chat_id]=False
-            elif query_data=='c':
-                if not self.req_pwd(chat_id):
-                    self.bot.sendMessage(chat_id,"You made too many requests, command aborted",reply_markup=ReplyKeyboardRemove())
-                    return
-                self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
-                self.del_past_creation(chat_id)
-                self.id_creation[chat_id]=4
-                self.boolvett[chat_id]=True
-
         self.id_creation={}
         self.boolvett={}
         self.unconfirmed_bot={}
@@ -87,7 +23,69 @@ class BotCreation:
         self.admin_pwd=self.tree.get_pwd_admin()
         self.select_str="Please select a topic:"
         self.bot=telepot.Bot(token)
-        self.bot.message_loop({'chat':message,'callback_query':query})
+        self.bot.message_loop({'chat':self.message,'callback_query':self.query})
+
+    def message(self,msg):
+        content_type, chat_type, chat_id = telepot.glance(msg)
+        if chat_id in self.banned_user:
+            if self.banned_user[chat_id]>99:
+                self.bot.sendMessage(chat_id,"You are banned from this bot", reply_markup=self.tree.topicKeyboard())
+                return
+        if content_type == 'text' and chat_type=="private":
+            if msg["text"]=='/start':
+                self.bot.sendMessage(chat_id,"Hi, this is the bot to create a new subject.", reply_markup=ReplyKeyboardRemove())
+                self.bot.sendMessage(chat_id,"Click on a command below:", reply_markup=self.keyboard)
+                self.del_past_creation(chat_id)
+            elif msg["text"]=='/delete_bot':
+                self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
+                self.del_past_creation(chat_id)
+                self.id_creation[chat_id]=4
+                self.boolvett[chat_id]=False
+            elif msg["text"]=='/new_bot':
+                self.bot.sendMessage(chat_id,"Please select a new topic, please write the name in english:", reply_markup=self.tree.topicKeyboard())
+                self.del_past_creation(chat_id)
+                self.id_creation[chat_id]=1
+            elif msg["text"]=='/change_pwd':
+                if not self.req_pwd(chat_id):
+                    self.bot.sendMessage(chat_id,"You made too many requests, command aborted", reply_markup=self.tree.topicKeyboard())
+                    return
+                self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
+                self.del_past_creation(chat_id)
+                self.id_creation[chat_id]=4
+                self.boolvett[chat_id]=True
+            elif chat_id in self.id_creation:
+                self.switch_creation(chat_id,msg["text"])
+            else :
+                self.bot.sendMessage(chat_id,"Unknown command or bot restarted.", reply_markup=self.tree.topicKeyboard())
+
+    def query(self,msg):
+        query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
+        chat_id=msg["message"]["chat"]["id"]
+        if chat_id in self.banned_user:
+            if self.banned_user[chat_id]>99:
+                self.bot.sendMessage(chat_id,"You are banned from this bot",reply_markup=ReplyKeyboardRemove())
+                return
+        if query_data=='s':
+            self.bot.sendMessage(chat_id,"Hi, this is the bot to create a new subject.", reply_markup=ReplyKeyboardRemove())
+            self.bot.sendMessage(chat_id,"Click on a command below:", reply_markup=self.keyboard)
+            self.del_past_creation(chat_id)
+        elif query_data=='n':
+            self.bot.sendMessage(chat_id,"Please select a new topic, please write the name in english:",reply_markup=ReplyKeyboardRemove())
+            self.del_past_creation(chat_id)
+            self.id_creation[chat_id]=1
+        elif query_data=='d':
+            self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
+            self.del_past_creation(chat_id)
+            self.id_creation[chat_id]=4
+            self.boolvett[chat_id]=False
+        elif query_data=='c':
+            if not self.req_pwd(chat_id):
+                self.bot.sendMessage(chat_id,"You made too many requests, command aborted",reply_markup=ReplyKeyboardRemove())
+                return
+            self.bot.sendMessage(chat_id,self.select_str, reply_markup=self.tree.topicKeyboard())
+            self.del_past_creation(chat_id)
+            self.id_creation[chat_id]=4
+            self.boolvett[chat_id]=True
 
     def teach_board_topic(self,topic,chat_id):
         self.bot.sendMessage(chat_id,"If you want go to a bot",reply_markup=self.tree.get_creation_keyboard(topic))

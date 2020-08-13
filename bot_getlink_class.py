@@ -4,19 +4,18 @@ from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, Reply
 class BotGetlink:
 
     def __init__(self,token,tree):
-
-        def message(msg):
-            content_type, chat_type, chat_id = telepot.glance(msg)
-            if content_type == 'text' and chat_type=="private":
-                if msg["text"]=='/start':
-                    self.bot.sendMessage(chat_id,"Select a bot:",reply_markup=self.create_url_inline_query())
-
-        def query(msg):
-            return None
-
         self.bot=telepot.Bot(token)
-        self.bot.message_loop({'chat':message,'callback_query':query})
+        self.bot.message_loop({'chat':self.message,'callback_query':self.query})
         self.tree=tree
+
+    def message(self,msg):
+        content_type, chat_type, chat_id = telepot.glance(msg)
+        if content_type == 'text' and chat_type=="private":
+            if msg["text"]=='/start':
+                self.bot.sendMessage(chat_id,"Select a bot:",reply_markup=self.create_url_inline_query())
+
+    def query(self,msg):
+        return None
 
     def create_url_button(self,topic):
         return InlineKeyboardButton(text=topic,url="https://t.me/"+self.tree.get_username_by_topic(topic)+"?start=foo")

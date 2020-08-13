@@ -6,71 +6,7 @@ from node_class import Node
 class BotStudent:
 
     def __init__(self,token,topic,database,lang_class):
-
         self.keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/list", callback_data='l')],[InlineKeyboardButton(text="/question", callback_data='q')],[InlineKeyboardButton(text="/report", callback_data='r')],[InlineKeyboardButton(text="/start", callback_data='s')],[InlineKeyboardButton(text="/revision", callback_data='rv')],[InlineKeyboardButton(text="/change_lang", callback_data='cl')]])
-
-        def message(msg):
-            content_type, chat_type, chat_id = telepot.glance(msg)
-            from_id=msg["from"]["id"]
-            print(msg)
-            txt=msg["text"]
-            if content_type == 'text':
-                user=self.bot.getChat(from_id)
-                lang=self.get_user_lang(chat_id)
-                if lang==None and not check_id(from_id,chat_id,self.id_commands)==4:
-                    self.set_lang(chat_id,from_id,msg['from']['language_code'],chat_type)
-                    self.id_commands=add_id(from_id,chat_id,self.id_commands,4)
-                elif matchCommand('/start',txt,chat_type,self.bot.getMe()["username"]):
-                    self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"start",xxx=self.node.get_topic_name()), reply_markup=ReplyKeyboardRemove(selective=True))
-                    self.bot.sendMessage(chat_id, self.node.getString(lang,"command"), reply_markup=self.keyboard)
-                    self.id_commands=del_id(from_id,chat_id,self.id_commands)
-                elif matchCommand('/question',txt,chat_type,self.bot.getMe()["username"]):
-                    self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"question"),reply_markup=ReplyKeyboardRemove(selective=True))
-                    self.id_commands=add_id(from_id,chat_id,self.id_commands,5)
-                elif matchCommand('/report',txt,chat_type,self.bot.getMe()["username"]):
-                    self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"report"),reply_markup=ReplyKeyboardRemove(selective=True))
-                    self.id_commands=add_id(from_id,chat_id,self.id_commands,2)
-                elif matchCommand('/revision',txt,chat_type,self.bot.getMe()["username"]):
-                    selection(chat_id,from_id,lang,self.node.get_res_array(lang,"ANSWER"),chat_type,self.bot,self.node.get_lang())
-                    self.id_commands=add_id(from_id,chat_id,self.id_commands,3)
-                elif matchCommand('/change_lang',txt,chat_type,self.bot.getMe()["username"]):
-                    self.set_lang(chat_id,from_id,lang,chat_type)
-                    self.id_commands=add_id(from_id,chat_id,self.id_commands,4)
-                elif matchCommand('/list',txt,chat_type,self.bot.getMe()["username"]):
-                    self.list_by_user(from_id,chat_id,lang,chat_type)
-                    self.id_commands=del_id(from_id,chat_id,self.id_commands)
-                elif check_id(from_id,chat_id,self.id_commands) != 0:
-                    self.switcher(chat_id,from_id,msg["text"],lang,chat_type)
-
-        def query(msg):
-            query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
-            chat_id=msg["message"]["chat"]["id"]
-            chat_type=msg["message"]["chat"]["type"]
-            user=self.bot.getChat(from_id)
-            lang=self.get_user_lang(chat_id)
-            if lang==None and not check_id(from_id,chat_id,self.id_commands)==4:
-                self.set_lang(chat_id,from_id,msg['from']['language_code'],chat_type)
-                self.id_commands=add_id(from_id,chat_id,self.id_commands,4)
-            elif query_data=='s':
-                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"start",xxx=self.node.get_topic_name()), reply_markup=ReplyKeyboardRemove(selective=True))
-                self.bot.sendMessage(chat_id, self.node.getString(lang,"command"), reply_markup=self.keyboard)
-                self.id_commands=del_id(from_id,chat_id,self.id_commands)
-            elif query_data=='q':
-                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"question"),reply_markup=ReplyKeyboardRemove(selective=True))
-                self.id_commands=add_id(from_id,chat_id,self.id_commands,5)
-            elif query_data=='r':
-                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"report"),reply_markup=ReplyKeyboardRemove(selective=True))
-                self.id_commands=add_id(from_id,chat_id,self.id_commands,2)
-            elif query_data=='rv':
-                selection(chat_id,from_id,lang,self.node.get_res_array(lang,"ANSWER"),chat_type,self.bot,self.node.get_lang())
-                self.id_commands=add_id(from_id,chat_id,self.id_commands,3)
-            elif query_data=='cl':
-                self.set_lang(chat_id,from_id,lang,chat_type)
-                self.id_commands=add_id(from_id,chat_id,self.id_commands,4)
-            elif query_data=='l':
-                self.list_by_user(chat_id,from_id,lang,chat_type)
-                self.id_commands=del_id(from_id,chat_id,self.id_commands)
-
         self.id_commands={}
         self.students=database.get_stud_ids(topic)
         print(self.students)
@@ -80,7 +16,69 @@ class BotStudent:
         self.bot=telepot.Bot(token)
         self.token=token
         self.banned_user=database.get_banned_user(topic)
-        self.bot.message_loop({'chat':message,'callback_query':query})
+        self.bot.message_loop({'chat':self.message,'callback_query':self.query})
+
+    def message(self,msg):
+        content_type, chat_type, chat_id = telepot.glance(msg)
+        from_id=msg["from"]["id"]
+        print(msg)
+        txt=msg["text"]
+        if content_type == 'text':
+            user=self.bot.getChat(from_id)
+            lang=self.get_user_lang(chat_id)
+            if lang==None and not check_id(from_id,chat_id,self.id_commands)==4:
+                self.set_lang(chat_id,from_id,msg['from']['language_code'],chat_type)
+                self.id_commands=add_id(from_id,chat_id,self.id_commands,4)
+            elif matchCommand('/start',txt,chat_type,self.bot.getMe()["username"]):
+                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"start",xxx=self.node.get_topic_name()), reply_markup=ReplyKeyboardRemove(selective=True))
+                self.bot.sendMessage(chat_id, self.node.getString(lang,"command"), reply_markup=self.keyboard)
+                self.id_commands=del_id(from_id,chat_id,self.id_commands)
+            elif matchCommand('/question',txt,chat_type,self.bot.getMe()["username"]):
+                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"question"),reply_markup=ReplyKeyboardRemove(selective=True))
+                self.id_commands=add_id(from_id,chat_id,self.id_commands,5)
+            elif matchCommand('/report',txt,chat_type,self.bot.getMe()["username"]):
+                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"report"),reply_markup=ReplyKeyboardRemove(selective=True))
+                self.id_commands=add_id(from_id,chat_id,self.id_commands,2)
+            elif matchCommand('/revision',txt,chat_type,self.bot.getMe()["username"]):
+                selection(chat_id,from_id,lang,self.node.get_res_array(lang,"ANSWER"),chat_type,self.bot,self.node.get_lang())
+                self.id_commands=add_id(from_id,chat_id,self.id_commands,3)
+            elif matchCommand('/change_lang',txt,chat_type,self.bot.getMe()["username"]):
+                self.set_lang(chat_id,from_id,lang,chat_type)
+                self.id_commands=add_id(from_id,chat_id,self.id_commands,4)
+            elif matchCommand('/list',txt,chat_type,self.bot.getMe()["username"]):
+                self.list_by_user(from_id,chat_id,lang,chat_type)
+                self.id_commands=del_id(from_id,chat_id,self.id_commands)
+            elif check_id(from_id,chat_id,self.id_commands) != 0:
+                self.switcher(chat_id,from_id,msg["text"],lang,chat_type)
+
+    def query(self,msg):
+        query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
+        chat_id=msg["message"]["chat"]["id"]
+        chat_type=msg["message"]["chat"]["type"]
+        user=self.bot.getChat(from_id)
+        lang=self.get_user_lang(chat_id)
+        if lang==None and not check_id(from_id,chat_id,self.id_commands)==4:
+            self.set_lang(chat_id,from_id,msg['from']['language_code'],chat_type)
+            self.id_commands=add_id(from_id,chat_id,self.id_commands,4)
+        elif query_data=='s':
+            self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"start",xxx=self.node.get_topic_name()), reply_markup=ReplyKeyboardRemove(selective=True))
+            self.bot.sendMessage(chat_id, self.node.getString(lang,"command"), reply_markup=self.keyboard)
+            self.id_commands=del_id(from_id,chat_id,self.id_commands)
+        elif query_data=='q':
+            self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"question"),reply_markup=ReplyKeyboardRemove(selective=True))
+            self.id_commands=add_id(from_id,chat_id,self.id_commands,5)
+        elif query_data=='r':
+            self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"report"),reply_markup=ReplyKeyboardRemove(selective=True))
+            self.id_commands=add_id(from_id,chat_id,self.id_commands,2)
+        elif query_data=='rv':
+            selection(chat_id,from_id,lang,self.node.get_res_array(lang,"ANSWER"),chat_type,self.bot,self.node.get_lang())
+            self.id_commands=add_id(from_id,chat_id,self.id_commands,3)
+        elif query_data=='cl':
+            self.set_lang(chat_id,from_id,lang,chat_type)
+            self.id_commands=add_id(from_id,chat_id,self.id_commands,4)
+        elif query_data=='l':
+            self.list_by_user(chat_id,from_id,lang,chat_type)
+            self.id_commands=del_id(from_id,chat_id,self.id_commands)
 
     def get_token(self):
         return self.token

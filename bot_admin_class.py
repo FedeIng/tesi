@@ -4,16 +4,15 @@ from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, Reply
 class BotAdmin:
 
     def __init__(self,token,admins):
-
-        def message(msg):
-            return None
-
-        def query(msg):
-            return None
-
         self.bot=telepot.Bot(token)
-        self.bot.message_loop({'chat':message,'callback_query':query})
+        self.bot.message_loop({'chat':self.message,'callback_query':self.query})
         self.admins=admins
+
+    def message(self,msg):
+        return None
+
+    def query(self,msg):
+        return None
 
     def get_bot(self):
         return self.bot
