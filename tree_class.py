@@ -310,21 +310,19 @@ class Tree:
 
     def set_ban(self,txt,lang,topic):
         jarray=self.array[topic].get_json_array(lang)
-        for elem in jarray:
-            e=self.match_array1(txt,lang,jarray)
-            if e != None:
-                if jarray[e]["answer"]=="":
-                    self.array[topic].set_response(lang,e,"BANNED")
+        e=self.match_array1(txt,lang,jarray)
+        if e != None:
+            if jarray[e]["answer"]=="":
+                self.array[topic].set_response(lang,e,"BANNED")
         self.array[topic].set_bannedUsers(self.lang)
         #self.write_data()
 
     def set_sban(self,txt,lang,topic):
         jarray=self.array[topic].get_json_array(lang)
-        for elem in jarray:
-            e=self.match_array1(txt,lang,jarray)
-            if e != None:
-                if jarray[e]["answer"]=="BANNED":
-                    self.array[topic].set_response(lang,e,"")
+        e=self.match_array1(txt,lang,jarray)
+        if e != None:
+            if jarray[e]["answer"]=="BANNED":
+                self.array[topic].set_response(lang,e,"")
         self.array[topic].set_bannedUsers(self.lang)
         #self.write_data()
 
