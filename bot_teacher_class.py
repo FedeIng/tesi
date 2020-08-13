@@ -29,7 +29,7 @@ class BotTeacher:
         if content_type == 'text' and self.verify_user(msg,chat_id,from_id,topic):
             lang=self.tree.getSuperUserLang(chat_id,topic)
             if matchCommand('/start',txt,chat_type,self.bot.getMe()["username"]):
-                self.bot.sendMessage(chat_id,tagGroup(chat_type,user)+tree.getString(lang,"start",xxx=topic), reply_markup=ReplyKeyboardRemove(selective=True))
+                self.bot.sendMessage(chat_id,tagGroup(chat_type,user)+self.tree.getString(lang,"start",xxx=topic), reply_markup=ReplyKeyboardRemove(selective=True))
                 self.bot.sendMessage(chat_id, self.tree.getString(lang,"command"), reply_markup=self.keyboard)
                 self.id_commands=del_id(from_id,chat_id,self.id_commands)
             elif matchCommand('/answer',txt,chat_type,self.bot.getMe()["username"]):
