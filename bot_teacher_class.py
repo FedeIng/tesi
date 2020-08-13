@@ -64,7 +64,7 @@ class BotTeacher:
                 self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+list_to_str(self.tree.getHint(topic,lang)),reply_markup=ReplyKeyboardRemove(selective=True))
                 self.id_commands=del_id(from_id,chat_id,self.id_commands)
             elif matchCommand('/add_hint',txt,chat_type,self.bot.getMe()["username"]):
-                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"select_hint"),reply_markup=createReplyKeyboard(array_to_matrix(tree.getHint(topic,lang))))
+                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"select_hint"),reply_markup=createReplyKeyboard(array_to_matrix(self.tree.getHint(topic,lang))))
                 self.id_commands=add_id(from_id,chat_id,self.id_commands,6)
             elif check_id(from_id,chat_id,self.id_commands) != 0:
                 self.switcher(chat_id,from_id,txt,lang,topic,chat_type)
