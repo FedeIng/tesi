@@ -80,7 +80,7 @@ class BotTeacher:
             return
         lang=self.tree.getSuperUserLang(chat_id,topic)
         if query_data=='s':
-            self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+tree.getString(lang,"start",xxx=topic), reply_markup=ReplyKeyboardRemove(selective=True))
+            self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"start",xxx=topic), reply_markup=ReplyKeyboardRemove(selective=True))
             self.bot.sendMessage(chat_id, self.tree.getString(lang,"command"), reply_markup=self.keyboard)
             self.id_commands=del_id(from_id,chat_id,self.id_commands)
         elif query_data=='a':
@@ -121,10 +121,10 @@ class BotTeacher:
         elif query_data=='ah':
             hints=self.tree.getHint(topic,lang)
             if len(hints)>0:
-                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"select_hint"),reply_markup=createReplyKeyboard(array_to_matrix(tree.getHint(topic,lang))))
+                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"select_hint"),reply_markup=createReplyKeyboard(array_to_matrix(self.tree.getHint(topic,lang))))
                 self.id_commands=add_id(from_id,chat_id,self.id_commands,6)
             else :
-                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"empty"),reply_markup=createReplyKeyboard(array_to_matrix(tree.getHint(topic,lang))))
+                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"empty"),reply_markup=createReplyKeyboard(array_to_matrix(self.tree.getHint(topic,lang))))
                 self.id_commands=del_id(from_id,chat_id,self.id_commands)
         
     def list_sel(self,chat_id,from_id,lang,list1,chat_type):
