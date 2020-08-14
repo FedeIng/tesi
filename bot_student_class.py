@@ -317,7 +317,9 @@ class BotStudent:
             self.match_speech(chat_id,from_id,txt,lang,chat_type)
             self.id_commands=del_id(from_id,chat_id,self.id_commands)
         elif check_id(from_id,chat_id,self.id_commands)==2:
-            seg_bug(chat_id,from_id,txt,lang,chat_type,"students",self.bot,self.node.get_database(),self.node.get_lang())
+            chat={"chat":chat_id,"from":from_id}
+            bot={"bot":self.bot,"type":"student"}
+            seg_bug(chat,txt,lang,chat_type,bot,self.node.get_database(),self.node.get_lang())
             self.id_commands=del_id(from_id,chat_id,self.id_commands)
         elif check_id(from_id,chat_id,self.id_commands)==3:
             self.seg_rev(chat_id,from_id,txt,lang,chat_type)
