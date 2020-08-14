@@ -20,13 +20,16 @@ class BotTeacher:
         self.banned_user=self.tree.read_ban()
         self.tree.send_notification(self.bot)
 
+    def condition(self,content_type,msg,chat_id,from_id,topic):
+        return content_type == 'text' and self.verify_user(msg,chat_id,from_id,topic)
+
     def message(self,msg):
         content_type, chat_type, chat_id = telepot.glance(msg)
         from_id=msg["from"]["id"]
         topic=self.tree.getTopic(chat_id)
         user=self.bot.getChat(from_id)
         txt=msg["text"]
-        if content_type == 'text' and self.verify_user(msg,chat_id,from_id,topic):
+        if self.condition(content_type,msg,chat_id,from_id,topic):
             lang=self.tree.getSuperUserLang(chat_id,topic)
             if matchCommand('/start',txt,chat_type,self.bot.getMe()["username"]):
                 self.bot.sendMessage(chat_id,tagGroup(chat_type,user)+self.tree.getString(lang,"start",xxx=topic), reply_markup=ReplyKeyboardRemove(selective=True))
