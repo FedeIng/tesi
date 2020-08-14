@@ -1,11 +1,10 @@
 from node_class import Node
 from language_class import Language
-from library import *
 import json
 import telepot
 import operator
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
-from bot_student_class import * 
+from bot_student_class import BotStudent 
 
 class Tree:
 
@@ -311,18 +310,16 @@ class Tree:
     def set_ban(self,txt,lang,topic):
         jarray=self.array[topic].get_json_array(lang)
         e=self.match_array1(txt,lang,jarray)
-        if e != None:
-            if jarray[e]["answer"]=="":
-                self.array[topic].set_response(lang,e,"BANNED")
+        if e != None and jarray[e]["answer"]=="":
+            self.array[topic].set_response(lang,e,"BANNED")
         self.array[topic].set_bannedUsers(self.lang)
         #self.write_data()
 
     def set_sban(self,txt,lang,topic):
         jarray=self.array[topic].get_json_array(lang)
         e=self.match_array1(txt,lang,jarray)
-        if e != None:
-            if jarray[e]["answer"]=="BANNED":
-                self.array[topic].set_response(lang,e,"")
+        if e != None and jarray[e]["answer"]=="BANNED":
+            self.array[topic].set_response(lang,e,"")
         self.array[topic].set_bannedUsers(self.lang)
         #self.write_data()
 
