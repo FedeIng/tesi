@@ -291,11 +291,7 @@ class Node:
         if lang not in self.json_array:
             return data
         for elem in self.json_array[lang]:
-            if condition=="FREE" and self.json_array[lang][elem]["answer"]=='':
-                data.append(elem)
-            elif condition=="BANNED" and self.json_array[lang][elem]["answer"]=="BANNED":
-                data.append(elem)
-            elif condition=="ANSWER" and self.json_array[lang][elem]["answer"]!='' and self.json_array[lang][elem]["answer"]!="BANNED":
+            if (condition=="FREE" and self.json_array[lang][elem]["answer"]=='') or (condition=="BANNED" and self.json_array[lang][elem]["answer"]=="BANNED") or (condition=="ANSWER" and self.json_array[lang][elem]["answer"]!='' and self.json_array[lang][elem]["answer"]!="BANNED"):
                 data.append(elem)
         return data
 
