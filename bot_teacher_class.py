@@ -72,6 +72,23 @@ class BotTeacher:
             elif check_id(from_id,chat_id,self.id_commands) != 0:
                 self.switcher(chat_id,from_id,txt,lang,topic,chat_type)
 
+    def hints(self,chat_id,from_id,topic,lang,chat_type,user):
+        vett=self.tree.getHint(topic,lang)
+        if vett!=[]:
+            self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+list_to_str(vett),reply_markup=ReplyKeyboardRemove(selective=True))
+        else:
+            self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"empty"),reply_markup=ReplyKeyboardRemove(selective=True))
+        self.id_commands=del_id(from_id,chat_id,self.id_commands)
+
+    def add_hints(self,chat_id,from_id,topic,lang,chat_type,user):
+        hints=self.tree.getHint(topic,lang)
+        if len(hints)>0:
+            self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"select_hint"),reply_markup=createReplyKeyboard(array_to_matrix(self.tree.getHint(topic,lang))))
+            self.id_commands=add_id(from_id,chat_id,self.id_commands,6)
+        else :
+            self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"empty"),reply_markup=createReplyKeyboard(array_to_matrix(self.tree.getHint(topic,lang))))
+            self.id_commands=del_id(from_id,chat_id,self.id_commands)
+
     def query(self,msg):
         query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
         chat_id=msg["message"]["chat"]["id"]
@@ -115,20 +132,9 @@ class BotTeacher:
             self.bot.sendMessage(chat_id, "Permission deleted",reply_markup=ReplyKeyboardRemove())
             self.id_commands=del_id(from_id,chat_id,self.id_commands)
         elif query_data=='h':
-            vett=self.tree.getHint(topic,lang)
-            if vett!=[]:
-                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+list_to_str(vett),reply_markup=ReplyKeyboardRemove(selective=True))
-            else:
-                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"empty"),reply_markup=ReplyKeyboardRemove(selective=True))
-            self.id_commands=del_id(from_id,chat_id,self.id_commands)
+            self.hints(chat_id,from_id,topic,lang,chat_type,user)
         elif query_data=='ah':
-            hints=self.tree.getHint(topic,lang)
-            if len(hints)>0:
-                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"select_hint"),reply_markup=createReplyKeyboard(array_to_matrix(self.tree.getHint(topic,lang))))
-                self.id_commands=add_id(from_id,chat_id,self.id_commands,6)
-            else :
-                self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.tree.getString(lang,"empty"),reply_markup=createReplyKeyboard(array_to_matrix(self.tree.getHint(topic,lang))))
-                self.id_commands=del_id(from_id,chat_id,self.id_commands)
+            self.add_hints(chat_id,from_id,topic,lang,chat_type,user)
         
     def list_sel(self,chat_id,from_id,lang,list1,chat_type):
         user=self.bot.getChat(from_id)
