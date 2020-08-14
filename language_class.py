@@ -152,9 +152,8 @@ class Language:
     def get_string(self, lang, string, xxx=None, yyy=None):
         if string=="start":
             xxx=self.translate(xxx,"en",lang)
-        if lang in self.lang_strings:
-            if string in self.lang_strings[lang]:
-                return self.printx(self.lang_strings[lang][string],xxx,yyy)
+        if lang in self.lang_strings and string in self.lang_strings[lang]:
+            return self.printx(self.lang_strings[lang][string],xxx,yyy)
         return ""
 
     def create_button(self,lang):

@@ -46,9 +46,8 @@ class Node:
         return self.json_array[lang]
 
     def get_response(self,txt,lang):
-        if lang in self.json_array:
-            if txt in self.json_array[lang]:
-                return self.json_array[lang][txt]
+        if lang in self.json_array and txt in self.json_array[lang]:
+            return self.json_array[lang][txt]
         return None
 
     def normalize_vect(self,vect):
@@ -165,11 +164,10 @@ class Node:
                 bot_s.sendMessage(s,lang_class.get_string(lang,"restart"),reply_markup=ReplyKeyboardRemove())
 
     def add_chat_id(self,question,lang,id):
-        if lang in self.json_array:
-            if question in self.json_array[lang]:
-                if id not in self.json_array[lang][question]["ids"]:
-                    self.json_array[lang][question]["ids"].append(id)
-                return True
+        if lang in self.json_array and question in self.json_array[lang]:
+            if id not in self.json_array[lang][question]["ids"]:
+                self.json_array[lang][question]["ids"].append(id)
+            return True
         for p in self.parents:
             if p.add_chat_id(question,lang,id):
                 return True
@@ -199,13 +197,12 @@ class Node:
         self.database.put("/bots/students", name=self.node_name, data=data)
 
     def sub_set_banned_users(self,lang,lang_str,elem,users):
-        if "answer" in self.json_array[lang_str][elem]:
-            if self.json_array[lang_str][elem]["answer"]=="BANNED":
-                for chat_id in self.json_array[lang_str][elem]["ids"]:
-                    if chat_id in users:
-                        users[chat_id]+=1
-                    else:
-                        users[chat_id]=1
+        if "answer" in self.json_array[lang_str][elem] and self.json_array[lang_str][elem]["answer"]=="BANNED":
+            for chat_id in self.json_array[lang_str][elem]["ids"]:
+                if chat_id in users:
+                    users[chat_id]+=1
+                else:
+                    users[chat_id]=1
         return users
 
     def set_banned_users(self,lang):

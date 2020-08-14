@@ -10,9 +10,8 @@ class BotGetlink:
 
     def message(self,msg):
         content_type, chat_type, chat_id = telepot.glance(msg)
-        if content_type == 'text' and chat_type=="private":
-            if msg["text"]=='/start':
-                self.bot.sendMessage(chat_id,"Select a bot:",reply_markup=self.create_url_inline_query())
+        if content_type == 'text' and chat_type=="private" and msg["text"]=='/start':
+            self.bot.sendMessage(chat_id,"Select a bot:",reply_markup=self.create_url_inline_query())
 
     def query(self,msg):
         return None
