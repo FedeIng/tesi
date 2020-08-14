@@ -27,10 +27,9 @@ class BotCreation:
 
     def message(self,msg):
         content_type, chat_type, chat_id = telepot.glance(msg)
-        if chat_id in self.banned_user:
-            if self.banned_user[chat_id]>99:
-                self.bot.sendMessage(chat_id,"You are banned from this bot", reply_markup=self.tree.topicKeyboard())
-                return
+        if chat_id in self.banned_user and self.banned_user[chat_id]>99:
+            self.bot.sendMessage(chat_id,"You are banned from this bot", reply_markup=self.tree.topicKeyboard())
+            return
         if content_type == 'text' and chat_type=="private":
             if msg["text"]=='/start':
                 self.bot.sendMessage(chat_id,"Hi, this is the bot to create a new subject.", reply_markup=ReplyKeyboardRemove())
@@ -61,10 +60,9 @@ class BotCreation:
     def query(self,msg):
         query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
         chat_id=msg["message"]["chat"]["id"]
-        if chat_id in self.banned_user:
-            if self.banned_user[chat_id]>99:
-                self.bot.sendMessage(chat_id,"You are banned from this bot",reply_markup=ReplyKeyboardRemove())
-                return
+        if chat_id in self.banned_user and self.banned_user[chat_id]>99:
+            self.bot.sendMessage(chat_id,"You are banned from this bot",reply_markup=ReplyKeyboardRemove())
+            return
         if query_data=='s':
             self.bot.sendMessage(chat_id,"Hi, this is the bot to create a new subject.", reply_markup=ReplyKeyboardRemove())
             self.bot.sendMessage(chat_id,"Click on a command below:", reply_markup=self.keyboard)
@@ -127,7 +125,7 @@ class BotCreation:
             else:
                 print(2)
                 return False
-        except:
+        except BaseException:
             print(3)
             return False
 
@@ -153,7 +151,7 @@ class BotCreation:
                 print(2)
                 self.bot.sendMessage(chat_id,"The token is already used or is not valid. Retry with another token. Please retry.",reply_markup=ReplyKeyboardRemove())
                 return
-        except:
+        except BaseException:
             print(3)
             self.bot.sendMessage(chat_id,"The token is already used or is not valid. Retry with another token. Please retry.",reply_markup=ReplyKeyboardRemove())
             return
