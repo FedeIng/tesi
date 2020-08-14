@@ -125,7 +125,7 @@ class BotCreation:
             else:
                 print(2)
                 return False
-        except BaseException:
+        except telepot.exception:
             print(3)
             return False
 
@@ -151,7 +151,7 @@ class BotCreation:
                 print(2)
                 self.bot.sendMessage(chat_id,"The token is already used or is not valid. Retry with another token. Please retry.",reply_markup=ReplyKeyboardRemove())
                 return
-        except BaseException:
+        except telepot.exception:
             print(3)
             self.bot.sendMessage(chat_id,"The token is already used or is not valid. Retry with another token. Please retry.",reply_markup=ReplyKeyboardRemove())
             return
