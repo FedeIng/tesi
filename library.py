@@ -80,33 +80,34 @@ def create_reply_keyboard(matrix,only_one=True):
 
 def delete_bug(t,time,lang,bug_array):
     data={}
-    if lang in bug_array:
-        if t in bug_array[lang]:
-            data[t]={}
-            for elem in bug_array[lang][t]:
-                if time<bug_array[lang][t][elem]:
-                    data[t][elem]=bug_array[lang][t][elem]
+    if lang in bug_array and t in bug_array[lang]:
+        data[t]={}
+        for elem in bug_array[lang][t]:
+            if time<bug_array[lang][t][elem]:
+                data[t][elem]=bug_array[lang][t][elem]
     print(data)
     return data
 
-def seg_bug(chat_id,from_id,txt,lang,chat_type,bot_type,bot,database,lang_class):
+#ids[chat]=chat_id ids[from]=from_id
+#bot[bot]=bot bot[type]=bot_type
+def seg_bug(ids,txt,lang,chat_type,bot,database,lang_class):
     time=datetime.datetime.today()
     bug_array=database.read_bug()
     print("1 : "+str(bug_array))
     if lang not in bug_array:
         bug_array[lang]={}
     print("2 : "+str(bug_array)+" , "+lang)
-    if bot_type not in bug_array[lang]:
-        bug_array[lang][bot_type]={}
-    print("3 : "+str(bug_array)+" , "+bot_type)
-    user=bot.getChat(from_id)
-    bug_array[lang]=delete_bug(bot_type,time,lang,bug_array)
+    if bot["type"] not in bug_array[lang]:
+        bug_array[lang][bot["type"]]={}
+    print("3 : "+str(bug_array)+" , "+bot["type"])
+    user=bot["bot"].getChat(ids["from"])
+    bug_array[lang]=delete_bug(bot["type"],time,lang,bug_array)
     print("4 : "+str(bug_array))
-    if lang_class.matchArray(txt,lang,bug_array[lang][bot_type]) == None:
-        bug_array[lang][bot_type][txt]=time+datetime.timedelta(days=14)
+    if lang_class.matchArray(txt,lang,bug_array[lang][bot["type"]]) == None:
+        bug_array[lang][bot["type"]][txt]=time+datetime.timedelta(days=14)
         for a_id in database.getAdmins(lang):
-            database.get_bot_admin().get_bot().sendMessage(a_id,bot_type+": "+txt)
-    bot.sendMessage(chat_id, tag_group(chat_type,user)+lang_class.getString(lang,"bug"),reply_markup=ReplyKeyboardRemove(selective=True))
+            database.get_bot_admin().get_bot().sendMessage(a_id,bot["type"]+": "+txt)
+    bot["bot"].sendMessage(ids["chat"], tag_group(chat_type,user)+lang_class.getString(lang,"bug"),reply_markup=ReplyKeyboardRemove(selective=True))
     database.write_bug(bug_array)
 
 def match_command(command,msg,chat_type,username):
