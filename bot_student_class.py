@@ -318,7 +318,7 @@ class BotStudent:
             self.id_commands=del_id(from_id,chat_id,self.id_commands)
         elif check_id(from_id,chat_id,self.id_commands)==2:
             chat={"chat":chat_id,"from":from_id}
-            bot={"bot":self.bot,"type":"student"}
+            bot={"bot":self.bot,"type":"students"}
             seg_bug(chat,txt,lang,chat_type,bot,self.node.get_database(),self.node.get_lang())
             self.id_commands=del_id(from_id,chat_id,self.id_commands)
         elif check_id(from_id,chat_id,self.id_commands)==3:

@@ -302,7 +302,9 @@ class BotTeacher:
         if check_id(from_id,chat_id,self.id_commands)==1:
             self.case1(chat_id,from_id,txt,lang,topic,chat_type)
         elif check_id(from_id,chat_id,self.id_commands)==2:
-            seg_bug(chat_id,from_id,txt,lang,chat_type,"teachers",self.bot,self.tree.get_database(),self.tree.get_lang())
+            chat={"chat":chat_id,"from":from_id}
+            bot={"bot":self.bot,"type":"teachers"}
+            seg_bug(chat,txt,lang,chat_type,bot,self.tree.get_database(),self.tree.get_lang())
             self.id_commands=del_id(from_id,chat_id,self.id_commands)
         elif check_id(from_id,chat_id,self.id_commands)==3:
             self.case3(chat_id,from_id,txt,lang,topic,chat_type)
