@@ -9,19 +9,13 @@ from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, Reply
 class Language:
 
     def __init__(self,database):
-        print("Lang")
         self.database=database
-        print(1)
         self.admins={}
-        print(2)
         self.setted_lang=None
-        print(3)
         self.nlp=None
-        print(4)
         #with open (fileName,"r") as jfile:
             #self.user_lang=json.load(jfile)
         self.lang_strings=database.get_trans()
-        print(5)
         self.switcher={
             "it":"\U0001F1EE\U0001F1F9 IT \U0001F1EE\U0001F1F9",
             "de":"\U0001F1E9\U0001F1EA DE \U0001F1E9\U0001F1EA",
@@ -50,7 +44,6 @@ class Language:
             "en":self.en_fun,
             "es":self.es_fun
         }
-        print("lang setted")
 
     def it_fun(self):
         self.nlp = spacy.load('it_core_news_sm')
@@ -86,7 +79,6 @@ class Language:
             "\U0001F1EA\U0001F1F8 ES \U0001F1EA\U0001F1F8"]
 
     def match_array(self,txt,lang,vett):
-        print(vett)
         e=''
         val=0
         for elem in vett:
@@ -94,7 +86,6 @@ class Language:
             if num > val:
                 val=num
                 e=elem
-                print(elem)
         if val>0.8:
             return vett[e]
         else:
@@ -113,12 +104,9 @@ class Language:
 
     def question_sent(self,lang,text):
         data=[]
-        print(lang)
-        print("2")
         trans=Translator()
         for elem in self.nlp(text).sents:
             string=elem.text
-            print("3 : "+string)
             if string.endswith("?") and lang==trans.translate(string).src:
                 data.append(string)
         return data
@@ -134,7 +122,6 @@ class Language:
         array1=[]
         if xxx!=None:
             array=string.split("XXX")
-            print(array)
         else:
             return string
         if yyy!=None:
@@ -205,5 +192,4 @@ class Language:
     def translate(self,string,src,dest):
         trans=Translator()
         t=trans.translate(string,src=src,dest=dest)
-        print(t)
         return t.text

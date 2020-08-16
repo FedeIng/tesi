@@ -85,7 +85,6 @@ def delete_bug(t,time,lang,bug_array):
         for elem in bug_array[lang][t]:
             if time<bug_array[lang][t][elem]:
                 data[t][elem]=bug_array[lang][t][elem]
-    print(data)
     return data
 
 #ids[chat]=chat_id ids[from]=from_id
@@ -93,16 +92,12 @@ def delete_bug(t,time,lang,bug_array):
 def seg_bug(ids,txt,lang,chat_type,bot,database,lang_class):
     time=datetime.datetime.today()
     bug_array=database.read_bug()
-    print("1 : "+str(bug_array))
     if lang not in bug_array:
         bug_array[lang]={}
-    print("2 : "+str(bug_array)+" , "+lang)
     if bot["type"] not in bug_array[lang]:
         bug_array[lang][bot["type"]]={}
-    print("3 : "+str(bug_array)+" , "+bot["type"])
     user=bot["bot"].getChat(ids["from"])
     bug_array[lang]=delete_bug(bot["type"],time,lang,bug_array)
-    print("4 : "+str(bug_array))
     if lang_class.matchArray(txt,lang,bug_array[lang][bot["type"]]) == None:
         bug_array[lang][bot["type"]][txt]=time+datetime.timedelta(days=14)
         for a_id in database.getAdmins(lang):
@@ -111,10 +106,7 @@ def seg_bug(ids,txt,lang,chat_type,bot,database,lang_class):
     database.write_bug(bug_array)
 
 def match_command(command,msg,chat_type,username):
-    print(command+" : "+msg)
     if chat_type=="private":
-        print("case1: "+str(msg==command))
         return msg==command
     else:
-        print("case2: "+str(msg==(command+"@"+username)))
         return msg==(command+"@"+username)

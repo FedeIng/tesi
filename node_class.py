@@ -10,7 +10,6 @@ class Node:
     def __init__(self,node_name,database,lang_class):
         self.name=node_name
         self.json_array=database.get_questions_array(node_name)
-        print(self.json_array)
         self.lang=lang_class
         self.questions={}
         self.hash=database.get_hash(node_name)
@@ -83,7 +82,6 @@ class Node:
         self.database.set_questions_array(self.json_array[lang],self.name,lang)
 
     def get_sent(self,lang,txt):
-        print("1")
         return self.lang.question_sent(lang,txt)
 
     def check_lang_str(self,txt,string):
@@ -129,7 +127,6 @@ class Node:
         return data
 
     def match_array(self,txt,lang,vett,lang_class):
-        print(vett)
         e=''
         val=0
         for elem in vett:
@@ -137,7 +134,6 @@ class Node:
             if num > val:
                 val=num
                 e=elem
-                print(elem)
         if val>0.8:
             return e
         else:
@@ -220,31 +216,19 @@ class Node:
         self.questions[chat_id][from_id]=txt
 
     def set_response(self,lang,question,txt):
-        print("Question : "+question)
-        print("Lang : "+lang)
-        print("Array : "+str(self.json_array))
         if lang not in self.json_array:
-            print("2")
             return None
         if question not in self.json_array[lang]:
-            print("3")
             return None
         self.json_array[lang][question]["answer"]=txt
         self.database.set_questions_array(self.json_array[lang],self.name,lang)
-        print("4")
         return question
 
     def get_qid(self,chat_id,from_id):
-        print("Chat_id : "+str(chat_id))
-        print("From_id : "+str(from_id))
-        print("Array : "+str(self.questions))
         if chat_id not in self.questions:
-            print("1")
             return None
         if from_id not in self.questions[chat_id]:
-            print("2")
             return None
-        print("3")
         return self.questions[chat_id][from_id]
 
     def del_qid(self,chat_id,from_id):
@@ -307,7 +291,6 @@ class Node:
         lang_vett=[]
         for elem in self.json_array:
             lang_vett.append(elem)
-        print("Lang: "+str(lang_vett))
         return lang_vett
 
     def sub_del_teachers(self,data,elem,lang,lang_class,bot):
@@ -668,7 +651,6 @@ class Node:
     def cross_lang(self,obj,lang,lang_vett):
         for elem in lang_vett:
             vett=self.cross_match(obj,lang,elem)
-            print(vett)
             for i in vett:
                 if vett[i]< 0.8:
                     return False
@@ -727,6 +709,3 @@ class Node:
     
     def __ge__(self,obj):
         return self.get_name() >= obj.get_name()
-
-    def __de__(self):
-        print("Nodo "+self.name+" eliminato")

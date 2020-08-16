@@ -9,7 +9,6 @@ class BotStudent:
         self.keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/list", callback_data='l')],[InlineKeyboardButton(text="/question", callback_data='q')],[InlineKeyboardButton(text="/report", callback_data='r')],[InlineKeyboardButton(text="/start", callback_data='s')],[InlineKeyboardButton(text="/revision", callback_data='rv')],[InlineKeyboardButton(text="/change_lang", callback_data='cl')]])
         self.id_commands={}
         self.students=database.get_stud_ids(topic)
-        print(self.students)
         self.teachers=database.get_teach_ids(topic)
         self.collaborators=database.get_coll_ids(topic)
         self.node=Node(topic,database,lang_class)
@@ -21,7 +20,6 @@ class BotStudent:
     def message(self,msg):
         content_type, chat_type, chat_id = telepot.glance(msg)
         from_id=msg["from"]["id"]
-        print(msg)
         txt=msg["text"]
         if content_type == 'text':
             user=self.bot.getChat(from_id)
@@ -141,19 +139,16 @@ class BotStudent:
     def send_not_stud(self,lang,lang_class):
         if lang in self.students:
             for stud in self.students[lang]:
-                print("Stud:"+str(stud))
                 self.bot.sendMessage(stud,lang_class.getString(lang,"restart"),reply_markup=ReplyKeyboardRemove(selective=False))
 
     def send_not_teach(self,bot_teacher,lang,lang_class):
         if lang in self.teachers:
             for teach in self.teachers[lang]:
-                print("Teach:"+str(teach))
                 bot_teacher.sendMessage(teach,lang_class.getString(lang,"restart"),reply_markup=ReplyKeyboardRemove(selective=False))
 
     def send_not_coll(self,bot_teacher,lang,lang_class):
         if lang in self.collaborators:
             for coll in self.collaborators[lang]:
-                print("Coll:"+str(coll))
                 bot_teacher.sendMessage(coll,lang_class.getString(lang,"restart"),reply_markup=ReplyKeyboardRemove(selective=False))
 
     def send_notification(self,bot_teacher,lang_class):
@@ -224,7 +219,6 @@ class BotStudent:
 
     def match_speech(self,chat_id,from_id,txt,lang,chat_type):
         is_new=self.node.checkLangStr(txt,"new_q")
-        print("Boolean : "+str(is_new))
         if not is_new:
             self.node.set_qid(chat_id,from_id,txt)
         user=self.bot.getChat(from_id)
@@ -233,20 +227,16 @@ class BotStudent:
         if not is_new:
             response=self.node.getResponse(elem,lang,chat_id)
         if response == None and lang in self.lang_teach_coll():
-            print("1")
             self.node.setQuestion(elem,lang,chat_id)
             self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"q_not_found",xxx=elem),reply_markup=ReplyKeyboardRemove(selective=True))
             if lang in self.teachers:
                 for teacher_id in self.teachers[lang]:
                     self.node.get_bot_teacher().get_bot().sendMessage(teacher_id, self.node.getString(lang,"new_q",xxx=elem),reply_markup=ReplyKeyboardRemove(selective=True))
         elif response == "BANNED":
-            print("2")
             self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"banned_q",xxx=elem),reply_markup=ReplyKeyboardRemove(selective=True))
         elif response == "":
-            print("3")
             self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"wait_q",xxx=elem),reply_markup=ReplyKeyboardRemove(selective=True))
         else:
-            print("4")
             self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"answer_q",xxx=elem,yyy=response),reply_markup=ReplyKeyboardRemove(selective=True))
         self.node.delQID(chat_id,from_id)
 
@@ -287,7 +277,6 @@ class BotStudent:
 
     def sel_question(self,chat_id,from_id,txt,lang,chat_type):
         list_val=self.node.getSent(lang,txt)
-        print("List_q : "+str(list_val))
         user=self.bot.getChat(from_id)
         if len(list_val)!=1:
             self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"error_q"),reply_markup=ReplyKeyboardRemove(selective=True))
@@ -295,18 +284,14 @@ class BotStudent:
             return
         txt=list_val[0]
         bres=self.node.getBestResp(txt,lang)
-        print("array : "+str(bres))
         self.node.set_qid(chat_id,from_id,txt)
         if bres==[]:
-            print("1")
             self.match_speech(chat_id,from_id,self.node.getString(lang,"new_q"),lang,chat_type)
             self.id_commands=del_id(from_id,chat_id,self.id_commands)
         elif txt in bres:
-            print("2")
             self.match_speech(chat_id,from_id,txt,lang,chat_type)
             self.id_commands=del_id(from_id,chat_id,self.id_commands)
         else:
-            print("3")
             bres.append(self.node.getString(lang,"new_q"))
             self.bot.sendMessage(chat_id, tagGroup(chat_type,user)+self.node.getString(lang,"select_q"),reply_markup=createReplyKeyboard(array_to_matrix(bres)))
             self.id_commands=add_id(from_id,chat_id,self.id_commands,1)

@@ -20,27 +20,22 @@ from bot_pwd_class import BotPwd
 from bot_teacher_class import BotTeacher
 
 database = Database()
-print("Database created")
 admin=database.get_admin()
 bot_admin=BotAdmin(admin['token'],admin['admins'])
-print("Admin created")
 pwd=database.get_pwd()
 bot_pwd=BotPwd(pwd)
-print("Pwd created")
 database.set_bot_pwd(bot_pwd)
 database.set_bot_admin(bot_admin)
 tree=Tree(database)
-print("Tree created")
 creation=database.get_creation()
 bot_creation=BotCreation(creation,tree)
-print("Creation created")
 getlink=database.get_getlink()
 bot_getlink=BotGetlink(getlink,tree)
-print("Getlink created")
 teacher=database.get_teacher()
 bot_teacher=BotTeacher(teacher,tree)
-print("Teacher created")
 database.set_bot_teacher(bot_teacher)
+
+print("Init complete")
 
 while True:
     time.sleep(10)

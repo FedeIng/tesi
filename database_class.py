@@ -199,7 +199,6 @@ class Database:
         for elem in result:
             data[int(elem)]=[]
             for e in result[elem]:
-                print(e)
                 date=datetime.datetime.fromisoformat(e)
                 data[int(elem)].append(date)
         return data

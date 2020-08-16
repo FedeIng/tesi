@@ -114,19 +114,15 @@ class BotCreation:
         self.id_creation[chat_id]=2
 
     def token_valid(self,token):
-        print("Valid:")
         url="https://api.telegram.org/bot"+token+"/getMe"
         try:
             response = urlopen(url)
             data = json.loads(response.read())
             if data['ok'] and token not in self.tree.getTokenList():
-                print(1)
                 return True
             else:
-                print(2)
                 return False
         except telepot.exception:
-            print(3)
             return False
 
     def rand_string(self,string_length=10):
@@ -142,17 +138,13 @@ class BotCreation:
         return (salt + pwdhash).decode('ascii')
 
     def save_token(self,chat_id,txt):
-        print("Token:")
         try:
             if self.token_valid(txt):
-                print(1)
                 self.unconfirmed_bot[chat_id]["token"]=txt
             else:
-                print(2)
                 self.bot.sendMessage(chat_id,"The token is already used or is not valid. Retry with another token. Please retry.",reply_markup=ReplyKeyboardRemove())
                 return
         except telepot.exception:
-            print(3)
             self.bot.sendMessage(chat_id,"The token is already used or is not valid. Retry with another token. Please retry.",reply_markup=ReplyKeyboardRemove())
             return
         pwd=self.rand_string()

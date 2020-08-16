@@ -10,23 +10,15 @@ from bot_student_class import BotStudent
 class Tree:
 
     def __init__(self,database):
-        print(1)
         self.lang=Language(database)
-        print(2)
         self.array={}
-        print(3)
         self.num=0
-        print(4)
         self.database=database
-        print(5)
         #with open(fileName,'r') as json_file:
             #data=json.load(json_file)
         data=database.get('/bots/students','')
-        print(6)
         for topic in data:
-            print("Begin bot "+topic)
             self.array[topic]=BotStudent(database.get_topic_token(topic),topic,database,self.lang)
-            print("Bot "+topic+" created")
         #for down in data:
             #for up in data[down]:
                 #node1=self.array[down]
@@ -142,7 +134,6 @@ class Tree:
     def new_bot(self,token,topic,hash):
         self.database.new_topic(token,topic,hash)
         self.array[topic]=BotStudent(token,topic,self.database,self.lang)
-        print("Bot "+topic+" created")
 
     def get_pwd_admin(self):
         return self.database.get_pwd_admin()
@@ -195,8 +186,6 @@ class Tree:
 
     def get_ids_array(self,topic,lang,txt):
         array=self.array[topic].get_json_array(lang)
-        print(array)
-        print(array[txt])
         return array[txt]["ids"]
 
     def add_admins(self,lang,vett):
@@ -303,9 +292,7 @@ class Tree:
     def set_res(self,chat_id,from_id,txt,lang,topic):
         question=self.array[topic].get_qid(chat_id,from_id)
         if question != None:
-            print("1")
             return self.array[topic].set_response(lang,question,txt)
-        print("0")
         return None
 
     def set_ban(self,txt,lang,topic):
@@ -366,7 +353,6 @@ class Tree:
         return self.array[topic].getTeachers(lang)
         
     def match_array(self,txt,lang,vett):
-        print(vett)
         e=''
         val=0
         for elem in vett:
@@ -374,14 +360,12 @@ class Tree:
             if num > val:
                 val=num
                 e=elem
-                print(elem)
         if val>0.8:
             return vett[e]
         else:
             return None
 
     def match_array1(self,txt,lang,vett):
-        print(vett)
         e=''
         val=0
         for elem in vett:
@@ -389,7 +373,6 @@ class Tree:
             if num > val:
                 val=num
                 e=elem
-                print(elem)
         if val>0.8:
             return e
         else:
