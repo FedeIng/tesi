@@ -61,7 +61,7 @@ def read_doc():
                 for lang_str in data[topic_str]:
                     db.put("/bots/students/"+topic_str+"/"+lang_str,name="questions",data=q_and_a(data[topic_str][lang_str]))
 
-def Error():
+def error():
     print("Questo è un programma per caricare il database delle domande del bot del politecnico")
     print("Accetta i seguenti parametri")
     print("-lang <string>: si sceglie la lingua da scaricare, se non specificato si scaricano tutte")
@@ -83,6 +83,6 @@ try:
         raise CustomError
     read_doc()
 except CustomError:
-    Error()
+    error()
 except IndexError:
-    Error()
+    error()

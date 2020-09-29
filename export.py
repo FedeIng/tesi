@@ -76,7 +76,7 @@ def write_doc():
                         array=q_and_a(data[topic_str][lang_str]["questions"])
         json.dump(array,jfile)
 
-def Error():
+def error():
     print("Questo è un programma per scaricare il database delle domande del bot del politecnico")
     print("Accetta i seguenti parametri")
     print("-lang <string>: si sceglie la lingua da scaricare, se non specificato si scaricano tutte")
@@ -98,6 +98,6 @@ try:
         raise CustomError
     write_doc()
 except CustomError:
-    Error()
+    error()
 except IndexError:
-    Error()
+    error()
