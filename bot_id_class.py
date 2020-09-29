@@ -59,7 +59,7 @@ class BotId:
                 del array[name]
             return array
 
-        def sub_smi(self,time,index):
+        def sub_smi(self,time,index,name,elem,elem1):
             if elem == elem1:
                 if time == None or time<self.id_times[name][elem]:
                     time=self.id_times[name][elem]
@@ -76,7 +76,7 @@ class BotId:
             for name in old_array:
                 for elem in old_array[name]:
                     for elem1 in old_array[name][elem]:
-                        time, index=self.sub_smi(time,index)
+                        time, index=self.sub_smi(time,index,name,elem,elem1)
             return index
 
         def delete_old(self,chat_type,lang_class,lang,num):
