@@ -22,6 +22,9 @@ class BotStudent(Bot):
         self.singleton.set_bot(self.node.get_topic_name(),super().get_bot())
         self.singleton.reset_key_id(topic)
 
+    def start_command(self,txt,chat_type,lang,from_id,chat_id):
+        return match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]) or (self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0 and self.node.check_lang_str(txt,"canc"))
+
     def message(self,msg):
         content_type, chat_type, chat_id = telepot.glance(msg)
         from_id=msg["from"]["id"]
@@ -34,7 +37,7 @@ class BotStudent(Bot):
             elif chat_id in self.banned_user:
                 self.singleton.del_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())
                 send_message(super().get_bot(),chat_id,self.node.get_string(lang,"banned_user"))
-            elif match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]) or (self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0 and self.node.check_lang_str(txt,"canc")):
+            elif self.start_command(txt,chat_type,lang,from_id,chat_id):
                 self.singleton.del_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())
                 self.singleton.start_fun(chat_id,from_id,chat_type,lang,self.node.get_lang(),self.node.get_topic_name(),self.node.get_topic_name(),self.keyboard)
             elif match_command('/question',txt,chat_type,super().get_bot().getMe()["username"]):
