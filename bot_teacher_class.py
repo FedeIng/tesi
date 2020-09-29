@@ -181,9 +181,7 @@ class BotTeacher:
                 self.tree.add_collaborators([chat_id],self.topic_name[chat_id],lang)
                 del self.topic_name[chat_id]
                 del self.prev_lang[chat_id]
-            print("start 1")
             self.singleton_id.start_fun(chat_id,from_id,"private",lang,self.tree.get_lang(),"teacher",topic,self.keyboard)
-            print("start w")
             self.query_bool[chat_id]=False
             self.lang_bool[chat_id]=False
 
@@ -290,16 +288,12 @@ class BotTeacher:
             send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+self.tree.get_string(lang,"answer_q",xxx=splitted[0],yyy=splitted[1]),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0)
 
         def case7(self,chat_id,from_id,txt,lang,topic,chat_type):
-            print("final_set : "+str(1))
             user=super().get_bot().getChat(from_id)
             txt=self.tree.switcherflag(txt)
             if txt==None:
-                print("final_set : "+str(2))
                 send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.tree.get_string(lang,"error"),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0)
                 return
-            print("final_set : "+str(3))
             self.tree.set_super_user_lang(chat_id,topic,txt)
-            print("final_set : "+str(5))
             send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.tree.get_string(txt,"setted_lang"),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0)
             self.singleton_id.start_fun(chat_id,from_id,chat_type,txt,self.tree.get_lang(),"teacher",topic,self.keyboard)
 
