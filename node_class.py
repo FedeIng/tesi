@@ -1,4 +1,5 @@
 from language_class import Language
+from database_class import Database
 import json
 import telepot
 import operator
@@ -7,13 +8,13 @@ from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, Reply
 
 class Node:
 
-    def __init__(self,node_name,database,lang_class):
+    def __init__(self,node_name):
         self.name=node_name
-        self.json_array=database.get_questions_array(node_name)
-        self.lang=lang_class
+        self.database=Database()
+        self.json_array=self.database.get_questions_array(node_name)
+        self.lang=Language()
         self.questions={}
-        self.hash=database.get_hash(node_name)
-        self.database=database
+        self.hash=self.database.get_hash(node_name)
 
     def verify_password(self,provided_password):
         stored_password=self.hash
@@ -30,11 +31,11 @@ class Node:
         self.hash=password
         self.database.set_new_pwd(self.name,password)
 
-    def set_teach_ids(self,array,topic,lang):
-        self.database.set_teach_ids(array,topic,lang)
+    def set_teach_ids(self,array,lang):
+        self.database.set_teach_ids(array,self.name,lang)
 
-    def set_coll_ids(self,array,topic,lang):
-        self.database.set_coll_ids(array,topic,lang)
+    def set_coll_ids(self,array,lang):
+        self.database.set_coll_ids(array,self.name,lang)
 
     def get_topic_name(self):
         return self.name
@@ -46,7 +47,7 @@ class Node:
 
     def get_response(self,txt,lang):
         if lang in self.json_array and txt in self.json_array[lang]:
-            return self.json_array[lang][txt]
+            return self.json_array[lang][txt]["answer"]
         return None
 
     def normalize_vect(self,vect):
@@ -64,7 +65,8 @@ class Node:
 
     def get_best_resp(self,txt,lang):
         list1={}
-        for question in self.json_array:
+        for question in self.json_array[lang]:
+            print(question)
             num=self.lang.calculate_similarity(txt,question,lang)
             if num>0.8:
                 list1[question]=num
@@ -90,6 +92,9 @@ class Node:
     def set_nlp(self,lang):
         self.lang.set_nlp(lang)
 
+    def get_flag_list(self):
+        return self.lang.get_flag_list()
+
     def get_lang_by_flag(self,flag):
         return self.lang.get_lang_by_flag(flag)
 
@@ -101,7 +106,7 @@ class Node:
         return data
 
     def set_lang_keyboard(self,array):
-        return self.lang.setKeyboard(array)
+        return self.lang.set_keyboard(array)
 
     def write_data(self):
         self.database.write_data()
@@ -126,22 +131,9 @@ class Node:
                 data[lang]=array[lang]["questions"]
         return data
 
-    def match_array(self,txt,lang,vett,lang_class):
-        e=''
-        val=0
-        for elem in vett:
-            num=lang_class.calculate_similarity(txt,elem,lang)
-            if num > val:
-                val=num
-                e=elem
-        if val>0.8:
-            return e
-        else:
-            return None
-
     def get_real_node(self,lang,question,lang_class):
         if lang in self.json_array:
-            elem=self.match_array(question,lang,self.json_array[lang],lang_class)
+            elem=self.lang.match_array(question,lang,self.json_array[lang])
             if elem!=None:
                 return self.name,elem
         for node in self.parents:
@@ -192,7 +184,7 @@ class Node:
             data[lang]["questions"]=self.json_array[lang]
         self.database.put("/bots/students", name=self.node_name, data=data)
 
-    def sub_set_banned_users(self,lang,lang_str,elem,users):
+    def sub_set_banned_users(self,lang_str,elem,users):
         if "answer" in self.json_array[lang_str][elem] and self.json_array[lang_str][elem]["answer"]=="BANNED":
             for chat_id in self.json_array[lang_str][elem]["ids"]:
                 if chat_id in users:
@@ -201,19 +193,33 @@ class Node:
                     users[chat_id]=1
         return users
 
-    def set_banned_users(self,lang):
+    def set_banned_stud(self):
         users={}
+        banned=[]
         for lang_str in self.json_array:
             for elem in self.json_array[lang_str]:
-                users=self.sub_set_banned_users(lang,lang_str,elem,users)
+                users=self.sub_set_banned_users(lang_str,elem,users)
         for chat_id in users:
             if users[chat_id]>10:
-                self.bannedUser.append(chat_id)
+                banned.append(chat_id)
+        self.database.set_banned_stud(self.name,banned)
+        return banned
         
     def set_qid(self,chat_id,from_id,txt):
         if chat_id not in self.questions:
             self.questions[chat_id]={}
         self.questions[chat_id][from_id]=txt
+
+    def set_rv_comment(self,question,comment,lang):
+        if lang not in self.json_array or question not in self.json_array[lang]:
+            return False
+        if "revision" not in self.json_array[lang][question]:
+            self.json_array[lang][question]["revision"]=[]
+        if self.lang.match_array(comment,lang,self.json_array[lang][question]["revision"]) == None:
+            self.json_array[lang][question]["revision"].append(comment)
+            self.database.set_questions_array(self.json_array[lang],self.name,lang)
+            return True
+        return False
 
     def set_response(self,lang,question,txt):
         if lang not in self.json_array:
@@ -585,7 +591,6 @@ class Node:
         self.json_array[lang][txt]={}
         self.json_array[lang][txt]["answer"]=res
         self.json_array[lang][txt]["ids"]=[]
-        self.json_array[lang][txt]["code"]=len(self.json_array[lang])
 
     def cross_match(self,obj,lang,lang_str):
         tot={}
@@ -655,15 +660,6 @@ class Node:
                 if vett[i]< 0.8:
                     return False
         return True
-
-    def get_lang(self):
-        array=[]
-        for elem in self.teachers:
-            array.append(elem)
-        for elem in self.collaborators:
-            if elem not in array:
-                array.append(elem)
-        return sorted(array)
 
     def __eq__(self,obj):
         p1, s1 = self.get_arrays()

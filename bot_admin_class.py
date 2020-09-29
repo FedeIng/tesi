@@ -1,18 +1,22 @@
 import telepot
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
+from bot_class import Bot
+from database_class import Database
 
-class BotAdmin:
+class BotAdmin():
+    class Singleton(Bot):
 
-    def __init__(self,token,admins):
-        self.bot=telepot.Bot(token)
-        self.bot.message_loop({'chat':self.message,'callback_query':self.query})
-        self.admins=admins
+        def __init__(self):
+            database = Database()
+            admin=database.get_admin()
+            super().__init__(admin["token"])
+            self.admins=admin["admins"]
 
-    def message(self,msg):
-        return None
-
-    def query(self,msg):
-        return None
-
-    def get_bot(self):
-        return self.bot
+        def get_bot(self):
+            return super().get_bot()
+    
+    instance = None
+    def __new__(cls): # __new__ always a classmethod
+        if not BotAdmin.instance:
+            BotAdmin.instance = BotAdmin.Singleton()
+        return BotAdmin.instance

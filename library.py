@@ -1,6 +1,87 @@
 import telepot
 import datetime
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
+from telepot.exception import TelegramError, BotWasBlockedError
+import os
+
+def set_time(from_id,chat_id,array):
+    if from_id==chat_id:
+        array[chat_id]=datetime.datetime.today()
+    else :
+        if chat_id not in array:
+            array[chat_id]={}
+            array[chat_id][from_id]=datetime.datetime.today()
+        else :
+            array[chat_id][from_id]=datetime.datetime.today()
+    return array
+
+def edit_message(bot,msg_id,reply_markup=None):
+    try:
+        bot.editMessageReplyMarkup(msg_id,reply_markup=reply_markup)
+    except TelegramError:
+        pass
+    except BotWasBlockedError:
+        pass
+
+def send_doc(bot,chat_id,string,reply):
+    with open("questions.txt","w") as doc:
+        doc.write(string)
+    with open("questions.txt","rb") as doc:
+        try:
+            bot.sendDocument(chat_id,doc,reply_to_message_id=reply)
+        except TelegramError:
+            pass
+        except BotWasBlockedError:
+            pass
+    os.remove("questions.txt")
+
+def send_message(bot,chat_id,string,button_str="Cancel",bool_val=False,reply_markup=ReplyKeyboardRemove(selective=True)):
+    print(reply_markup)
+    print("send_message")
+    print(1)
+    if reply_markup==None:
+        try:
+            return bot.sendMessage(chat_id,string)
+        except TelegramError:
+            pass
+        except BotWasBlockedError:
+            pass
+        return
+    var=reply_markup[0]
+    if bool_val:
+        print(2)
+        if reply_markup==ReplyKeyboardRemove(selective=True):
+            print(3)
+            reply_markup=create_reply_keyboard([[button_str]])
+            print(reply_markup)
+        elif reply_markup==ReplyKeyboardRemove() or reply_markup==ReplyKeyboardRemove(selective=False):
+            print(4)
+            reply_markup=create_reply_keyboard([[button_str]],False)
+            print(reply_markup)
+        else:
+            print(5)
+            var.append([KeyboardButton(text=button_str)])
+            if len(reply_markup)==4:
+                print(6)
+                reply_markup=ReplyKeyboardMarkup(keyboard=var,resize_keyboard=True,one_time_keyboard=True,selective=reply_markup[3])
+                print(reply_markup)
+            else:
+                print(7)
+                reply_markup=ReplyKeyboardMarkup(keyboard=var,resize_keyboard=True,one_time_keyboard=True)
+                print(reply_markup)
+    print(8)
+    print(reply_markup)
+    try:
+        print(9)
+        return bot.sendMessage(chat_id,string,reply_markup=reply_markup)
+    except TelegramError as e:
+        print(10)
+        print(e)
+        pass
+    except BotWasBlockedError as e:
+        print(11)
+        print(e)
+        pass
 
 def del_id(from_id,chat_id,array):
     if from_id==chat_id:
@@ -41,7 +122,7 @@ def tag_group(chat_type,user):
         string="@"+user["username"]+": "
     return string
 
-def selection(chat_id,from_id,lang,list1,chat_type,bot,lang_class):
+def selection(chat_id,from_id,lang,list1,chat_type,bot,lang_class,singleton,name):
     user=bot.getChat(from_id)  
     data=[]
     for elem in list1:
@@ -49,9 +130,10 @@ def selection(chat_id,from_id,lang,list1,chat_type,bot,lang_class):
         create_reply_keyboard(data)
     keyboard1 = create_reply_keyboard(data)
     if list1 ==[] :
-        bot.sendMessage(chat_id,tag_group(chat_type,user)+lang_class.getString(lang,"empty"),reply_markup=ReplyKeyboardRemove(selective=True))
+        singleton.del_time_id(chat_type,lang_class,lang,from_id,chat_id,name)
+        send_message(bot,chat_id, tag_group(chat_type,user)+lang_class.get_string(lang,"empty"),lang_class.get_string(lang,"canc"),singleton.check_time_id(chat_type,lang_class,lang,from_id,chat_id,name)!=0)
     else :
-        bot.sendMessage(chat_id,tag_group(chat_type,user)+lang_class.getString(lang,"select"),reply_markup=keyboard1)
+        send_message(bot,chat_id, tag_group(chat_type,user)+lang_class.get_string(lang,"select"),lang_class.get_string(lang,"canc"),singleton.check_time_id(chat_type,lang_class,lang,from_id,chat_id,name)!=0,keyboard1)
 
 def list_to_str(data):
     stringa=""
@@ -87,6 +169,56 @@ def delete_bug(t,time,lang,bug_array):
                 data[t][elem]=bug_array[lang][t][elem]
     return data
 
+def max_date_index(array):
+    max_index=None
+    for from_id in array:
+        if max_index==None or array[from_id] > array[max_index]:
+            max_index=from_id
+    return max_index
+
+def send_timeout(from_id,chat_id,bot,chat_type,lang_class,lang):
+    user=bot.getChat(from_id)
+    id_chat=None
+    if chat_id==None:
+        id_chat=from_id
+    else:
+        id_chat=chat_id
+    bot.sendMessage(id_chat,tag_group(chat_type,user)+lang_class.get_string(lang,"timeout"),reply_markup=ReplyKeyboardRemove())
+
+def delete_old(array,length,chat_id,bot,lang_class,lang):
+    max_index=0
+    delete_index={}
+    max_index=None
+    for from_id in array:
+        if max_index < length:
+            max_index+=1
+            delete_index[from_id]=array[from_id]
+            max_index=max_date_index(delete_index)
+        else:
+            if delete_index[from_index] > array[from_id]:
+                del delete_index[max_index]
+                delete_index[from_id]=array[from_id]
+                max_index=max_date_index(delete_index)
+    for from_id in delete_index:
+        del array[from_id]
+        send_timeout(from_id,chat_id,bot,chat_type,lang_class,lang)
+    return array
+
+#attr["length"]=length attr["time"]=time
+def normalize_array(array,bot,lang_class,chat_id=None,chat_type="private",lang="en",attr={"length":1000,"time":30}):
+    new_array={}
+    time_now=datetime.datetime.today()
+    time_now-=attr["time"]
+    for from_id in array:
+        if array[from_id] > time_now:
+            new_array[from_id]=array[from_id]
+        else:
+            send_timeout(from_id,chat_id,bot,chat_type,lang_class,lang)
+    l=len(new_array)
+    if l > attr["length"]:
+        new_array=delete_old(new_array,l-attr["length"],chat_id,bot,lang_class,lang)
+    return new_array
+
 #ids[chat]=chat_id ids[from]=from_id
 #bot[bot]=bot bot[type]=bot_type
 def seg_bug(ids,txt,lang,chat_type,bot,database,lang_class):
@@ -98,11 +230,11 @@ def seg_bug(ids,txt,lang,chat_type,bot,database,lang_class):
         bug_array[lang][bot["type"]]={}
     user=bot["bot"].getChat(ids["from"])
     bug_array[lang]=delete_bug(bot["type"],time,lang,bug_array)
-    if lang_class.matchArray(txt,lang,bug_array[lang][bot["type"]]) == None:
+    if lang_class.match_array(txt,lang,bug_array[lang][bot["type"]]) == None:
         bug_array[lang][bot["type"]][txt]=time+datetime.timedelta(days=14)
-        for a_id in database.getAdmins(lang):
+        for a_id in database.get_admins(lang):
             database.get_bot_admin().get_bot().sendMessage(a_id,bot["type"]+": "+txt)
-    bot["bot"].sendMessage(ids["chat"], tag_group(chat_type,user)+lang_class.getString(lang,"bug"),reply_markup=ReplyKeyboardRemove(selective=True))
+    bot["bot"].sendMessage(ids["chat"], tag_group(chat_type,user)+lang_class.get_string(lang,"bug"),reply_markup=ReplyKeyboardRemove(selective=True))
     database.write_bug(bug_array)
 
 def match_command(command,msg,chat_type,username):
