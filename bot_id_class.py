@@ -150,6 +150,15 @@ class BotId:
                 array1[elem]=self.id_commands[name][elem]
             return array, array1
 
+        def sub_nv(self,new_times,new_ids,count,array,time):
+            user=bot.getChat(elem1)
+            if self.id_times[array[0]][array[1]][array[2]]>time:
+                new_times,new_ids=self.add_elem(new_times,new_ids,array[1],array[2],array[0])
+                count+=1
+            elif array[0] in self.id_commands and array[1] in self.id_commands[array[0]] and array[2] in self.id_commands[array[0]][array[1]]:
+                send_message(self.bot_array[array[0]],array[1],tag_group(chat_type,user)+lang_class.get_string(lang,"timeout"))
+            return new_times,new_ids,count
+
         def normalize_vect(self,chat_type,lang_class,lang,time,name):
             new_times={}
             new_ids={}
@@ -157,12 +166,7 @@ class BotId:
             for elem in self.id_times[name]:
                 if type(self.id_times[name][elem]) is dict:
                     for elem1 in self.id_times[name][elem]:
-                        user=bot.getChat(elem1)
-                        if self.id_times[name][elem][elem1]>time:
-                            new_times,new_ids=self.add_elem(new_times,new_ids,elem,elem1,name)
-                            count+=1
-                        elif name in self.id_commands and elem in self.id_commands[name] and elem1 in self.id_commands[name][elem]:
-                            send_message(self.bot_array[name],elem,tag_group(chat_type,user)+lang_class.get_string(lang,"timeout"))
+                        new_times,new_ids,count=self.sub_nv(new_times,new_ids,count,[name,elem,elem1],time)
                 elif type(self.id_times[name][elem]) is datetime.datetime:
                     if self.id_times[name][elem]>time:
                         new_times,new_ids=self.add_elem(new_times,new_ids,elem,None,name)
