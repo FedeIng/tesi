@@ -24,16 +24,17 @@ def edit_message(bot,msg_id,reply_markup=None):
         pass
 
 def send_doc(bot,chat_id,string,reply):
-    with open("questions.txt","w") as doc:
+    q_string="questions.txt"
+    with open(q_string,"w") as doc:
         doc.write(string)
-    with open("questions.txt","rb") as doc:
+    with open(q_string,"rb") as doc:
         try:
             bot.sendDocument(chat_id,doc,reply_to_message_id=reply)
         except TelegramError:
             pass
         except BotWasBlockedError:
             pass
-    os.remove("questions.txt")
+    os.remove(q_string)
 
 def send_message(bot,chat_id,string,button_str="Cancel",bool_val=False,reply_markup=ReplyKeyboardRemove(selective=True)):
     if reply_markup==None:
