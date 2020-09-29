@@ -325,40 +325,26 @@ class BotStudent(Bot):
         return super().get_bot()
 
     def match_speech(self,chat_id,from_id,txt,lang,chat_type):
-        print("match")
-        print(1)
         is_new=self.node.check_lang_str(txt,"new_button")
         if not is_new:
-            print(2)
             self.node.set_qid(chat_id,from_id,txt)
-        print(3)
         user=super().get_bot().getChat(from_id)
         elem=self.node.get_qid(chat_id,from_id)
         response=None
         if not is_new:
-            print(4)
             response=self.node.get_response(elem,lang)
-        print(5)
-        print(response)
         if response == None:
-            print(6)
             self.node.set_question(elem,lang,chat_id)
             send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.node.get_string(lang,"q_not_found",xxx=elem),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
             if lang in self.teachers:
-                print(7)
                 for teacher_id in self.teachers[lang]:
-                    print(8)
                     send_message(self.node.get_bot_teacher().get_bot(),teacher_id, self.node.get_string(lang,"new_q",xxx=elem),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
         elif response == "BANNED":
-            print(9)
             send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.node.get_string(lang,"banned_q",xxx=elem),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
         elif response == "":
-            print(10)
             send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.node.get_string(lang,"wait_q",xxx=elem),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
         else:
-            print(11)
             send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.node.get_string(lang,"answer_q",xxx=elem,yyy=response),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
-        print(12)
         self.node.del_qid(chat_id,from_id)
 
     def seg_rev(self,chat_id,from_id,txt,lang,chat_type):
@@ -398,27 +384,21 @@ class BotStudent(Bot):
 
     def sel_question(self,chat_id,from_id,txt,lang,chat_type):
         list_val=self.node.get_sent(lang,txt)
-        print("sel_q: "+str(list_val))
         user=super().get_bot().getChat(from_id)
         if len(list_val)!=1:
-            print(4)
             self.singleton.del_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())
             send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.node.get_string(lang,"error_q"),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
             return
         txt=list_val[0].lower()
         bres=self.node.get_best_resp(txt,lang)
-        print(bres)
         self.node.set_qid(chat_id,from_id,txt)
         if bres==[]:
-            print(1)
             self.singleton.del_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())
             self.match_speech(chat_id,from_id,self.node.get_string(lang,"new_button"),lang,chat_type)
         elif txt in bres:
-            print(2)
             self.singleton.del_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())
             self.match_speech(chat_id,from_id,txt,lang,chat_type)
         else:
-            print(3)
             bres.append(self.node.get_string(lang,"new_button"))
             self.singleton.add_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,1,self.node.get_topic_name())
             send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.node.get_string(lang,"select_q"),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0,reply_markup=create_reply_keyboard(array_to_matrix(bres)))
