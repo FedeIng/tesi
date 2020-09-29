@@ -78,10 +78,7 @@ class BotTeacher:
                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+self.tree.get_string(lang,"lang"),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0,reply_markup=self.tree.set_keyboard(["it","de","en","es","fr"]))
                 elif match_command('/change_role',txt,chat_type,super().get_bot().getMe()["username"]):
                     role=self.tree.change_role(chat_id,topic)
-                    if role=="teacher":
-                        send_message(super().get_bot(),chat_id, self.tree.get_string(lang,"teacher"),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0,reply_markup=ReplyKeyboardRemove())
-                    elif role=="collaborator":
-                        send_message(super().get_bot(),chat_id, self.tree.get_string(lang,"collaborator"),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0,reply_markup=ReplyKeyboardRemove())
+                    send_message(super().get_bot(),chat_id, self.tree.get_string(lang,role),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0,reply_markup=ReplyKeyboardRemove())
                     self.singleton_id.start_fun(chat_id,from_id,chat_type,lang,self.tree.get_lang(),"teacher",topic,self.keyboard)
                 elif self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher") != 0:
                     self.switcher(chat_id,from_id,txt,lang,topic,chat_type)
@@ -154,10 +151,7 @@ class BotTeacher:
                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+self.tree.get_string(lang,"lang"),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0,reply_markup=self.tree.set_keyboard(["it","de","en","es","fr"]))
             elif query_data=='cr':
                 role=self.tree.change_role(chat_id,topic)
-                if role=="teacher":
-                    send_message(super().get_bot(),chat_id, self.tree.get_string(lang,"teacher"),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0,reply_markup=ReplyKeyboardRemove())
-                elif role=="collaborator":
-                    send_message(super().get_bot(),chat_id, self.tree.get_string(lang,"collaborator"),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0,reply_markup=ReplyKeyboardRemove())
+                send_message(super().get_bot(),chat_id, self.tree.get_string(lang,role),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0,reply_markup=ReplyKeyboardRemove())
                 self.singleton_id.start_fun(chat_id,from_id,chat_type,lang,self.tree.get_lang(),"teacher",topic,self.keyboard)
             
         def list_sel(self,chat_id,from_id,lang,list1,chat_type):
