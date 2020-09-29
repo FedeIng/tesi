@@ -350,6 +350,20 @@ class BotStudent(Bot):
             send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.node.get_string(lang,"answer_q",xxx=elem,yyy=response),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
         self.node.del_qid(chat_id,from_id)
 
+    def new_seg_rev(self,question,lang,user,chat_type,from_id,chat_id):
+        response=self.node.get_response(question,lang)
+        if lang in self.teachers:
+            for teacher_id in self.teachers[lang]:
+                if response != None and response != "" and lang in self.teachers:
+                    send_message(self.node.get_bot_teacher().get_bot(),teacher_id, tag_group(chat_type,user)+self.node.get_string(lang,"revision",xxx=question),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
+
+    def old_seg_rev(self,question,lang,user,chat_type,from_id,chat_id):
+        response=self.node.get_response(question,lang)
+        if lang in self.teachers:
+            for teacher_id in self.teachers[lang]:
+                if response != None and response != "" and lang in self.teachers:
+                    send_message(self.node.get_bot_teacher().get_bot(),teacher_id, tag_group(chat_type,user)+self.node.get_string(lang,"revision",xxx=question)+" (\""+txt+"\")",self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
+
     def seg_rev(self,chat_id,from_id,txt,lang,chat_type):
         question=self.node.get_qid(chat_id,from_id)
         self.node.del_qid(chat_id,from_id)
@@ -359,20 +373,12 @@ class BotStudent(Bot):
             send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.node.get_string(lang,"revision",xxx=question),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
             if not self.node.set_rv_comment(question,"",lang):
                 return
-            response=self.node.get_response(question,lang)
-            if lang in self.teachers:
-                for teacher_id in self.teachers[lang]:
-                    if response != None and response != "" and lang in self.teachers:
-                        send_message(self.node.get_bot_teacher().get_bot(),teacher_id, tag_group(chat_type,user)+self.node.get_string(lang,"revision",xxx=question),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
+            self.new_seg_rev(question,lang,user,chat_type,from_id,chat_id)
         else:
             send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.node.get_string(lang,"revision",xxx=question)+" (\""+txt+"\")",self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
             if not self.node.set_rv_comment(question,txt,lang):
                 return
-            response=self.node.get_response(question,lang)
-            if lang in self.teachers:
-                for teacher_id in self.teachers[lang]:
-                    if response != None and response != "" and lang in self.teachers:
-                        send_message(self.node.get_bot_teacher().get_bot(),teacher_id, tag_group(chat_type,user)+self.node.get_string(lang,"revision",xxx=question)+" (\""+txt+"\")",self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
+            self.old_seg_rev(question,lang,user,chat_type,from_id,chat_id)
 
     def final_set(self,chat_id,from_id,txt,lang,chat_type):
         user=super().get_bot().getChat(from_id)
