@@ -18,13 +18,11 @@ class BotId:
         def reset_key_id(self,name):
             if name in self.key_id:
                 for chat_id in self.key_id[name]:
-                    print(self.key_id[name][chat_id])
                     edit_message(self.bot_array[name],(chat_id,self.key_id[name][chat_id]))
                 del self.key_id[name]
                 self.database.del_key_id(name)  
 
         def set_key_id(self,msg_id,name):
-            print(msg_id)
             chat_id=msg_id[0]
             if name in self.key_id:
                 if chat_id in self.key_id[name]:
@@ -61,20 +59,24 @@ class BotId:
                 del array[name]
             return array
 
+        def sub_smi():
+            if elem == elem1:
+                if time == None or time<self.id_times[name][elem]:
+                    time=self.id_times[name][elem]
+                    index=[name,elem,elem1]
+                else:
+                    if time == None or time<self.id_times[name][elem][elem1]:
+                        time=self.id_times[name][elem][elem1]
+                        index=[name,elem,elem1]
+            return time, index
+
         def set_max_index(self,old_array):
             time=None
             index=[]
             for name in old_array:
                 for elem in old_array[name]:
                     for elem1 in old_array[name][elem]:
-                        if elem == elem1:
-                            if time == None or time<self.id_times[name][elem]:
-                                time=self.id_times[name][elem]
-                                index=[name,elem,elem1]
-                        else:
-                            if time == None or time<self.id_times[name][elem][elem1]:
-                                time=self.id_times[name][elem][elem1]
-                                index=[name,elem,elem1]
+                        time, index=self.sub_smi(time,index)
             return index
 
         def delete_old(self,chat_type,lang_class,lang,num):
@@ -84,38 +86,28 @@ class BotId:
             for name in self.id_times:
                 for elem in self.id_times[name]:
                     if type(self.id_times[name][elem]) is dict:
-                        print(str(elem)+" is a dict")
-                        print(max_index)
                         for elem1 in self.id_times[name][elem]:
                             if count<num:
-                                print(1)
                                 old_array=self.add_elem_id(old_array,name,elem,elem1)
                                 max_index=self.set_max_index(old_array)
                                 count+=1
                             elif max_index[0]==max_index[1] and self.id_times[name][max_index[0]]>self.id_times[name][elem][elem1]:
-                                print(2)
                                 old_array=self.delete_elem_id(old_array,name,max_index[0],max_index[0])
                                 old_array=self.add_elem_id(old_array,name,elem,elem1)
                                 max_index=self.set_max_index(old_array)
                             elif max_index[0]!=max_index[1] and self.id_times[name][max_index[0]][max_index[1]]>self.id_times[name][elem][elem1]:
-                                print(3)
                                 old_array=self.delete_elem_id(old_array,name,max_index[0],max_index[1])
                                 old_array=self.add_elem_id(old_array,name,elem,elem1)
                                 max_index=self.set_max_index(old_array)
                     elif type(self.id_times[name][elem]) is datetime.datetime:
-                        print(str(elem)+" is a date")
-                        print(max_index)
                         if count<num:
-                            print(4)
                             old_array=self.add_elem_id(old_array,name,elem,elem)
                             count+=1
                         elif max_index[0]==max_index[1] and self.id_times[name][max_index[0]]>self.id_times[name][elem]:
-                            print(5)
                             old_array=self.delete_elem_id(old_array,name,max_index[0],max_index[0])
                             old_array=self.add_elem_id(old_array,name,elem,elem)
                             max_index=self.set_max_index(old_array)
                         elif max_index[0]!=max_index[1] and self.id_times[name][max_index[0]][max_index[1]]>self.id_times[name][elem]:
-                            print(6)
                             old_array=self.delete_elem_id(old_array,name,max_index[0],max_index[1])
                             old_array=self.add_elem_id(old_array,name,elem,elem)
                             max_index=self.set_max_index(old_array)
@@ -164,7 +156,6 @@ class BotId:
             count=0
             for elem in self.id_times[name]:
                 if type(self.id_times[name][elem]) is dict:
-                    print(str(elem)+" is a dict")
                     for elem1 in self.id_times[name][elem]:
                         user=bot.getChat(elem1)
                         if self.id_times[name][elem][elem1]>time:
@@ -173,19 +164,11 @@ class BotId:
                         elif name in self.id_commands and elem in self.id_commands[name] and elem1 in self.id_commands[name][elem]:
                             send_message(self.bot_array[name],elem,tag_group(chat_type,user)+lang_class.get_string(lang,"timeout"))
                 elif type(self.id_times[name][elem]) is datetime.datetime:
-                    print(str(elem)+" is a date")
                     if self.id_times[name][elem]>time:
                         new_times,new_ids=self.add_elem(new_times,new_ids,elem,None,name)
                         count+=1
                     elif name in self.id_commands and elem in self.id_commands[name]:
                         send_message(self.bot_array[name],elem,lang_class.get_string(lang,"timeout"))
-            print("Count is "+str(count))
-            print(new_times)
-            print(new_ids)
-            #if count>num:
-                #new_times,new_ids=self.delete_old(new_times,new_ids,count-num)
-            print(new_times)
-            print(new_ids)
             self.id_times[name]=new_times
             self.id_commands[name]=new_ids
             return count
