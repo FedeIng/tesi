@@ -12,10 +12,11 @@ class Database:
             self.bot_teacher=None
             self.stud_str="/bots/students/"
             self.admin_str="/bots/admin/"
+            self.key_str="/bots/key_id"
 
         def get_key_id(self):
             data={}
-            res=self.db.get('/bots/key_id','')
+            res=self.db.get(self.key_str,'')
             if res==None:
                 return {}
             for name in res:
@@ -25,13 +26,13 @@ class Database:
             return data
 
         def del_key_id(self,name):
-            self.db.delete('/bots/key_id', name)
+            self.db.delete(self.key_str, name)
 
         def set_key_id(self,name,array):
             data={}
             for chat_id in array:
                 data[str(chat_id)]=array[chat_id]
-            self.db.put('/bots/key_id', name=name, data=data)          
+            self.db.put(self.key_str, name=name, data=data)          
 
         def get_banned_users(self):
             data=self.db.get('/bots/teachers/banned','')
