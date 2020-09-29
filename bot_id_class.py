@@ -68,17 +68,11 @@ class BotId:
                 for elem in old_array[name]:
                     for elem1 in old_array[name][elem]:
                         if elem == elem1:
-                            if time == None:
-                                time=self.id_times[name][elem]
-                                index=[name,elem,elem1]
-                            elif time<self.id_times[name][elem]:
+                            if time == None or time<self.id_times[name][elem]:
                                 time=self.id_times[name][elem]
                                 index=[name,elem,elem1]
                         else:
-                            if time == None:
-                                time=self.id_times[name][elem][elem1]
-                                index=[name,elem,elem1]
-                            elif time<self.id_times[name][elem][elem1]:
+                            if time == None or time<self.id_times[name][elem][elem1]:
                                 time=self.id_times[name][elem][elem1]
                                 index=[name,elem,elem1]
             return index
@@ -156,9 +150,8 @@ class BotId:
                     array[elem]={}
                     array1[elem]={}
                 array[elem][elem1]=self.id_times[name][elem][elem1]
-                if elem in self.id_commands[name]:
-                    if elem1 in self.id_commands[name][elem]:
-                        array1[elem][elem1]=self.id_commands[name][elem][elem1]
+                if elem in self.id_commands[name] and elem1 in self.id_commands[name][elem]:
+                    array1[elem][elem1]=self.id_commands[name][elem][elem1]
                 return array, array1
             array[elem]=self.id_times[name][elem]
             if elem in self.id_commands[name]:
