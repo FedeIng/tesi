@@ -51,6 +51,23 @@ def q_and_a(array):
             array1[elem]=array[elem]["answer"]
     return array1
 
+def branch_one(topic_str):
+    array[topic_str]={}
+    for lang_str in data[topic_str]:
+        if "questions" not in data[topic_str][lang_str]:
+            continue
+        if lang =="":
+            array[topic_str][lang_str]=q_and_a(data[topic_str][lang_str]["questions"])
+        elif lang_str==lang:
+            array[topic_str]=q_and_a(data[topic_str][lang_str]["questions"])
+
+def branch_two(topic_str):
+    for lang_str in data[topic_str]:
+        if lang =="":
+            array[lang_str]=q_and_a(data[topic_str][lang_str]["questions"])
+        elif lang_str==lang:
+            array=q_and_a(data[topic_str][lang_str]["questions"])
+
 def write_doc():
     global data
     global topic
@@ -60,20 +77,9 @@ def write_doc():
         array={}
         for topic_str in data:
             if topic=="":
-                array[topic_str]={}
-                for lang_str in data[topic_str]:
-                    if "questions" not in data[topic_str][lang_str]:
-                        continue
-                    if lang =="":
-                        array[topic_str][lang_str]=q_and_a(data[topic_str][lang_str]["questions"])
-                    elif lang_str==lang:
-                        array[topic_str]=q_and_a(data[topic_str][lang_str]["questions"])
+                branch_one(topic_str)
             elif topic_str==topic:
-                for lang_str in data[topic_str]:
-                    if lang =="":
-                        array[lang_str]=q_and_a(data[topic_str][lang_str]["questions"])
-                    elif lang_str==lang:
-                        array=q_and_a(data[topic_str][lang_str]["questions"])
+                branch_two(topic_str)
         json.dump(array,jfile)
 
 def error():
