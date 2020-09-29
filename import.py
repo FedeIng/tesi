@@ -9,6 +9,8 @@ lang=""
 name="questions.txt"
 topic=""
 
+students="/bots/students/"
+
 def set_lang(string):
     global lang
     lang=string
@@ -48,18 +50,18 @@ def read_doc():
         data = json.load(json_file)
     if lang !="":
         if topic !="":
-            db.put("/bots/students/"+topic+"/"+lang,name="questions",data=q_and_a(data))
+            db.put(students+topic+"/"+lang,name="questions",data=q_and_a(data))
         else:
             for topic_str in data:
-                db.put("/bots/students/"+topic_str+"/"+lang,name="questions",data=q_and_a(data[topic_str]))
+                db.put(students+topic_str+"/"+lang,name="questions",data=q_and_a(data[topic_str]))
     else:
         if topic !="":
             for lang_str in data:
-                db.put("/bots/students/"+topic+"/"+lang_str,name="questions",data=q_and_a(data[lang_str]))
+                db.put(students+topic+"/"+lang_str,name="questions",data=q_and_a(data[lang_str]))
         else:
             for topic_str in data:
                 for lang_str in data[topic_str]:
-                    db.put("/bots/students/"+topic_str+"/"+lang_str,name="questions",data=q_and_a(data[topic_str][lang_str]))
+                    db.put(students+topic_str+"/"+lang_str,name="questions",data=q_and_a(data[topic_str][lang_str]))
 
 def error():
     print("Questo è un programma per caricare il database delle domande del bot del politecnico")
