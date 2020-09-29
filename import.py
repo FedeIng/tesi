@@ -40,6 +40,22 @@ def q_and_a(array):
         array1[elem]={"answer":array[elem]}
     return array1
 
+def branch_one(data):
+    if topic !="":
+        db.put(students+topic+"/"+lang,name="questions",data=q_and_a(data))
+    else:
+        for topic_str in data:
+            db.put(students+topic_str+"/"+lang,name="questions",data=q_and_a(data[topic_str]))
+
+def branch_two(data):
+    if topic !="":
+        for lang_str in data:
+            db.put(students+topic+"/"+lang_str,name="questions",data=q_and_a(data[lang_str]))
+    else:
+        for topic_str in data:
+            for lang_str in data[topic_str]:
+                db.put(students+topic_str+"/"+lang_str,name="questions",data=q_and_a(data[topic_str][lang_str]))
+
 def read_doc():
     global db
     global topic
@@ -49,19 +65,9 @@ def read_doc():
     with open(name,"r") as json_file:
         data = json.load(json_file)
     if lang !="":
-        if topic !="":
-            db.put(students+topic+"/"+lang,name="questions",data=q_and_a(data))
-        else:
-            for topic_str in data:
-                db.put(students+topic_str+"/"+lang,name="questions",data=q_and_a(data[topic_str]))
+        branch_one(data)
     else:
-        if topic !="":
-            for lang_str in data:
-                db.put(students+topic+"/"+lang_str,name="questions",data=q_and_a(data[lang_str]))
-        else:
-            for topic_str in data:
-                for lang_str in data[topic_str]:
-                    db.put(students+topic_str+"/"+lang_str,name="questions",data=q_and_a(data[topic_str][lang_str]))
+        branch_two(data)
 
 def error():
     print("Questo è un programma per caricare il database delle domande del bot del politecnico")
