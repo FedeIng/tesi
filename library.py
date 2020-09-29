@@ -36,9 +36,6 @@ def send_doc(bot,chat_id,string,reply):
     os.remove("questions.txt")
 
 def send_message(bot,chat_id,string,button_str="Cancel",bool_val=False,reply_markup=ReplyKeyboardRemove(selective=True)):
-    print(reply_markup)
-    print("send_message")
-    print(1)
     if reply_markup==None:
         try:
             return bot.sendMessage(chat_id,string)
@@ -49,38 +46,21 @@ def send_message(bot,chat_id,string,button_str="Cancel",bool_val=False,reply_mar
         return
     var=reply_markup[0]
     if bool_val:
-        print(2)
         if reply_markup==ReplyKeyboardRemove(selective=True):
-            print(3)
             reply_markup=create_reply_keyboard([[button_str]])
-            print(reply_markup)
         elif reply_markup==ReplyKeyboardRemove() or reply_markup==ReplyKeyboardRemove(selective=False):
-            print(4)
             reply_markup=create_reply_keyboard([[button_str]],False)
-            print(reply_markup)
         else:
-            print(5)
             var.append([KeyboardButton(text=button_str)])
             if len(reply_markup)==4:
-                print(6)
                 reply_markup=ReplyKeyboardMarkup(keyboard=var,resize_keyboard=True,one_time_keyboard=True,selective=reply_markup[3])
-                print(reply_markup)
             else:
-                print(7)
                 reply_markup=ReplyKeyboardMarkup(keyboard=var,resize_keyboard=True,one_time_keyboard=True)
-                print(reply_markup)
-    print(8)
-    print(reply_markup)
     try:
-        print(9)
         return bot.sendMessage(chat_id,string,reply_markup=reply_markup)
     except TelegramError as e:
-        print(10)
-        print(e)
         pass
     except BotWasBlockedError as e:
-        print(11)
-        print(e)
         pass
 
 def del_id(from_id,chat_id,array):
