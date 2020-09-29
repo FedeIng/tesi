@@ -59,7 +59,7 @@ class BotId:
                 del array[name]
             return array
 
-        def sub_smi():
+        def sub_smi(self,time,index):
             if elem == elem1:
                 if time == None or time<self.id_times[name][elem]:
                     time=self.id_times[name][elem]
