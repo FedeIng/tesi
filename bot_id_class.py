@@ -183,17 +183,20 @@ class BotId:
                     self.id_times[name][chat_id]={}
                 self.id_times[name][chat_id][from_id]=datetime.datetime.today()
 
+        def sub_del_id(self,from_id,chat_id,name):
+            if chat_id in self.id_commands[name]:
+                if from_id in self.id_commands[name][chat_id]:
+                    del self.id_commands[name][chat_id][from_id]
+                if len(self.id_commands[name][chat_id])==0:
+                    del self.id_commands[name][chat_id]
+
         def del_id(self,from_id,chat_id,name):
             if name in self.id_commands:
                 if from_id==chat_id:
                     if chat_id in self.id_commands[name]:
                         del self.id_commands[name][chat_id]
                 else :
-                    if chat_id in self.id_commands[name]:
-                        if from_id in self.id_commands[name][chat_id]:
-                            del self.id_commands[name][chat_id][from_id]
-                        if len(self.id_commands[name][chat_id])==0:
-                            del self.id_commands[name][chat_id]
+                    sub_del_id(self,from_id,chat_id,name)
                 if len(self.id_commands[name])==0:
                     del self.id_commands[name]
 
