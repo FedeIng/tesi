@@ -168,7 +168,7 @@ class BotTeacher:
                 reply=telepot.message_identifier(send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"File:",self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0))[1]
                 send_doc(super().get_bot(),chat_id,list_to_str(list1),reply)
 
-        def branch_one(self,msg,chat_id,from_id,topic):
+        def branch_one(self,msg,chat_id,from_id):
             lang=self.prev_lang[chat_id]
             topic=self.topic_name[chat_id]
             if self.tree.check_teach(lang,msg["text"]):
@@ -233,7 +233,7 @@ class BotTeacher:
             if chat_id not in self.query_bool:
                 self.query_bool[chat_id]=False
             if self.lang_bool[chat_id]==True:
-                self.branch_one(msg,chat_id,from_id,topic)
+                self.branch_one(msg,chat_id,from_id)
                 return False
             if self.query_bool[chat_id]==True:
                 self.branch_two(msg,chat_id,from_id,topic)
