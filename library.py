@@ -36,6 +36,20 @@ def send_doc(bot,chat_id,string,reply):
             pass
     os.remove(q_string)
 
+def sm_branch1(button_str,reply_markup):
+    var=reply_markup[0]
+    if reply_markup==ReplyKeyboardRemove(selective=True):
+        reply_markup=create_reply_keyboard([[button_str]])
+    elif reply_markup==ReplyKeyboardRemove() or reply_markup==ReplyKeyboardRemove(selective=False):
+        reply_markup=create_reply_keyboard([[button_str]],False)
+    else:
+        var.append([KeyboardButton(text=button_str)])
+        if len(reply_markup)==4:
+            reply_markup=ReplyKeyboardMarkup(keyboard=var,resize_keyboard=True,one_time_keyboard=True,selective=reply_markup[3])
+        else:
+            reply_markup=ReplyKeyboardMarkup(keyboard=var,resize_keyboard=True,one_time_keyboard=True)
+    return reply_markup
+
 def send_message(bot,chat_id,string,button_str="Cancel",bool_val=False,reply_markup=ReplyKeyboardRemove(selective=True)):
     if reply_markup==None:
         try:
@@ -45,18 +59,8 @@ def send_message(bot,chat_id,string,button_str="Cancel",bool_val=False,reply_mar
         except BotWasBlockedError:
             pass
         return
-    var=reply_markup[0]
     if bool_val:
-        if reply_markup==ReplyKeyboardRemove(selective=True):
-            reply_markup=create_reply_keyboard([[button_str]])
-        elif reply_markup==ReplyKeyboardRemove() or reply_markup==ReplyKeyboardRemove(selective=False):
-            reply_markup=create_reply_keyboard([[button_str]],False)
-        else:
-            var.append([KeyboardButton(text=button_str)])
-            if len(reply_markup)==4:
-                reply_markup=ReplyKeyboardMarkup(keyboard=var,resize_keyboard=True,one_time_keyboard=True,selective=reply_markup[3])
-            else:
-                reply_markup=ReplyKeyboardMarkup(keyboard=var,resize_keyboard=True,one_time_keyboard=True)
+        reply_markup=sm_branch1(button_str,reply_markup)
     try:
         return bot.sendMessage(chat_id,string,reply_markup=reply_markup)
     except TelegramError:
