@@ -58,9 +58,9 @@ def send_message(bot,chat_id,string,button_str="Cancel",bool_val=False,reply_mar
                 reply_markup=ReplyKeyboardMarkup(keyboard=var,resize_keyboard=True,one_time_keyboard=True)
     try:
         return bot.sendMessage(chat_id,string,reply_markup=reply_markup)
-    except TelegramError as e:
+    except TelegramError:
         pass
-    except BotWasBlockedError as e:
+    except BotWasBlockedError:
         pass
 
 def del_id(from_id,chat_id,array):
