@@ -281,12 +281,9 @@ class Tree:
         def set_ban(self,txt,lang,topic):
             jarray=self.array[topic].get_json_array(lang)
             e=self.lang.match_array(txt,lang,jarray)
-            print("e : "+str(e))
-            print("jarray : "+str(jarray))
             if e != None and jarray[e]["answer"]=="":
                 self.array[topic].set_response(lang,e,"BANNED")
             self.array[topic].set_banned_stud()
-            #self.write_data()
 
         def set_sban(self,txt,lang,topic):
             jarray=self.array[topic].get_json_array(lang)
@@ -294,7 +291,6 @@ class Tree:
             if e != None and jarray[e]["answer"]=="BANNED":
                 self.array[topic].set_response(lang,e,"")
             self.array[topic].set_banned_stud()
-            #self.write_data()
 
         def set_nlp(self,lang):
             self.lang.set_nlp(lang)
