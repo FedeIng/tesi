@@ -60,7 +60,7 @@ class BotStudent(Bot):
                 self.del_students([chat_id])
                 send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.node.get_string(lang,"delete_s"),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
             elif self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name()) != 0:
-                self.switcher(chat_id,from_id,msg["text"],lang,chat_type)
+                self.switcher(chat_id,from_id,txt,lang,chat_type)
 
     def query(self,msg):
         query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
@@ -95,12 +95,6 @@ class BotStudent(Bot):
             self.singleton.del_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())
             self.del_students([chat_id])
             send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.node.get_string(lang,"delete_s"),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
-
-    def get_coll(self):
-        return self.collaborators
-
-    def get_teach(self):
-        return self.teachers
 
     def add_question(self,question,lang):
         self.node.add_question(question,lang)
@@ -312,15 +306,6 @@ class BotStudent(Bot):
         lang_array=["it","de","en","es","fr"]
         for lang in lang_array:
             if (lang in self.teachers and len(self.teachers[lang])>0) or (lang in self.collaborators and len(self.collaborators[lang])>0):
-                data.append(lang)
-        return data
-
-    def lang_teach_coll(self):
-        data=[]
-        for lang in self.teachers:
-            data.append(lang)
-        for lang in self.collaborators:
-            if lang not in data:
                 data.append(lang)
         return data
 

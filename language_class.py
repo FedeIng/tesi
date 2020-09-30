@@ -144,9 +144,6 @@ class Language:
                 return self.printx(self.lang_strings[lang][string],xxx,yyy)
             return ""
 
-        def create_button(self,lang):
-            return InlineKeyboardButton(text=self.switcher.get(lang,""),callback_data=lang)
-
         def set_keyboard(self,lang_array,bool_var=True):
             i=0
             data=[]

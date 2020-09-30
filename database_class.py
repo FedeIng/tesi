@@ -131,16 +131,6 @@ class Database:
                     data=self.sub_read_bug(data,lang,role)
             return data
 
-        def get_array_by_topic(self,topic):
-            data={}
-            result=self.db.get(self.stud_str+topic,'')
-            for lang in self.lang_array:
-                if lang in result:
-                    data[lang]=result[lang]
-            data["banned"]=result["banned"]
-            data["hash"]=result["hash"]
-            return data
-
         def get_stud_ids(self,topic):
             data={}
             for lang in self.lang_array:

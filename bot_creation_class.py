@@ -104,12 +104,6 @@ class BotCreation:
                     data.append(elem)
             return data
 
-        def get_banned_dict(self):
-            data={}
-            for chat_id in self.user_request:
-                data[chat_id]=len(self.user_request)
-            return data
-
         def select_topic(self,chat_id,text):
             if not re.search("^[a-zA-Z0-9][a-zA-Z0-9 ]{3}[a-zA-Z0-9 ]*[a-zA-Z0-9]$", text):
                 send_message(super().get_bot(),chat_id,"The name of the topic is not valid, it must have at least 5 characters and contain only letters, numbers and spaces. The name cannot begin or end with a space. Please retry","Cancel",self.singleton_id.check_time_id("private",self.tree.get_lang(),"en",chat_id,chat_id,"creation")!=0,reply_markup=ReplyKeyboardRemove())

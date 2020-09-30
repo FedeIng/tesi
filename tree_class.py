@@ -61,10 +61,6 @@ class Tree:
                 i+=1
             return list1
 
-        def setnum(self):
-            while "STATE"+str(self.num) in self.array:
-                self.num+=1
-
         def delete_bot(self,topic):
             self.database.del_bot(topic)
             del self.array[topic]
@@ -89,9 +85,6 @@ class Tree:
 
         def send_notification(self,teacher,student,topic):
             self.array[topic].sendRestartNotify(teacher,student,self.lang)
-
-        def set_choose_lang(self,topic):
-            return self.lang.set_keyboard(self.array[topic].getLang(),True)
 
         def add_collaborators(self,vett,topic,lang):
             self.array[topic].add_collaborators(lang,vett)
@@ -184,79 +177,11 @@ class Tree:
         def set_qid(self,chat_id,from_id,txt,topic):
             self.array[topic].set_qid(chat_id,from_id,txt)
 
-        def get_hash_list(self):
-            hashlist=[]
-            for node in self.array:
-                hashlist.append(self.array[node].get_hash())
-            return hashlist
-
         def get_hash(self,topic):
             return self.array[topic].get_hash()
 
-        def contains(self,node,question,txt,lang):
-            vett=node.get_json_array(self.lang,lang,False)
-            e=''
-            val=0
-            val1=0
-            for elem in vett:
-                num=self.lang.calculate_similarity(question,elem,lang)
-                num1=self.lang.calculate_similarity(txt,vett[elem]["answer"],lang)
-                if (num+num1)/2 > (val+val1)/2:
-                    val=num
-                    val1=num1
-                    e=elem
-            if val>0.8 and val1>0.8:
-                return e
-            else:
-                return None
-
-        def exist(self,vett):
-            for node in self.array:
-                sons=self.array[node].getArrays()[1]
-                if len(sons)==2 and sons[0]==vett[0] and sons[1]==vett[1]:
-                    return node
-            return None
-
         def get_sent(self,lang,text):
             return self.lang.question_sent(lang,text)
-
-        def state_exist(self,node1,node2):
-            p1=self.array[node1].getArrays()[0]
-            p2=self.array[node2].getArrays()[0]
-            for node in list(set(p1).intersection(p2)):
-                if sorted(p1,p2)==node.getArrays()[1]:
-                    return node.getName(), True
-            return None, False
-
-        def normalize_tree(self,node1,node2):
-            bool_var=False
-            p,s=self.array[node1].getArrays()
-            if len(p)==1 and len(s)==1:
-                p[0].addSon(s[0])
-                p[0].delSon(self.array[node1])
-                s[0].addParent(p[0])
-                s[0].delParent(self.array[node1])
-                s[0].addJSON(self.array[node1],self.lang)
-                del self.array[node1]
-                bool_var=True
-            p1,s1=self.array[node2].getArrays()
-            if len(p1)==1 and len(s1)==1:
-                p1[0].addSon(s1[0])
-                p1[0].delSon(self.array[node2])
-                s1[0].addParent(p1[0])
-                s1[0].delParent(self.array[node2])
-                s1[0].addJSON(self.array[node2],self.lang)
-                del self.array[node2]
-                bool_var=True
-            if bool_var:
-                return
-            if len(p1)==len(list(set(p1).intersection(p))) and len(s1)==len(list(set(s1).intersection(s))) and len(p1)==len(p) and len(s1)==len(s):
-                for elem in p1:
-                    elem.delSon(self.array[node2])
-                for elem in s1:
-                    elem.delParent(self.array[node2])
-                self.array[node1].addJSON(self.array[node2],self.lang)
-                del self.array[node2]
 
         def get_q_array(self,chat_id,lang,topic):
             list_q=self.array[topic].get_json_array(self.lang,lang,True)
@@ -316,23 +241,6 @@ class Tree:
                     return node
             return None
 
-        def get_teacher_ids(self):
-            teachers=[]
-            for node in self.array:
-                teachers+=self.array[node].get_teach_coll()
-            return teachers
-
-        def bot_enabled(self,topic):
-            if len(self.array[topic].get_teach_coll())==0:
-                return False
-            return True
-
-        def get_teachers_and_collaborators(self,topic):
-            return self.array[topic].getLangTCArray()
-
-        def get_res_id(self,lang,topic):
-            return self.array[topic].getTeachers(lang)
-
         def write_data(self):
             for elem in self.array:
                 self.array[elem].set_formatted_data()
@@ -364,10 +272,6 @@ class Tree:
         def set_keyboard(self,lang_array):
             return self.lang.set_keyboard(lang_array,False)
 
-        def set_user_lang(self,id,lang,topic):
-            self.array[topic].addStudents([id],lang)
-            self.write_data()
-
         def get_string(self, lang, string, xxx=None, yyy=None):
             return self.lang.get_string(lang,string,xxx,yyy)
 
@@ -377,82 +281,11 @@ class Tree:
         def get_super_user_lang(self,id,topic):
             return self.array[topic].get_toc_lang(id)
 
-        def delete_node(self,name):
-            parents_array=self.array[name].getArrays()[0]
-            if len(parents_array)>0:
-                for parent in parents_array:
-                    name2=parent.getSecondSon(self.array[name])
-                    self.array[name2].setMergedArray(parent,self.lang)
-                    grandparents_array=parent.getArrays()[0]
-                    if len(grandparents_array)>0:
-                        for grandparent in grandparents_array:
-                            grandparent.delSon(parent)
-                            grandparent.addSon(self.array[name])
-                            self.array[name].addParent(grandparent)
-                    self.array[name].delParent(parent)
-                    del self.array[parent]
-            del self.array[name]
-            self.write_data()
-
         def check_coll(self,lang,text):
             return self.lang.check_coll(lang,text)
 
         def check_teach(self,lang,text):
             return self.lang.check_teach(lang,text)
-
-        def create_node(self,new_name,w=False):
-            if new_name in self.array:
-                return False
-            qa_array={}
-            with open(self.dataName,'r') as json_file:
-                qa_array=json.load(json_file)
-            if new_name not in qa_array:
-                qa_array[new_name]={}
-            new_node=Node(new_name,qa_array[new_name])
-            new_node.set_bannedUsers(self.lang)
-            self.array[new_name]=new_node
-            if w:
-                self.write_data()
-            return True
-
-        def add_node(self,name1,name2,new_name):
-            if name1 not in self.array or name2 not in self.array:
-                return False
-            if not self.create_node(new_name):
-                return False
-            node1=self.array[name1]
-            node2=self.array[name2]
-            new_node=self.array[new_name]
-            node1.addParent(new_node)
-            node2.addParent(new_node)
-            new_node.addSon(node1)
-            new_node.addSon(node2)
-            self.write_data()
-            return True
-
-        def merge_node(self,name1,name2):
-            node1=self.array[name1]
-            node2=self.array[name2]
-            if node1==node2:
-                node1.substite(node2)
-                del self.array[name1]
-                return True
-            return False
-
-        def delete_link(self,name1,name2):
-            node1=self.array[name1]
-            node2=self.array[name2]
-            if len(node1.getArrays()[0])==1 and len(node2.getArrays()[1])==1 and node1.isSon(node2) and node2.isParent(node1):
-                node1.addParents(node2.getArrays()[0])
-                node1.substite(node2)
-                del self.array[name2]
-                return True
-            if len(node2.getArrays()[0])==1 and len(node1.getArrays()[1])==1 and node2.isSon(node1) and node1.isParent(node2):
-                node2.addParents(node1.getArrays()[0])
-                node2.substite(node1)
-                del self.array[name1]
-                return True
-            return False
     
     instance = None
     def __new__(cls): # __new__ always a classmethod

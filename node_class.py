@@ -66,7 +66,6 @@ class Node:
     def get_best_resp(self,txt,lang):
         list1={}
         for question in self.json_array[lang]:
-            print(question)
             num=self.lang.calculate_similarity(txt,question,lang)
             if num>0.8:
                 list1[question]=num
@@ -139,17 +138,6 @@ class Node:
         for node in self.parents:
             node.get_real_node(lang,question,lang_class)
         return None,None
-
-    def send_restart_notify(self,bot_t,bot_s,lang_class):
-        for lang in self.teachers:
-            for t in self.teachers[lang]:
-                bot_t.sendMessage(t,lang_class.get_string(lang,"restart"),reply_markup=ReplyKeyboardRemove())
-        for lang in self.collaborators:
-            for c in self.collaborators[lang]:
-                bot_t.sendMessage(c,lang_class.get_string(lang,"restart"),reply_markup=ReplyKeyboardRemove())
-        for lang in self.students:
-            for s in self.students[lang]:
-                bot_s.sendMessage(s,lang_class.get_string(lang,"restart"),reply_markup=ReplyKeyboardRemove())
 
     def add_chat_id(self,question,lang,id):
         if lang in self.json_array and question in self.json_array[lang]:
@@ -241,18 +229,6 @@ class Node:
         del self.questions[chat_id][from_id]
         if len(self.questions[chat_id])==0:
             del self.questions[chat_id]
-
-    def get_lang_tc_array(self):
-        data={}
-        for lang in self.teachers:
-            if lang not in data:
-                data[lang]=[]
-            data[lang]=self.teachers[lang]
-        for lang in self.collaborators:
-            if lang not in data:
-                data[lang]=[]
-            data[lang]+=self.collaborators[lang]
-        return data
         
     def get_ancestors(self):
         data=[]
@@ -284,20 +260,6 @@ class Node:
             if (condition=="FREE" and self.json_array[lang][elem]["answer"]=='') or (condition=="BANNED" and self.json_array[lang][elem]["answer"]=="BANNED") or (condition=="ANSWER" and self.json_array[lang][elem]["answer"]!='' and self.json_array[lang][elem]["answer"]!="BANNED"):
                 data.append(elem)
         return data
-
-    def get_teachers(self,lang):
-        if lang in self.teachers:
-            return self.teachers[lang]
-        return []
-
-    def get_banned_user(self):
-        return self.bannedUser
-
-    def get_array_lang(self):
-        lang_vett=[]
-        for elem in self.json_array:
-            lang_vett.append(elem)
-        return lang_vett
 
     def sub_del_teachers(self,data,elem,lang,lang_class,bot):
         if elem not in self.teachers[lang] and len(self.teachers[lang])>0:
@@ -393,12 +355,6 @@ class Node:
         for elem in vett:
             if elem not in self.students[lang]:
                 self.students[lang].append(elem)
-
-    def get_student_lang(self,id):
-        for lang in self.students:
-            if id in self.students[lang]:
-                return lang
-        return None
     
     def get_toc_lang(self,id):
         for lang in self.collaborators:
@@ -415,48 +371,6 @@ class Node:
     def get_hash(self):
         return self.hash
 
-    def add_parent(self,node):
-        self.parents.append(node)
-    
-    def add_son(self,node):
-        self.sons.append(node)
-
-    def del_son(self,node):
-        self.sons.remove(node)
-
-    def del_parent(self,node):
-        self.parents.remove(node)
-
-    def add_json(self,node,lang):
-        for lang_str in ["it","de","en","es","fr"]:
-            data={}
-            data=node.get_json_array(lang,lang_str,recursive=False)
-            if len(data)>0:
-                if lang_str not in self.json_array:
-                    self.json_array[lang]=data
-                else:
-                    self.json_array[lang].update(data)
-
-    def ret_struct(self):
-        data={}
-        data["hash"]=self.hash
-        for lang in self.teachers:
-            if lang not in data:
-                data[lang]={}
-            data[lang]["teachers"]=self.teachers[lang]
-        for lang in self.collaborators:
-            if lang not in data:
-                data[lang]={}
-            data[lang]["collaborators"]=self.collaborators[lang]
-        for lang in self.students:
-            if lang not in data:
-                data[lang]={}
-            data[lang]["students"]=self.students[lang]
-        return data
-
-    def get_arrays(self):
-        return sorted(self.parents), sorted(self.sons)
-
     def change(self,node1,node2):
         for num in range(0,len(self.sons)):
             if self.sons[num] == node1:
@@ -464,58 +378,6 @@ class Node:
         for num in range(0,len(self.sons)):
             if self.parents[num] == node1:
                 self.parents[num] = node2
-
-    def get_name(self):
-        return self.name
-
-    def get_multiple_lang_array(self):
-        return self.json_array
-
-    def set_merged_array(self,obj,lang):
-        data={}
-        data1=obj.get_multiple_lang_array()
-        for lang_str in self.json_array:
-            data[lang_str]={}
-            if lang not in data1:
-                data[lang_str]=self.merge_arrays(self.json_array[lang_str],data1,lang,lang_str)
-            else:
-                data[lang_str]=self.json_array[lang_str]
-        for lang_str in data1:
-            if lang_str not in data:
-                data[lang_str]=data1[lang_str]
-        self.json_array=data
-
-    def get_second_son(self,obj):
-        for son in self.sons:
-            if son != obj:
-                return son
-        return None
-
-    def substite(self,obj):
-        for son in self.sons:
-            if son!=obj:
-                son.change(self,obj)
-        for parent in self.parents:
-            if parent!=obj:
-                parent.change(self,obj)
-
-    def is_parent(self,obj):
-        return obj in self.parents
-
-    def del_parent(self,obj):
-        self.parents.remove(obj)
-
-    def del_son(self,obj):
-        self.sons.remove(obj)
-
-    def is_son(self,obj):
-        return obj in self.sons
-
-    def add_parents(self,array):
-        self.parents=array
-
-    def add_sons(self,array):
-        self.sons=array
 
     def is_in_array(self,string,array,lang,lang_str):
         for elem in array:
@@ -559,31 +421,6 @@ class Node:
                     data[num+1]={}
                 data[num+1]=self.merge_arrays(data[num+1],array[num],lang,lang_str)
         return data
-    
-    def add_response(self,question,lang,txt):
-        self.json_array[lang][question]["answer"]=txt
-        
-    def delete_question(self,question,lang):
-        del self.json_array[lang][question]
-
-    def sub_delete_double_question(self,lang,lang_str,data,elem):
-        for question in data[elem]:
-            vett=[]
-            for question1 in self.json_array[lang_str]:
-                if lang.calculate_similarity(question,question1,lang_str) > 0.8:
-                    vett.append(question1)
-            for question1 in vett:
-                del self.json_array[lang_str][question1]
-
-    def delete_double_question(self,lang,lang_str):
-        if lang_str not in self.json_array:
-            return
-        data={}
-        data=self.calc_distance(lang,lang_str)
-        for elem in data:
-            if elem==0:
-                continue
-            self.sub_delete_double_question(lang,lang_str,data,elem)
 
     def add_question(self,txt,lang,res=""):
         if lang not in self.json_array:
@@ -591,37 +428,6 @@ class Node:
         self.json_array[lang][txt]={}
         self.json_array[lang][txt]["answer"]=res
         self.json_array[lang][txt]["ids"]=[]
-
-    def cross_match(self,obj,lang,lang_str):
-        tot={}
-        tot[0]=0
-        tot[1]=0
-        num={}
-        val={}
-        if lang_str not in self.json_array:
-            tot[0]=1.0
-            tot[1]=1.0
-            return tot
-        l=len(self.json_array[lang_str])
-        if l==0:
-            tot[0]=1.0
-            tot[1]=1.0
-            return tot
-        obj_array=obj.get_json_array(lang,lang_str,recursive=False)
-        for elem in self.json_array[lang_str]:
-            num[0]=0
-            num[1]=0
-            for elem1 in obj_array:
-                val[0]=lang.calculate_similarity(elem,elem1,lang_str)
-                val[1]=lang.calculate_similarity(self.json_array[lang_str][elem]['a'],obj_array[elem1]['a'],lang_str)
-                for i in range(0,2):
-                    if num[i]<val[i]:
-                        num[i]=val[i]
-            for i in range(0,2):
-                tot[i]+=num[i]
-        for i in range(0,2):
-            tot[i]/=l
-        return tot
     
     def add_id(self,from_id,chat_id,num):
         if from_id==chat_id:
@@ -653,27 +459,6 @@ class Node:
                 ret_val=self.id_commands[chat_id][from_id]
         return ret_val
 
-    def cross_lang(self,obj,lang,lang_vett):
-        for elem in lang_vett:
-            vett=self.cross_match(obj,lang,elem)
-            for i in vett:
-                if vett[i]< 0.8:
-                    return False
-        return True
-
-    def __eq__(self,obj):
-        p1, s1 = self.get_arrays()
-        p2, s2 = obj.get_arrays()
-        if len(p1)!=len(p2) or len(s1)!=len(s2):
-            return False
-        for num in range(0,len(p1)):
-            if p1[num]!=p2[num]:
-                return False
-        for num in range(0,len(s1)):
-            if s1[num]!=s2[num]:
-                return False
-        return True
-
     def ret_q_vett(self,lang):
         vett=[]
         if lang in self.json_array:
@@ -690,18 +475,3 @@ class Node:
                 string="\""+string+"\" -> \""+self.lang.translate(vett[elem]["answer"],src,dst)+"\""
                 array.append(string)
         return array
-
-    def __ne__(self,obj):
-        return not self==obj
-
-    def __lt__(self,obj):
-        return self.get_name() < obj.get_name()
-    
-    def __gt__(self,obj):
-        return self.get_name() > obj.get_name()
-
-    def __le__(self,obj):
-        return self.get_name() <= obj.get_name()
-    
-    def __ge__(self,obj):
-        return self.get_name() >= obj.get_name()
