@@ -33,58 +33,62 @@ class BotTeacher:
         def start_command(self,txt,chat_type,lang,from_id,chat_id):
             return match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]) or (self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0 and self.tree.check_lang_str(txt,"canc"))
 
+        def sub_message(self,chat_type,chat_id,from_id,topic,user):
+            txt=msg["text"]
+            lang=self.tree.get_super_user_lang(chat_id,topic)
+            if self.start_command(txt,chat_type,lang,from_id,chat_id):
+                self.singleton_id.del_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")
+                self.singleton_id.start_fun(chat_id,from_id,chat_type,lang,self.tree.get_lang(),"teacher",topic,self.keyboard)
+            elif match_command('/answer',txt,chat_type,super().get_bot().getMe()["username"]):
+                self.singleton_id.add_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,1,"teacher")
+                selection(chat_id,from_id,lang,self.tree.get_res_array(topic,lang,"FREE"),chat_type,super().get_bot(),self.tree.get_lang(),self.singleton_id,"teacher")
+            elif match_command('/ban',txt,chat_type,super().get_bot().getMe()["username"]):
+                self.singleton_id.add_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,3,"teacher")
+                selection(chat_id,from_id,lang,self.tree.get_res_array(topic,lang,"FREE"),chat_type,super().get_bot(),self.tree.get_lang(),self.singleton_id,"teacher")
+            elif match_command('/report',txt,chat_type,super().get_bot().getMe()["username"]):
+                self.singleton_id.add_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,2,"teacher")
+                send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.tree.get_string(lang,"report"),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0)
+            elif match_command('/list',txt,chat_type,super().get_bot().getMe()["username"]):
+                self.singleton_id.del_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")
+                self.list_sel(chat_id,from_id,lang,self.tree.get_res_array(topic,lang,"ANSWER"),chat_type)
+            elif match_command('/ban_list',txt,chat_type,super().get_bot().getMe()["username"]):
+                self.singleton_id.del_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")
+                self.list_sel(chat_id,from_id,lang,self.tree.get_res_array(topic,lang,"BANNED"),chat_type)
+            elif match_command('/free_list',txt,chat_type,super().get_bot().getMe()["username"]):
+                self.singleton_id.del_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")
+                self.list_sel(chat_id,from_id,lang,self.tree.get_res_array(topic,lang,"FREE"),chat_type)
+            elif match_command('/sban',txt,chat_type,super().get_bot().getMe()["username"]):
+                self.singleton_id.add_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,5,"teacher")
+                selection(chat_id,from_id,lang,self.tree.get_res_array(topic,lang,"BANNED"),chat_type,super().get_bot(),self.tree.get_lang(),self.singleton_id,"teacher")
+            elif match_command('/change',txt,chat_type,super().get_bot().getMe()["username"]):
+                self.singleton_id.add_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,1,"teacher")
+                selection(chat_id,from_id,lang,self.tree.get_res_array(topic,lang,"ANSWER"),chat_type,super().get_bot(),self.tree.get_lang(),self.singleton_id,"teacher")
+            elif match_command('/delete',txt,chat_type,super().get_bot().getMe()["username"]):
+                self.tree.delete_tc(chat_id,topic)
+                self.singleton_id.del_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")
+                send_message(super().get_bot(),chat_id, "Permission deleted",self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0,reply_markup=ReplyKeyboardRemove())
+            elif match_command('/hints',txt,chat_type,super().get_bot().getMe()["username"]):
+                self.hints(chat_id,from_id,topic,lang,chat_type,user)
+            elif match_command('/add_hint',txt,chat_type,super().get_bot().getMe()["username"]):
+                self.add_hints(chat_id,from_id,topic,lang,chat_type,user)
+            elif match_command('/change_lang',txt,chat_type,super().get_bot().getMe()["username"]):
+                self.singleton_id.add_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,7,"teacher")
+                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+self.tree.get_string(lang,"lang"),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0,reply_markup=self.tree.set_keyboard(["it","de","en","es","fr"]))
+            elif match_command('/change_role',txt,chat_type,super().get_bot().getMe()["username"]):
+                role=self.tree.change_role(chat_id,topic)
+                send_message(super().get_bot(),chat_id, self.tree.get_string(lang,role),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0,reply_markup=ReplyKeyboardRemove())
+                self.singleton_id.start_fun(chat_id,from_id,chat_type,lang,self.tree.get_lang(),"teacher",topic,self.keyboard)
+            elif self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher") != 0:
+                self.switcher(chat_id,from_id,txt,lang,topic,chat_type)
+
         def message(self,msg):
             content_type, chat_type, chat_id = telepot.glance(msg)
             from_id=msg["from"]["id"]
             topic=self.tree.get_topic(chat_id)
             user=super().get_bot().getChat(from_id)
-            txt=msg["text"]
             if self.condition(content_type,msg,chat_id,from_id,topic):
-                lang=self.tree.get_super_user_lang(chat_id,topic)
-                if self.start_command(txt,chat_type,lang,from_id,chat_id):
-                    self.singleton_id.del_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")
-                    self.singleton_id.start_fun(chat_id,from_id,chat_type,lang,self.tree.get_lang(),"teacher",topic,self.keyboard)
-                elif match_command('/answer',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.singleton_id.add_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,1,"teacher")
-                    selection(chat_id,from_id,lang,self.tree.get_res_array(topic,lang,"FREE"),chat_type,super().get_bot(),self.tree.get_lang(),self.singleton_id,"teacher")
-                elif match_command('/ban',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.singleton_id.add_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,3,"teacher")
-                    selection(chat_id,from_id,lang,self.tree.get_res_array(topic,lang,"FREE"),chat_type,super().get_bot(),self.tree.get_lang(),self.singleton_id,"teacher")
-                elif match_command('/report',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.singleton_id.add_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,2,"teacher")
-                    send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.tree.get_string(lang,"report"),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0)
-                elif match_command('/list',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.singleton_id.del_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")
-                    self.list_sel(chat_id,from_id,lang,self.tree.get_res_array(topic,lang,"ANSWER"),chat_type)
-                elif match_command('/ban_list',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.singleton_id.del_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")
-                    self.list_sel(chat_id,from_id,lang,self.tree.get_res_array(topic,lang,"BANNED"),chat_type)
-                elif match_command('/free_list',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.singleton_id.del_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")
-                    self.list_sel(chat_id,from_id,lang,self.tree.get_res_array(topic,lang,"FREE"),chat_type)
-                elif match_command('/sban',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.singleton_id.add_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,5,"teacher")
-                    selection(chat_id,from_id,lang,self.tree.get_res_array(topic,lang,"BANNED"),chat_type,super().get_bot(),self.tree.get_lang(),self.singleton_id,"teacher")
-                elif match_command('/change',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.singleton_id.add_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,1,"teacher")
-                    selection(chat_id,from_id,lang,self.tree.get_res_array(topic,lang,"ANSWER"),chat_type,super().get_bot(),self.tree.get_lang(),self.singleton_id,"teacher")
-                elif match_command('/delete',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.tree.delete_tc(chat_id,topic)
-                    self.singleton_id.del_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")
-                    send_message(super().get_bot(),chat_id, "Permission deleted",self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0,reply_markup=ReplyKeyboardRemove())
-                elif match_command('/hints',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.hints(chat_id,from_id,topic,lang,chat_type,user)
-                elif match_command('/add_hint',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.add_hints(chat_id,from_id,topic,lang,chat_type,user)
-                elif match_command('/change_lang',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.singleton_id.add_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,7,"teacher")
-                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+self.tree.get_string(lang,"lang"),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0,reply_markup=self.tree.set_keyboard(["it","de","en","es","fr"]))
-                elif match_command('/change_role',txt,chat_type,super().get_bot().getMe()["username"]):
-                    role=self.tree.change_role(chat_id,topic)
-                    send_message(super().get_bot(),chat_id, self.tree.get_string(lang,role),self.tree.get_string(lang,"canc"),self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0,reply_markup=ReplyKeyboardRemove())
-                    self.singleton_id.start_fun(chat_id,from_id,chat_type,lang,self.tree.get_lang(),"teacher",topic,self.keyboard)
-                elif self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher") != 0:
-                    self.switcher(chat_id,from_id,txt,lang,topic,chat_type)
+                self.sub_message(chat_type,chat_id,from_id,topic,user)
+                
 
         def hints(self,chat_id,from_id,topic,lang,chat_type,user):
             self.tree.set_nlp(lang)
