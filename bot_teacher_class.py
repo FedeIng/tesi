@@ -30,6 +30,9 @@ class BotTeacher:
         def condition(self,content_type,msg,chat_id,from_id,topic):
             return content_type == 'text' and self.verify_user(msg,chat_id,from_id,topic)
 
+        def start_command(self,txt,chat_type,lang,from_id,chat_id):
+            return match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]) or (self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0 and self.tree.check_lang_str(txt,"canc"))
+
         def message(self,msg):
             content_type, chat_type, chat_id = telepot.glance(msg)
             from_id=msg["from"]["id"]
@@ -38,7 +41,7 @@ class BotTeacher:
             txt=msg["text"]
             if self.condition(content_type,msg,chat_id,from_id,topic):
                 lang=self.tree.get_super_user_lang(chat_id,topic)
-                if match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]) or (self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0 and self.tree.check_lang_str(txt,"canc")):
+                if self.start_command(txt,chat_type,lang,from_id,chat_id):
                     self.singleton_id.del_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")
                     self.singleton_id.start_fun(chat_id,from_id,chat_type,lang,self.tree.get_lang(),"teacher",topic,self.keyboard)
                 elif match_command('/answer',txt,chat_type,super().get_bot().getMe()["username"]):
