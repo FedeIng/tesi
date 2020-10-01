@@ -149,7 +149,7 @@ class BotId:
             for name in old_array:
                 for elem in old_array[name]:
                     for elem1 in old_array[name][elem]:
-                        self.delete_old_branchthree(old_array,count,max_index,name,elem,elem1)
+                        self.delete_old_branchthree(old_array,count,max_index,name,elem,elem1,lang_class)
                 if len(self.id_times[name])==0:
                     del self.id_times[name]
 
@@ -167,7 +167,7 @@ class BotId:
                 array1[elem]=self.id_commands[name][elem]
             return array, array1
 
-        def sub_nv(self,new_times,new_ids,count,array,time):
+        def sub_nv(self,new_times,new_ids,count,array,time,lang_class):
             user=bot.getChat(elem1)
             if self.id_times[array[0]][array[1]][array[2]]>time:
                 new_times,new_ids=self.add_elem(new_times,new_ids,array[1],array[2],array[0])
@@ -183,7 +183,7 @@ class BotId:
             for elem in self.id_times[name]:
                 if type(self.id_times[name][elem]) is dict:
                     for elem1 in self.id_times[name][elem]:
-                        new_times,new_ids,count=self.sub_nv(new_times,new_ids,count,[name,elem,elem1],time)
+                        new_times,new_ids,count=self.sub_nv(new_times,new_ids,count,[name,elem,elem1],time,lang_class)
                 elif type(self.id_times[name][elem]) is datetime.datetime:
                     if self.id_times[name][elem]>time:
                         new_times,new_ids=self.add_elem(new_times,new_ids,elem,None,name)
