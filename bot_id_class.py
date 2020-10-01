@@ -109,26 +109,32 @@ class BotId:
                 max_index=self.set_max_index(old_array)
             return old_array, max_index, count
 
-        def delete_old_branchthree(self,old_array,count,max_index,name,elem,elem1):
-            user=bot.getChat(elem1)
-            if elem==elem1:
-                del self.id_times[name][elem]
-                if name in self.id_commands and elem in self.id_commands[name]:
-                    send_message(self.bot_array[name],elem,lang_class.get_string(lang,"timeout"))
+        def delete_old_branchthreeone(self,name,elem,lang_class):
+            del self.id_times[name][elem]
+            if name in self.id_commands and elem in self.id_commands[name]:
+                send_message(self.bot_array[name],elem,lang_class.get_string(lang,"timeout"))
+                del self.id_commands[name][elem]
+                if len(self.id_commands[name])==0:
+                    del self.id_commands[name]
+
+        def delete_old_branchthreetwo(self,name,elem,elem1,lang_class):
+            del self.id_times[name][elem][elem1]
+            if name in self.id_commands and elem in self.id_commands[name] and elem1 in self.id_commands[name][elem]:
+                send_message(self.bot_array[name],elem,tag_group(chat_type,user)+lang_class.get_string(lang,"timeout"))
+                del self.id_commands[name][elem][elem1]
+                if len(self.id_commands[name][elem])==0:
                     del self.id_commands[name][elem]
                     if len(self.id_commands[name])==0:
                         del self.id_commands[name]
+            if len(self.id_times[name][elem])==0:
+                del self.id_times[name][elem]
+
+        def delete_old_branchthree(self,old_array,count,max_index,name,elem,elem1,lang_class):
+            user=bot.getChat(elem1)
+            if elem==elem1:
+                self.delete_old_branchthreeone(name,elem,lang_class)
             elif elem!=elem1:
-                del self.id_times[name][elem][elem1]
-                if name in self.id_commands and elem in self.id_commands[name] and elem1 in self.id_commands[name][elem]:
-                    send_message(self.bot_array[name],elem,tag_group(chat_type,user)+lang_class.get_string(lang,"timeout"))
-                    del self.id_commands[name][elem][elem1]
-                    if len(self.id_commands[name][elem])==0:
-                        del self.id_commands[name][elem]
-                        if len(self.id_commands[name])==0:
-                            del self.id_commands[name]
-                if len(self.id_times[name][elem])==0:
-                    del self.id_times[name][elem]
+                self.delete_old_branchthreetwo(name,elem,elem1,lang_class)
 
         def delete_old(self,chat_type,lang_class,lang,num):
             old_array={}
