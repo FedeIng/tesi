@@ -142,7 +142,7 @@ class BotId:
             for name in old_array:
                 for elem in old_array[name]:
                     for elem1 in old_array[name][elem]:
-                        self.delete_old_branchthree(old_array,count,max_index,name,elem)
+                        self.delete_old_branchthree(old_array,count,max_index,name,elem,elem1)
                 if len(self.id_times[name])==0:
                     del self.id_times[name]
 
