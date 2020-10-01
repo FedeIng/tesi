@@ -107,6 +107,7 @@ class BotId:
                 old_array=self.delete_elem_id(old_array,name,max_index[0],max_index[1])
                 old_array=self.add_elem_id(old_array,name,elem,elem)
                 max_index=self.set_max_index(old_array)
+            return old_array, max_index, count
 
         def delete_old_branchthree(self,old_array,count,max_index,name,elem,elem1):
             user=bot.getChat(elem1)
