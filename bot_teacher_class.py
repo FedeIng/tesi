@@ -33,7 +33,7 @@ class BotTeacher:
         def start_command(self,txt,chat_type,lang,from_id,chat_id):
             return match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]) or (self.singleton_id.check_time_id(chat_type,self.tree.get_lang(),lang,from_id,chat_id,"teacher")!=0 and self.tree.check_lang_str(txt,"canc"))
 
-        def sub_message(self,chat_type,chat_id,from_id,topic,user):
+        def sub_message(self,chat_type,chat_id,from_id,topic,user,msg):
             txt=msg["text"]
             lang=self.tree.get_super_user_lang(chat_id,topic)
             if self.start_command(txt,chat_type,lang,from_id,chat_id):
@@ -87,7 +87,7 @@ class BotTeacher:
             topic=self.tree.get_topic(chat_id)
             user=super().get_bot().getChat(from_id)
             if self.condition(content_type,msg,chat_id,from_id,topic):
-                self.sub_message(chat_type,chat_id,from_id,topic,user)
+                self.sub_message(chat_type,chat_id,from_id,topic,user,msg)
                 
 
         def hints(self,chat_id,from_id,topic,lang,chat_type,user):

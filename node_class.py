@@ -100,8 +100,11 @@ class Node:
     def get_q_array(self,chat_id,lang):
         data=[]
         for elem in self.json_array[lang]:
+            string=elem
+            if "answer" in self.json_array[lang][elem] and self.json_array[lang][elem]["answer"]!="BANNED" and self.json_array[lang][elem]["answer"]!="":
+                string+=" -> "+self.json_array[lang][elem]["answer"]
             if chat_id in self.json_array[lang][elem]["ids"]:
-                data.append(elem)
+                data.append(string)
         return data
 
     def set_lang_keyboard(self,array):
@@ -257,8 +260,10 @@ class Node:
         if lang not in self.json_array:
             return data
         for elem in self.json_array[lang]:
-            if (condition=="FREE" and self.json_array[lang][elem]["answer"]=='') or (condition=="BANNED" and self.json_array[lang][elem]["answer"]=="BANNED") or (condition=="ANSWER" and self.json_array[lang][elem]["answer"]!='' and self.json_array[lang][elem]["answer"]!="BANNED"):
+            if (condition=="FREE" and self.json_array[lang][elem]["answer"]=='') or (condition=="BANNED" and self.json_array[lang][elem]["answer"]=="BANNED"):
                 data.append(elem)
+            elif condition=="ANSWER" and self.json_array[lang][elem]["answer"]!='' and self.json_array[lang][elem]["answer"]!="BANNED":
+                data.append(elem+" -> "+self.json_array[lang][elem]["answer"])
         return data
 
     def sub_del_teachers(self,data,elem,lang,lang_class,bot):

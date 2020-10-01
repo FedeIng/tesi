@@ -379,6 +379,7 @@ class BotStudent(Bot):
     def sel_question(self,chat_id,from_id,txt,lang,chat_type):
         list_val=self.node.get_sent(lang,txt)
         user=super().get_bot().getChat(from_id)
+        print(list_val)
         if len(list_val)!=1:
             self.singleton.del_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())
             send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.node.get_string(lang,"error_q"),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)

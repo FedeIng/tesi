@@ -119,15 +119,15 @@ class BotId:
                         del self.id_commands[name]
             elif elem!=elem1:
                 del self.id_times[name][elem][elem1]
-                    if name in self.id_commands and elem in self.id_commands[name] and elem1 in self.id_commands[name][elem]:
-                        send_message(self.bot_array[name],elem,tag_group(chat_type,user)+lang_class.get_string(lang,"timeout"))
-                        del self.id_commands[name][elem][elem1]
-                        if len(self.id_commands[name][elem])==0:
-                            del self.id_commands[name][elem]
-                            if len(self.id_commands[name])==0:
-                                del self.id_commands[name]
-                    if len(self.id_times[name][elem])==0:
-                        del self.id_times[name][elem]
+                if name in self.id_commands and elem in self.id_commands[name] and elem1 in self.id_commands[name][elem]:
+                    send_message(self.bot_array[name],elem,tag_group(chat_type,user)+lang_class.get_string(lang,"timeout"))
+                    del self.id_commands[name][elem][elem1]
+                    if len(self.id_commands[name][elem])==0:
+                        del self.id_commands[name][elem]
+                        if len(self.id_commands[name])==0:
+                            del self.id_commands[name]
+                if len(self.id_times[name][elem])==0:
+                    del self.id_times[name][elem]
 
         def delete_old(self,chat_type,lang_class,lang,num):
             old_array={}
