@@ -7,16 +7,16 @@ class Config:
         def __init__(self):
             with open('../config.yaml') as f:
                 data=yaml.load(f, Loader=yaml.FullLoader)
-                self.user_token=data['bot']['token']['user']
-                self.admin_token=data['bot']['token']['staff']
-                self.postgres_host=data['database']['postgres']['host']
-                self.postgres_database=data['database']['postgres']['database']
-                self.postgres_username=data['database']['postgres']['username']
-                self.postgres_password=data['database']['postgres']['password']
-                self.postgres_port=data['database']['postgres']['port']
-                self.postgres_schema=data['database']['postgres']['schema']
-                self.redis_host=data['database']['redis']['host']
-                self.redis_port=data['database']['redis']['port']
+                self.user_token=data['bots']['token']['user']
+                self.admin_token=data['bots']['token']['staff']
+                self.postgres_host=data['databases']['postgres']['host']
+                self.postgres_database=data['databases']['postgres']['database']
+                self.postgres_username=data['databases']['postgres']['username']
+                self.postgres_password=data['databases']['postgres']['password']
+                self.postgres_port=data['databases']['postgres']['port']
+                self.postgres_schema=data['databases']['postgres']['schema']
+                self.redis_host=data['databases']['redis']['host']
+                self.redis_port=data['databases']['redis']['port']
 
         def get_user_token(self):
             return self.user_token

@@ -1,8 +1,8 @@
-bot:
+bots:
   token:
     user: "5955947151:AAHVUnfEu6CjpzWS8MEHfC0kH_U5Nz9zJqk"
     staff: "5856598014:AAF-DY0d4oGt5Od43qtyrTnff4eTQG6-jb8"
-database:
+databases:
   postgres:
     host: 'localhost'
     database: 'postgres'

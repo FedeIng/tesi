@@ -3,8 +3,8 @@ from config_class import Config
 from databases.database_class import Database
 from databases.postgres_class import PostgresDb
 from databases.redis_class import RedisDb
-#from bots.bot_staff_class import BotStaff
-#from bots.bot_user_class import BotUser
+from bots.bot_staff_class import BotStaff
+from bots.bot_user_class import BotUser
 
 config=Config()
 
@@ -17,8 +17,8 @@ database.set_redis(redis)
 
 #bot_staff=BotStaff()
 #database.set_bot_staff(bot_staff)
-#bot_teacher=BotTeacher()
-#database.set_bot_staff(bot_staff)
+#bot_user=BotTeacher()
+#database.set_bot_staff(bot_user)
 
 print("Init complete")
 
