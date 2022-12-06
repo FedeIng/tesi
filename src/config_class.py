@@ -5,10 +5,10 @@ class Config:
     class Singleton:
 
         def __init__(self):
-            with open('../config.yaml') as f:
+            with open('./config.yaml') as f:
                 data=yaml.load(f, Loader=yaml.FullLoader)
                 self.user_token=data['bots']['token']['user']
-                self.admin_token=data['bots']['token']['staff']
+                self.staff_token=data['bots']['token']['staff']
                 self.postgres_host=data['databases']['postgres']['host']
                 self.postgres_database=data['databases']['postgres']['database']
                 self.postgres_username=data['databases']['postgres']['username']

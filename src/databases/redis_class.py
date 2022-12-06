@@ -1,6 +1,7 @@
 import datetime
 import json
 
+from data_structs.status import Status
 from redis import Redis
 
 class RedisDb:
@@ -12,11 +13,11 @@ class RedisDb:
             self.redis=Redis(host=host,port=port)
 
         def set_object(self,id,obj):
-            self.redis.set(str(id),json.dumps(obj))
+            self.redis.set(str(id),json.dumps(obj.__dict__))
         
         def get_object(self,id):
             try:
-                return json.loads(self.redis.get(str(id)))
+                return Status(json.loads(self.redis.get(str(id))))
             except TypeError:
                 return None
 

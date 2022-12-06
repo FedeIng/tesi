@@ -15,10 +15,10 @@ database.set_postgres(postgres)
 redis=RedisDb(config.redis_host,config.redis_port)
 database.set_redis(redis)
 
-#bot_staff=BotStaff()
-#database.set_bot_staff(bot_staff)
-#bot_user=BotTeacher()
-#database.set_bot_staff(bot_user)
+bot_staff=BotStaff(config.staff_token)
+database.set_bot_staff(bot_staff)
+bot_user=BotUser(config.user_token)
+database.set_bot_staff(bot_user)
 
 print("Init complete")
 

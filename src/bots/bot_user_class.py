@@ -8,18 +8,9 @@ from databases.database_class import Database
 class BotUser:
     class Singleton(Bot):
 
-        def __init__(self,topic):
-            self.keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/list", callback_data='l')],[InlineKeyboardButton(text="/question", callback_data='q')],[InlineKeyboardButton(text="/report", callback_data='r')],[InlineKeyboardButton(text="/start", callback_data='s')],[InlineKeyboardButton(text="/revision", callback_data='rv')],[InlineKeyboardButton(text="/change_lang", callback_data='cl')],[InlineKeyboardButton(text="/delete_subscription", callback_data='ds')]])
+        def __init__(self,token):
             database=Database()
-            self.students=database.get_stud_ids(topic)
-            self.teachers=database.get_teach_ids(topic)
-            self.collaborators=database.get_coll_ids(topic)
-            self.node=Node(topic)
-            self.banned_user=database.get_banned_stud(topic)
-            self.singleton=BotId()
-            super().__init__(database.get_topic_token(topic),self.message,self.query)
-            self.singleton.set_bot(self.node.get_topic_name(),super().get_bot())
-            self.singleton.reset_key_id(topic)
+            super().__init__(token,self.message,self.query)
 
         def start_command(self,txt,chat_type,lang,from_id,chat_id):
             return match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]) or (self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0 and self.node.check_lang_str(txt,"canc"))
@@ -30,36 +21,8 @@ class BotUser:
             if content_type == 'text':
                 txt=msg["text"]
                 user=super().get_bot().getChat(from_id)
-                lang=self.get_user_lang(chat_id)
-                if (lang==None and (not self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())==4 or not txt in self.node.get_flag_list())):
-                    self.switch_lang(chat_id,from_id,msg,chat_type)
-                elif chat_id in self.banned_user:
-                    self.singleton.del_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())
-                    send_message(super().get_bot(),chat_id,self.node.get_string(lang,"banned_user"))
-                elif self.start_command(txt,chat_type,lang,from_id,chat_id):
-                    self.singleton.del_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())
-                    self.singleton.start_fun(chat_id,from_id,chat_type,lang,self.node.get_lang(),self.node.get_topic_name(),self.node.get_topic_name(),self.keyboard)
-                elif match_command('/question',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.singleton.add_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,5,self.node.get_topic_name())
-                    send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.node.get_string(lang,"question"),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
-                elif match_command('/report',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.singleton.add_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,2,self.node.get_topic_name())
-                    send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.node.get_string(lang,"report"),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
-                elif match_command('/revision',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.singleton.add_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,6,self.node.get_topic_name())
-                    selection(chat_id,from_id,lang,self.node.get_res_array(lang,"ANSWER"),chat_type,super().get_bot(),self.get_lang_array(),self.singleton,self.node.get_topic_name())
-                elif match_command('/change_lang',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.singleton.add_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,4,self.node.get_topic_name())
-                    self.set_lang(chat_id,from_id,lang,chat_type)
-                elif match_command('/list',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.singleton.del_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())
-                    self.list_by_user(from_id,chat_id,lang,chat_type)
-                elif match_command('/delete_subscription',txt,chat_type,super().get_bot().getMe()["username"]):
-                    self.singleton.del_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())
-                    self.del_students([chat_id])
-                    send_message(super().get_bot(),chat_id, tag_group(chat_type,user)+self.node.get_string(lang,"delete_s"),self.node.get_string(lang,"canc"),self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name())!=0)
-                elif self.singleton.check_time_id(chat_type,self.node.get_lang(),lang,from_id,chat_id,self.node.get_topic_name()) != 0:
-                    self.switcher(chat_id,from_id,txt,lang,chat_type)
+                if match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]):
+                    send_message(super().get_bot(),chat_id,"Benvenuto nel bot telegram della Gilda del Grifone, cosa vuoi fare?",reply_markup=super().set_keyboard(["Vorrei vedere l'elenco dei giochi disponibili","Vorrei prestare un gioco"]))
 
         def query(self,msg):
             query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")
@@ -429,7 +392,7 @@ class BotUser:
                 self.add_comment(chat_id,from_id,txt,lang,chat_type)
     
     instance = None
-    def __new__(cls): # __new__ always a classmethod
+    def __new__(cls,token): # __new__ always a classmethod
         if not BotUser.instance:
-            BotUser.instance = BotUser.Singleton()
+            BotUser.instance = BotUser.Singleton(token)
         return BotUser.instance 

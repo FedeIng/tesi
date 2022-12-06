@@ -8,21 +8,8 @@ from databases.database_class import Database
 class BotStaff:
     class Singleton(Bot):
 
-        def __init__(self):
-            self.keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="/answer", callback_data='a')],[InlineKeyboardButton(text="/report", callback_data='r')],[InlineKeyboardButton(text="/start", callback_data='s')],[InlineKeyboardButton(text="/list", callback_data='l')],[InlineKeyboardButton(text="/free_list", callback_data='fl')],[InlineKeyboardButton(text="/ban", callback_data='b')],[InlineKeyboardButton(text="/ban_list", callback_data='bl')],[InlineKeyboardButton(text="/sban", callback_data='sb')],[InlineKeyboardButton(text="/change", callback_data='c')],[InlineKeyboardButton(text="/delete", callback_data='d')],[InlineKeyboardButton(text="/hints", callback_data='h')],[InlineKeyboardButton(text="/add_hint", callback_data='ah')],[InlineKeyboardButton(text="/change_lang", callback_data='cl')],[InlineKeyboardButton(text="/change_role", callback_data='cr')]])
-            self.tree=Tree()
-            self.query_bool={}
-            self.lang_bool={}
-            self.query_bool={}
-            self.prev_lang={}
-            self.topic_name={}
-            self.is_logged={}
-            self.singleton_id=BotId()
-            self.singleton_ban=UserBanned()
-            super().__init__(Database().get_teacher(),self.message,self.query)
-            self.tree.send_notification_teacher(super().get_bot())
-            self.singleton_id.set_bot("teacher",super().get_bot())
-            self.singleton_id.reset_key_id("teacher")
+        def __init__(self,token):
+            super().__init__(token,self.message,self.query)
 
         def condition(self,content_type,msg,chat_id,from_id,topic):
             return content_type == 'text' and self.verify_user(msg,chat_id,from_id,topic)
@@ -81,10 +68,11 @@ class BotStaff:
         def message(self,msg):
             content_type, chat_type, chat_id = telepot.glance(msg)
             from_id=msg["from"]["id"]
-            topic=self.tree.get_topic(chat_id)
-            user=super().get_bot().getChat(from_id)
-            if self.condition(content_type,msg,chat_id,from_id,topic):
-                self.sub_message(chat_type,chat_id,from_id,topic,user,msg)
+            if content_type == 'text' and from_id in self.database.get_postgres().run_function("telegram_id_staff_get"):
+                txt=msg["text"]
+                user=super().get_bot().getChat(from_id)
+                if match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]):
+                    send_message(super().get_bot(),chat_id,"Benvenuto nel bot telegram della Gilda del Grifone, cosa vuoi fare?",reply_markup=super().set_keyboard(["Vorrei vedere l'elenco dei giochi prestati","Vorrei prestare un gioco","Vorrei restituire un gioco"]))
                 
 
         def hints(self,chat_id,from_id,topic,lang,chat_type,user):
@@ -320,7 +308,7 @@ class BotStaff:
                 self.case7(chat_id,from_id,txt,lang,topic,chat_type)
 
     instance = None
-    def __new__(cls): # __new__ always a classmethod
-        if not BotSStaff.instance:
-            BotStaff.instance = BotStaff.Singleton()
+    def __new__(cls,token): # __new__ always a classmethod
+        if not BotStaff.instance:
+            BotStaff.instance = BotStaff.Singleton(token)
         return BotStaff.instance            

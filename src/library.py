@@ -50,7 +50,7 @@ def sm_branch1(button_str,reply_markup):
             reply_markup=ReplyKeyboardMarkup(keyboard=var,resize_keyboard=True,one_time_keyboard=True)
     return reply_markup
 
-def send_message(bot,chat_id,string,button_str="Cancel",bool_val=False,reply_markup=ReplyKeyboardRemove(selective=True)):
+def send_message(bot,chat_id,string,button_str="Indietro",bool_val=False,reply_markup=ReplyKeyboardRemove(selective=True)):
     if reply_markup==None:
         try:
             return bot.sendMessage(chat_id,string)
