@@ -12,21 +12,32 @@ class RedisDb:
             self.port=port
             self.redis=Redis(host=host,port=port)
 
-        def set_object(self,id,obj):
-            self.redis.set(str(id),json.dumps(obj.__dict__))
+        def set_object(self,bot_name,chat_id,from_id,obj):
+            if chat_id==from_id:
+                self.redis.set(f"{bot_name}-{str(chat_id)}",json.dumps(obj.__dict__))
+            else:
+                self.redis.set(f"{bot_name}-{str(chat_id)}-{str(from_id)}",json.dumps(obj.__dict__))
         
-        def get_object(self,id):
+        def get_object(self,bot_name,chat_id,from_id):
             try:
-                return Status(json.loads(self.redis.get(str(id))))
+                data=None
+                if chat_id==from_id:
+                    data=json.loads(self.redis.get(f"{bot_name}-{str(chat_id)}"))
+                else:
+                    data=json.loads(self.redis.get(f"{bot_name}-{str(chat_id)}-{str(from_id)}"))
+                return Status(data["id"],dictionary=data["obj"])
             except TypeError:
                 return None
 
-        def delete_object(self,id):
-            self.redis.delete(str(id))
+        def delete_object(self,bot_name,chat_id,from_id):
+            if chat_id==from_id:
+                self.redis.delete(f"{bot_name}-{str(chat_id)}")
+            else:
+                self.redis.delete(f"{bot_name}-{str(chat_id)}-{str(from_id)}")
 
-        def get_and_delete_object(self,id):
-            obj=self.get_object(id)
-            self.delete_object(id)
+        def get_and_delete_object(self,bot_name,chat_id,from_id):
+            obj=self.get_object(bot_name,chat_id,from_id)
+            self.delete_object(bot_name,chat_id,from_id)
             return obj
     
     instance = None

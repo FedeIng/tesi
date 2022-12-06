@@ -1,6 +1,5 @@
 import telepot
 from library import match_command, tag_group, selection, list_to_str, array_to_matrix, create_reply_keyboard, seg_bug, send_message, send_doc
-from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 
 from bots.bot_class import Bot
 from databases.database_class import Database
@@ -9,7 +8,7 @@ class BotUser:
     class Singleton(Bot):
 
         def __init__(self,token):
-            database=Database()
+            self.bot_name="user"
             super().__init__(token,self.message,self.query)
 
         def start_command(self,txt,chat_type,lang,from_id,chat_id):
@@ -22,7 +21,21 @@ class BotUser:
                 txt=msg["text"]
                 user=super().get_bot().getChat(from_id)
                 if match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]):
-                    send_message(super().get_bot(),chat_id,"Benvenuto nel bot telegram della Gilda del Grifone, cosa vuoi fare?",reply_markup=super().set_keyboard(["Vorrei vedere l'elenco dei giochi disponibili","Vorrei prestare un gioco"]))
+                    send_message(super().get_bot(),chat_id,"Benvenuto nel bot telegram della Gilda del Grifone, cosa vuoi fare?",reply_markup=super().set_keyboard(["Vorrei vedere l'elenco dei giochi disponibili","Vorrei prendere un gioco"]))
+                    super().set_status(self.bot_name,chat_id,from_id,1,None)
+                else:
+                    status=super().get_status(self.bot_name,chat_id,from_id)
+                    if status!=None:
+                        match status.id:
+                            case 1:
+                                match txt:
+                                    case "Vorrei vedere l'elenco dei giochi disponibili":
+                                        pass
+                                    case "Vorrei prendere un gioco":
+                                        send_message(super().get_bot(),chat_id,"Che gioco vuoi prendere?")
+                                        super().set_status(self.bot_name,chat_id,from_id,2,None)
+                                    case _:
+                                        send_message(super().get_bot(),chat_id,"Comando non trovato, si prega di rieseguire il comando start.")
 
         def query(self,msg):
             query_id, from_id, query_data = telepot.glance(msg, flavor="callback_query")

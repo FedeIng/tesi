@@ -1,17 +1,17 @@
 class Status:
 
-    def __init__(self,obj):
-        self.id=None
+    def __init__(self,id,dictionary=None,obj=None):
+        self.id=id
         self.obj=None
-        if "id" in obj:
-            self.id=obj["id"]
-        if "data" in obj:
-            match obj["data"]["class_name"]:
+        if obj!=None:
+            self.obj=obj
+        elif dictionary!=None:
+            match dictionary["class_name"]:
                 case "Game":
-                     self.obj=User(obj["data"])
+                     self.obj=User(dictionary)
                 case "User":
-                     self.obj=User(obj["data"])
+                     self.obj=User(dictionary)
                 case "Rental":
-                     self.obj=Rental(obj["data"])
+                     self.obj=Rental(dictionary)
                 case _:
                     pass

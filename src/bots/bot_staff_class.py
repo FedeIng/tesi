@@ -1,6 +1,5 @@
 import telepot
 from library import match_command, tag_group, selection, list_to_str, array_to_matrix, create_reply_keyboard, seg_bug, send_message, send_doc
-from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 
 from bots.bot_class import Bot
 from databases.database_class import Database
@@ -9,6 +8,7 @@ class BotStaff:
     class Singleton(Bot):
 
         def __init__(self,token):
+            self.bot_name="staff"
             super().__init__(token,self.message,self.query)
 
         def condition(self,content_type,msg,chat_id,from_id,topic):
@@ -68,12 +68,29 @@ class BotStaff:
         def message(self,msg):
             content_type, chat_type, chat_id = telepot.glance(msg)
             from_id=msg["from"]["id"]
-            if content_type == 'text' and from_id in self.database.get_postgres().run_function("telegram_id_staff_get"):
+            if content_type == 'text' and from_id in super().get_database().get_postgres().run_function("telegram_id_staff_get"):
                 txt=msg["text"]
                 user=super().get_bot().getChat(from_id)
                 if match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]):
                     send_message(super().get_bot(),chat_id,"Benvenuto nel bot telegram della Gilda del Grifone, cosa vuoi fare?",reply_markup=super().set_keyboard(["Vorrei vedere l'elenco dei giochi prestati","Vorrei prestare un gioco","Vorrei restituire un gioco"]))
-                
+                    super().set_status(self.bot_name,chat_id,from_id,1,None)
+                else:
+                    status=super().get_status(self.bot_name,chat_id,from_id)
+                    if status!=None:
+                        match status.id:
+                            case 1:
+                                match txt:
+                                    case "Vorrei vedere l'elenco dei giochi prestati":
+                                        pass
+                                    case "Vorrei prestare un gioco":
+                                        send_message(super().get_bot(),chat_id,"Che gioco vuoi prestare?")
+                                        super().set_status(self.bot_name,chat_id,from_id,2,None)
+                                    case "Vorrei restituire un gioco":
+                                        send_message(super().get_bot(),chat_id,"Che gioco vuoi restituire?")
+                                        super().set_status(self.bot_name,chat_id,from_id,3,None)
+                                    case _:
+                                        send_message(super().get_bot(),chat_id,"Comando non trovato, si prega di rieseguire il comando start.")
+
 
         def hints(self,chat_id,from_id,topic,lang,chat_type,user):
             self.tree.set_nlp(lang)
