@@ -4,6 +4,7 @@ from data_structs.user import User
 class Rental:
 
     def __init__(self,obj):
+        self.class_name="Rental"
         self.id=None
         self.game=None
         self.user=None

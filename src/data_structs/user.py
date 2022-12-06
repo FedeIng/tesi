@@ -1,6 +1,7 @@
 class User:
 
     def __init__(self,obj):
+        self.class_name="User"
         self.id=None
         self.telegram_id=None
         self.telephone=None
