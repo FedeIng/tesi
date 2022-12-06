@@ -2,8 +2,8 @@ import telepot
 from library import match_command, tag_group, selection, list_to_str, array_to_matrix, create_reply_keyboard, seg_bug, send_message, send_doc
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 
-from bot_class import Bot
-from database_class import Database
+from bots.bot_class import Bot
+from databases.database_class import Database
 
 class BotStaff:
     class Singleton(Bot):
