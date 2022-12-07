@@ -11,7 +11,7 @@ class BotStaff:
     class Singleton(Bot):
 
         def __init__(self,token):
-            self.bot_name="staff"
+            self.bot_name="s"
             super().__init__(token,message=self.message)
 
         def message(self,msg):

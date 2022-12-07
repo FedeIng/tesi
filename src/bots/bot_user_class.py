@@ -11,7 +11,7 @@ class BotUser:
     class Singleton(Bot):
 
         def __init__(self,token):
-            self.bot_name="user"
+            self.bot_name="u"
             super().__init__(token,message=self.message)
 
         def message(self,msg):
@@ -20,7 +20,7 @@ class BotUser:
             if content_type == 'text':
                 txt=msg["text"].lower()
                 user=super().get_bot().getChat(from_id)
-                if match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]):
+                if match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]) and super().get_database().get_postgres().run_function("user_set",str(user["id"]),"'"+user["first_name"]+"'","'"+user["last_name"]+"'","'"+user["username"]+"'"):
                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Benvenuto nel bot telegram della Gilda del Grifone, cosa vuoi fare?",reply_markup=super().set_keyboard(["Vorrei vedere l'elenco dei giochi disponibili","Vorrei prendere un gioco"]))
                     super().set_status(self.bot_name,chat_id,from_id,1,None)
                 else:
@@ -35,16 +35,22 @@ class BotUser:
                                             send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nessun gioco prestato.")
                                         else:
                                             divisore='\n'
-                                            send_message(super().get_bot(),from_id,tag_group(chat_type,user)+f"Lista dei giochi disponibili:\n{divisore.join(games)}")
+                                            send_message(super().get_bot(),from_id,tag_group(chat_type,user)+f"Lista dei giochi disponibili:\n{divisore.join(sorted(games))}")
                                             if chat_id!=from_id:
                                                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Lista inviata in privato.")
                                     case "vorrei prendere un gioco":
-                                        send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che gioco vuoi prendere?",reply_markup=super().set_keyboard(super().get_database().get_postgres().run_function("free_games_get")))
-                                        super().set_status(self.bot_name,chat_id,from_id,2,None)
+                                        games=super().get_database().get_postgres().run_function("rental_get_by_telegram_id",str(from_id))
+                                        print(games)
+                                        if games==[]:
+                                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che gioco vuoi prendere?",reply_markup=super().set_keyboard(sorted(super().get_database().get_postgres().run_function("free_games_get"))))
+                                            super().set_status(self.bot_name,chat_id,from_id,2,None)
+                                        else:
+                                            divisore='\n'
+                                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+f"Non puoi prendere un gico perchè hai già preso:\n{divisore.join(sorted(games))}")
                                     case _:
                                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Comando non trovato, si prega di rieseguire il comando \start.")
                             case 2:
-                                if super().get_database().get_postgres().run_function("rental_set"):
+                                if super().get_database().get_postgres().run_function("user_rental_set",str(from_id),"'"+txt+"'"):
                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Prenotazione presa con successo.")
                                 else:
                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la tua prenotazione non è andata a buon fine. Riesegui il comando \start e riprova.")
