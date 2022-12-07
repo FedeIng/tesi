@@ -1,3 +1,7 @@
+from data_structs.game import Game
+from data_structs.user import User
+from data_structs.rental import Rental
+
 class Status:
 
     def __init__(self,id,dictionary=None,obj=None):
