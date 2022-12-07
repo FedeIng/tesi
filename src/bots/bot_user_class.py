@@ -16,9 +16,9 @@ class BotUser:
 
         def message(self,msg):
             content_type, chat_type, chat_id = telepot.glance(msg)
-            from_id=msg["from"]["id"].lower()
+            from_id=msg["from"]["id"]
             if content_type == 'text':
-                txt=msg["text"]
+                txt=msg["text"].lower()
                 user=super().get_bot().getChat(from_id)
                 if match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]):
                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Benvenuto nel bot telegram della Gilda del Grifone, cosa vuoi fare?",reply_markup=super().set_keyboard(["Vorrei vedere l'elenco dei giochi disponibili","Vorrei prendere un gioco"]))
