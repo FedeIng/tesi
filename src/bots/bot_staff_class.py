@@ -29,7 +29,7 @@ class BotStaff:
                         match status.id:
                             case 1:
                                 match txt:
-                                    case "Vorrei vedere l'elenco dei giochi prestati":
+                                    case "vorrei vedere l'elenco dei giochi prestati":
                                         rentals=super().get_database().get_postgres().run_function("rental_get")
                                         if games==[]:
                                             send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nessun gioco prestato.")
@@ -38,10 +38,10 @@ class BotStaff:
                                             send_message(super().get_bot(),from_id,f"Lista dei giochi prestati:\n\n{divisore.join(rentals)}")
                                             if chat_id!=from_id:
                                                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Lista inviata in privato.")
-                                    case "Vorrei prestare un gioco":
+                                    case "vorrei prestare un gioco":
                                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che gioco vuoi prestare?")
                                         super().set_status(self.bot_name,chat_id,from_id,2,None)
-                                    case "Vorrei restituire un gioco":
+                                    case "vorrei restituire un gioco":
                                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che gioco vuoi restituire?")
                                         super().set_status(self.bot_name,chat_id,from_id,3,None)
                                     case _:

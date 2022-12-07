@@ -29,7 +29,7 @@ class BotUser:
                         match status.id:
                             case 1:
                                 match txt:
-                                    case "Vorrei vedere l'elenco dei giochi disponibili":
+                                    case "vorrei vedere l'elenco dei giochi disponibili":
                                         games=super().get_database().get_postgres().run_function("free_games_get")
                                         if games==[]:
                                             send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nessun gioco prestato.")
@@ -38,7 +38,7 @@ class BotUser:
                                             send_message(super().get_bot(),from_id,tag_group(chat_type,user)+f"Lista dei giochi disponibili:\n{divisore.join(games)}")
                                             if chat_id!=from_id:
                                                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Lista inviata in privato.")
-                                    case "Vorrei prendere un gioco":
+                                    case "vorrei prendere un gioco":
                                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che gioco vuoi prendere?",reply_markup=super().set_keyboard(super().get_database().get_postgres().run_function("free_games_get")))
                                         super().set_status(self.bot_name,chat_id,from_id,2,None)
                                     case _:
