@@ -87,11 +87,11 @@ class BotStaff:
                                             send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Digitare il telefono:")
                                             super().set_status(self.bot_name,chat_id,from_id,10,status)
                                         case "ok":
-                                            if status.user.get_name() == None or status.user.get_surname() == None or status.user.get_telephone() == None:
+                                            if status.obj.user.get_name() == None or status.obj.user.get_surname() == None or status.obj.user.get_telephone() == None:
                                                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nome, cognome e telefono necessari per la prenotazione.\nChe altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
                                                 super().set_status(self.bot_name,chat_id,from_id,4,status)
                                             else:
-                                                if super().get_database().get_postgres().run_function("staff_rental_set",from_id,status.game.get_name(),status.user.get_name(),status.game.get_surname(),status.game.get_nickname(),status.game.get_telephone()):
+                                                if super().get_database().get_postgres().run_function("staff_rental_set",from_id,status.obj.game.get_name(),status.obj.user.get_name(),status.obj.game.get_surname(),status.obj.game.get_nickname(),status.obj.game.get_telephone()):
                                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Prenotazione presa con successo.")
                                                 else:
                                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la prenotazione non è andata a buon fine. Riesegui il comando \start e riprova.")
@@ -102,7 +102,7 @@ class BotStaff:
                                 case 5:
                                     match txt:
                                         case "sì":
-                                            if super().get_database().get_postgres().run_function("restitution_set",status.user.get_telephone(),status.user.get_telegram_id()):
+                                            if super().get_database().get_postgres().run_function("restitution_set",status.obj.user.get_telephone(),status.obj.user.get_telegram_id()):
                                                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Restituzione avvenuta con successo.")
                                             else:
                                                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la restituzione è fallita, si prega di rieseguire il comando \start.")
@@ -114,20 +114,20 @@ class BotStaff:
                                     pass
                                 case 7:
                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nome salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
-                                    status.user.set_name(txt)
+                                    status.obj.user.set_name(txt)
                                     super().set_status(self.bot_name,chat_id,from_id,4,status)
                                 case 8:
                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Cognome salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
-                                    status.user.set_surname(txt)
+                                    status.obj.user.set_surname(txt)
                                     super().set_status(self.bot_name,chat_id,from_id,4,status)
                                 case 9:
                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nickname salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
-                                    status.user.set_nickname(txt)
+                                    status.obj.user.set_nickname(txt)
                                     super().set_status(self.bot_name,chat_id,from_id,4,status)
                                 case 10:
                                     if re.search("^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$", txt):
                                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Telefono salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
-                                        status.user.set_telephone(txt)
+                                        status.obj.user.set_telephone(txt)
                                         super().set_status(self.bot_name,chat_id,from_id,4,status)
                                     else:
                                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Il numero non è valido. Riprova.")

@@ -6,7 +6,10 @@ class Game:
         if "name" in obj:
             self.name=obj["name"]
     
-    def get_name():
+    def set_name(self,name):
+        self.name = name
+
+    def get_name(self):
         return self.name
 
     def __dict__(self):
