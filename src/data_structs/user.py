@@ -18,6 +18,12 @@ class User:
         if "nickname" in obj:
             self.nickname=obj["nickname"]
 
+    def set_telegram_id(telephone):
+        self.telegram_id=telegram_id
+    
+    def get_telegram_id():
+        return self.telegram_id
+
     def set_telephone(telephone):
         self.telephone=telephone
     

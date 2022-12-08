@@ -91,7 +91,7 @@ class BotStaff:
                                                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nome, cognome e telefono necessari per la prenotazione.\nChe altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
                                                 super().set_status(self.bot_name,chat_id,from_id,4,status)
                                             else:
-                                                if super().get_database().get_postgres().run_function("staff_rental_set"):
+                                                if super().get_database().get_postgres().run_function("staff_rental_set",from_id,status.game.get_name(),status.user.get_name(),status.game.get_surname(),status.game.get_nickname(),status.game.get_telephone()):
                                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Prenotazione presa con successo.")
                                                 else:
                                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la prenotazione non è andata a buon fine. Riesegui il comando \start e riprova.")
@@ -102,7 +102,7 @@ class BotStaff:
                                 case 5:
                                     match txt:
                                         case "sì":
-                                            if super().get_database().get_postgres().run_function("restitution_set"):
+                                            if super().get_database().get_postgres().run_function("restitution_set",status.user.get_telephone(),status.user.get_telegram_id()):
                                                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Restituzione avvenuta con successo.")
                                             else:
                                                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la restituzione è fallita, si prega di rieseguire il comando \start.")
