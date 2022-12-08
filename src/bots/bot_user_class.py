@@ -20,7 +20,7 @@ class BotUser:
             if content_type == 'text':
                 txt=msg["text"].lower()
                 user=super().get_bot().getChat(from_id)
-                if match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]) and super().get_database().get_postgres().run_function("user_set",str(user["id"]),"'"+user["first_name"]+"'","'"+user["last_name"]+"'","'"+user["username"]+"'"):
+                if match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]) and super().get_database().get_postgres().run_function("user_set",str(user["id"]),"'"+user["first_name"].lower()+"'","'"+user["last_name"].lower()+"'","'"+user["username"]+"'"):
                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Benvenuto nel bot telegram della Gilda del Grifone, cosa vuoi fare?",reply_markup=super().set_keyboard(["Vorrei vedere l'elenco dei giochi disponibili","Vorrei prendere un gioco"]))
                     super().set_status(self.bot_name,chat_id,from_id,1,None)
                 else:

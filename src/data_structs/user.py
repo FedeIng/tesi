@@ -22,31 +22,41 @@ class User:
         self.telegram_id=telegram_id
     
     def get_telegram_id(self):
-        return self.telegram_id
+        if self.telegram_id == None:
+            return "NULL"
+        return f"'{str(self.telegram_id)}'"
 
     def set_telephone(self,telephone):
         self.telephone=telephone
     
     def get_telephone(self):
-        return self.telephone
+        if self.telephone == None:
+            return "NULL"
+        return f"'{self.telephone}'"
 
     def set_name(self,name):
         self.name=name
     
     def get_name(self):
-        return self.name
+        if self.name == None:
+            return "NULL"
+        return f"'{self.name}'"
 
     def set_surname(self,surname):
         self.surname=surname  
     
     def get_surname(self):
-        return self.surname 
+        if self.surname == None:
+            return "NULL"
+        return f"'{self.surname}'"
 
     def set_nickname(self,nickname):
         self.nickname=nickname 
 
     def get_nickname(self):
-        return self.nickname
+        if self.nickname == None:
+            return "NULL"
+        return f"'{self.nickname}'"
 
     def __dict__(self):
         return {

@@ -43,10 +43,10 @@ class BotStaff:
                                         case "vorrei prestare un gioco":
                                             games=super().get_database().get_postgres().run_function("free_games_get")
                                             if games==[]:
+                                                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nessun gioco disponibile.")
+                                            else:
                                                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che gioco vuoi prestare?",reply_markup=super().set_keyboard(sorted(games)))
                                                 super().set_status(self.bot_name,chat_id,from_id,2,None)
-                                            else:
-                                                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nessun gioco disponibile.")
                                         case "vorrei restituire un gioco":
                                             games=super().get_database().get_postgres().run_function("game_name_rental_get")
                                             if games==[]:
@@ -68,30 +68,30 @@ class BotStaff:
                                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Comando annullato, nessun utente ha preso in prestito questo gioco. Rilanciare il comando \start.")
                                     elif len(users)==1:
                                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+f"É stato prestato a {self.user_to_string(users[0])}?",reply_markup=super().set_keyboard(["Sì","No"]))
-                                        super().set_status(self.bot_name,chat_id,from_id,5,Rental({"game_obj":status,"user_obj":User({"name":users[0]["name"],"surname":users[0]["surname"],"nickname":users[0]["nickname"],"telephone":users[0]["telephone"],"telegram_id":users[0]["telegram_id"]})}))
+                                        super().set_status(self.bot_name,chat_id,from_id,5,Rental({"game_obj":Game({"name":txt}),"user_obj":User({"name":users[0]["name"],"surname":users[0]["surname"],"nickname":users[0]["nickname"],"telephone":users[0]["telephone"],"telegram_id":users[0]["telegram_id"]})}))
                                     else:
                                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+f"A chi è stato prestato il gioco?",reply_markup=super().set_keyboard(self.get_users_array_strings(users)))
-                                        super().set_status(self.bot_name,chat_id,from_id,6,status)
+                                        super().set_status(self.bot_name,chat_id,from_id,6,Game({"name":txt}))
                                 case 4:
                                     match txt:
                                         case "nome":
                                             send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Digitare il nome:")
-                                            super().set_status(self.bot_name,chat_id,from_id,7,status)
+                                            super().set_status(self.bot_name,chat_id,from_id,7,status.obj)
                                         case "cognome":
                                             send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Digitare il cognome:")
-                                            super().set_status(self.bot_name,chat_id,from_id,8,status)
+                                            super().set_status(self.bot_name,chat_id,from_id,8,status.obj)
                                         case "nickname":
                                             send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Digitare il nickname:")
-                                            super().set_status(self.bot_name,chat_id,from_id,9,status)
+                                            super().set_status(self.bot_name,chat_id,from_id,9,status.obj)
                                         case "telefono":
                                             send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Digitare il telefono:")
-                                            super().set_status(self.bot_name,chat_id,from_id,10,status)
+                                            super().set_status(self.bot_name,chat_id,from_id,10,status.obj)
                                         case "ok":
-                                            if status.obj.user.get_name() == None or status.obj.user.get_surname() == None or status.obj.user.get_telephone() == None:
+                                            if status.obj.user.get_name() == "NULL" or status.obj.user.get_surname() == "NULL" or status.obj.user.get_telephone() == "NULL":
                                                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nome, cognome e telefono necessari per la prenotazione.\nChe altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
-                                                super().set_status(self.bot_name,chat_id,from_id,4,status)
+                                                super().set_status(self.bot_name,chat_id,from_id,4,status.obj)
                                             else:
-                                                if super().get_database().get_postgres().run_function("staff_rental_set",from_id,status.obj.game.get_name(),status.obj.user.get_name(),status.obj.game.get_surname(),status.obj.game.get_nickname(),status.obj.game.get_telephone()):
+                                                if super().get_database().get_postgres().run_function("staff_rental_set",str(from_id),status.obj.game.get_name(),status.obj.user.get_name(),status.obj.user.get_surname(),status.obj.user.get_nickname(),status.obj.user.get_telephone()):
                                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Prenotazione presa con successo.")
                                                 else:
                                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la prenotazione non è andata a buon fine. Riesegui il comando \start e riprova.")
@@ -111,27 +111,30 @@ class BotStaff:
                                         case _:
                                             send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Comando non trovato, si prega di rieseguire il comando \start.")
                                 case 6:
-                                    pass
+                                    if super().get_database().get_postgres().run_function("rental_set_by_full_name",status.obj.get_name(),"'"+txt+"'"):
+                                        send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Restituzione avvenuta con successo.")
+                                    else:
+                                        send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la restituzione è fallita, si prega di rieseguire il comando \start.")
                                 case 7:
                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nome salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
                                     status.obj.user.set_name(txt)
-                                    super().set_status(self.bot_name,chat_id,from_id,4,status)
+                                    super().set_status(self.bot_name,chat_id,from_id,4,status.obj)
                                 case 8:
                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Cognome salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
                                     status.obj.user.set_surname(txt)
-                                    super().set_status(self.bot_name,chat_id,from_id,4,status)
+                                    super().set_status(self.bot_name,chat_id,from_id,4,status.obj)
                                 case 9:
                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nickname salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
                                     status.obj.user.set_nickname(txt)
-                                    super().set_status(self.bot_name,chat_id,from_id,4,status)
+                                    super().set_status(self.bot_name,chat_id,from_id,4,status.obj)
                                 case 10:
                                     if re.search("^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$", txt):
                                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Telefono salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
                                         status.obj.user.set_telephone(txt)
-                                        super().set_status(self.bot_name,chat_id,from_id,4,status)
+                                        super().set_status(self.bot_name,chat_id,from_id,4,status.obj)
                                     else:
                                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Il numero non è valido. Riprova.")
-                                        super().set_status(self.bot_name,chat_id,from_id,10,status)
+                                        super().set_status(self.bot_name,chat_id,from_id,10,status.obj)
                 elif chat_type=="private":
                     send_message(super().get_bot(),chat_id,"Non hai i permessi per usare questo bot.")
 
@@ -195,10 +198,6 @@ class BotStaff:
                 if string!="":
                     string+=" "
                 string+=user["surname"]
-            if user["nickname"]!=None:
-                if string!="":
-                    string+=" "
-                string+=f"({user['nickname']})"
             return string
 
         def get_users_by_game(self,rentals,game_name):

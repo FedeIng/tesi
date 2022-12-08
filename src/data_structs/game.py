@@ -10,7 +10,9 @@ class Game:
         self.name = name
 
     def get_name(self):
-        return self.name
+        if self.name == None:
+            return "NULL"
+        return f"'{self.name}'"
 
     def __dict__(self):
         return {
