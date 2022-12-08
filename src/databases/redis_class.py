@@ -14,9 +14,10 @@ class RedisDb:
 
         def set_object(self,bot_name,chat_id,from_id,obj):
             if chat_id==from_id:
-                self.redis.set(f"{bot_name}-{str(chat_id)}",json.dumps(obj.__dict__))
+                print(obj.__dict__())
+                self.redis.set(f"{bot_name}-{str(chat_id)}",json.dumps(obj.__dict__()))
             else:
-                self.redis.set(f"{bot_name}-{str(chat_id)}-{str(from_id)}",json.dumps(obj.__dict__))
+                self.redis.set(f"{bot_name}-{str(chat_id)}-{str(from_id)}",json.dumps(obj.__dict__()))
         
         def get_object(self,bot_name,chat_id,from_id):
             try:

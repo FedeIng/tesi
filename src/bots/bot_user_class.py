@@ -40,10 +40,13 @@ class BotUser:
                                                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Lista inviata in privato.")
                                     case "vorrei prendere un gioco":
                                         games=super().get_database().get_postgres().run_function("rental_get_by_telegram_id",str(from_id))
-                                        print(games)
                                         if games==[]:
-                                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che gioco vuoi prendere?",reply_markup=super().set_keyboard(sorted(super().get_database().get_postgres().run_function("free_games_get"))))
-                                            super().set_status(self.bot_name,chat_id,from_id,2,None)
+                                            free_games=super().get_database().get_postgres().run_function("free_games_get")
+                                            if free_games==[]:
+                                                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nessun gioco disponibile.")
+                                            else:
+                                                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che gioco vuoi prendere?",reply_markup=super().set_keyboard(sorted(free_games)))
+                                                super().set_status(self.bot_name,chat_id,from_id,2,None)
                                         else:
                                             divisore='\n'
                                             send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+f"Non puoi prendere un gico perchè hai già preso:\n{divisore.join(sorted(games))}")

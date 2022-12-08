@@ -17,3 +17,37 @@ class User:
             self.surname=obj["surname"]
         if "nickname" in obj:
             self.nickname=obj["nickname"]
+
+    def set_telephone(telephone):
+        self.telephone=telephone
+    
+    def get_telephone():
+        return self.telephone
+
+    def set_name(name):
+        self.name=name
+    
+    def get_name():
+        return self.name
+
+    def set_surname(surname):
+        self.surname=surname  
+    
+    def get_surname():
+        return self.surname 
+
+    def set_nickname(nickname):
+        self.nickname=nickname 
+
+    def get_nickname():
+        return self.nickname
+
+    def __dict__(self):
+        return {
+            "class_name":self.class_name,
+            "telegram_id":self.telegram_id,
+            "telephone":self.telephone,
+            "name":self.name,
+            "surname":self.surname,
+            "nickname":self.nickname
+        }

@@ -19,3 +19,12 @@ class Status:
                      self.obj=Rental(dictionary)
                 case _:
                     pass
+
+    def __dict__(self):
+        obj={
+                "id": self.id,
+                "obj": None
+            }
+        if self.obj != None:
+            obj["obj"]=self.obj.__dict__()
+        return obj

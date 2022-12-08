@@ -16,7 +16,15 @@ class Rental:
             self.user=obj["user_obj"]
         if "user" in obj:
             self.user=User(obj["user"])
-        if "staff_obj" in obj:
-            self.staff=obj["staff_obj"]
-        if "staff" in obj:
-            self.user=User(obj["staff"])
+    
+    def __dict__(self):
+        obj={
+            "class_name": self.class_name,
+            "game": None,
+            "user": None
+        }
+        if self.game != None:
+            obj["game"]=self.game.__dict__()
+        if self.user != None:
+            obj["user"]=self.user.__dict__()
+        return obj
