@@ -17,8 +17,6 @@ class Status:
                      self.obj=User(dictionary)
                 case "Rental":
                      self.obj=Rental(dictionary)
-                case _:
-                    pass
 
     def __dict__(self):
         obj={
