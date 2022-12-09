@@ -144,13 +144,13 @@ class BotStaff:
                 case _:
                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().error_string)
 
-        def case_six(txt,chat_id,from_id,chat_type,user):
+        def case_six(self,txt,chat_id,from_id,chat_type,user):
             if super().get_database().get_postgres().run_function("rental_set_by_full_name",status.obj.get_name(),"'"+txt+"'"):
                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Restituzione avvenuta con successo.")
             else:
                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la restituzione è fallita, si prega di rieseguire il comando \start.")
 
-        def case_ten(txt,chat_id,from_id,chat_type,user):
+        def case_ten(self,txt,chat_id,from_id,chat_type,user):
             if re.search("^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$", txt):
                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Telefono salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
                 status.obj.user.set_telephone(txt)
