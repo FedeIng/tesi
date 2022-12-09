@@ -1,5 +1,5 @@
 import telepot
-from library import match_command, tag_group, selection, list_to_str, array_to_matrix, create_reply_keyboard, seg_bug, send_message, send_doc
+from library import match_command, tag_group, send_message
 
 from data_structs.game import Game
 from data_structs.user import User

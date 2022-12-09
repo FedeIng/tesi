@@ -1,6 +1,6 @@
 import telepot
 import re
-from library import match_command, tag_group, selection, list_to_str, array_to_matrix, create_reply_keyboard, seg_bug, send_message, send_doc
+from library import match_command, tag_group, send_message
 
 from data_structs.game import Game
 from data_structs.user import User
@@ -137,20 +137,6 @@ class BotStaff:
                                         super().set_status(self.bot_name,chat_id,from_id,10,status.obj)
                 elif chat_type=="private":
                     send_message(super().get_bot(),chat_id,"Non hai i permessi per usare questo bot.")
-
-        def get_rentals_keyboard(self,rentals):
-            rental_array=[]
-            for rental in rentals:
-                rental_array.append(self.get_rental_button(rental))
-            return sorted(rental_array)
-
-        def get_rental_button(self,rental):
-            string=f"{rental['game_name']} -> "
-            if rental['user_telegram_id']!=None:
-                string+=f"@{super().get_bot().getChat(rental['user_telegram_id'])['username']}"
-            elif rental['user_telephone']!=None:
-                string+=f"{rental['user_telephone']}"
-            return string
 
         def get_rentals_array_string(self,rentals):
             rental_array=[]
