@@ -19,7 +19,7 @@ class BotStaff:
             content_type, chat_type, chat_id = telepot.glance(msg)
             from_id=msg["from"]["id"]
             if content_type == 'text':
-                if from_id in super().get_database().get_postgres().run_function("telegram_id_staff_get"):
+                if super().get_database().get_postgres().run_function("telegram_id_staff_check",str(from_id)):
                     txt=msg["text"].lower()
                     user=super().get_bot().getChat(from_id)
                     if match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]):
