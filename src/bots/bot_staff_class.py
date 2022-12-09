@@ -55,7 +55,7 @@ class BotStaff:
                                                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che gioco vuoi restituire?",reply_markup=super().set_keyboard(games))
                                                 super().set_status(self.bot_name,chat_id,from_id,3,None)
                                         case _:
-                                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Comando non trovato, si prega di rieseguire il comando \start.")
+                                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().error_string)
                                 case 2:
                                     if txt in super().get_database().get_postgres().run_function("free_games_get"):
                                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che dati dell'utente vuoi salvare per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
@@ -98,7 +98,7 @@ class BotStaff:
                                         case "annulla":
                                             send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Registrazione annullata.")
                                         case _:
-                                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Comando non trovato, si prega di rieseguire il comando \start.")
+                                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().error_string)
                                 case 5:
                                     match txt:
                                         case "sì":
@@ -109,7 +109,7 @@ class BotStaff:
                                         case "no":
                                             send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nessun altro utente trovato con questo prestito, comando annullato.")
                                         case _:
-                                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Comando non trovato, si prega di rieseguire il comando \start.")
+                                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().error_string)
                                 case 6:
                                     if super().get_database().get_postgres().run_function("rental_set_by_full_name",status.obj.get_name(),"'"+txt+"'"):
                                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Restituzione avvenuta con successo.")
@@ -157,17 +157,21 @@ class BotStaff:
             if rental['user_telephone']!=None:
                 string+=f"\nTelefono:{rental['user_telephone']}"
             if rental['staff_name']!=None or rental['staff_surname']!=None or rental['staff_nickname']!=None or rental['staff_telegram_id']!=None or rental['staff_telephone']!=None:
-                string+=f"\nPrestato da ->"
-                if rental['staff_name']!=None:
-                    string+=f"\nNome:{rental['staff_name']}"
-                if rental['staff_surname']!=None:
-                    string+=f"\nCognome:{rental['staff_surname']}"
-                if rental['staff_nickname']!=None:
-                    string+=f"\nNickname:{rental['staff_nickname']}"
-                if rental['staff_telegram_id']!=None:
-                    string+=f"\nTelegram:@{super().get_bot().getChat(rental['staff_telegram_id'])['username']}"
-                if rental['staff_telephone']!=None:
-                    string+=f"\nTelefono:{rental['staff_telephone']}"
+                string+=self.staff_rental_to_string(rental)
+            return string
+
+        def staff_rental_to_string(self,rental):
+            string=f"\nPrestato da ->"
+            if rental['staff_name']!=None:
+                string+=f"\nNome:{rental['staff_name']}"
+            if rental['staff_surname']!=None:
+                string+=f"\nCognome:{rental['staff_surname']}"
+            if rental['staff_nickname']!=None:
+                string+=f"\nNickname:{rental['staff_nickname']}"
+            if rental['staff_telegram_id']!=None:
+                string+=f"\nTelegram:@{super().get_bot().getChat(rental['staff_telegram_id'])['username']}"
+            if rental['staff_telephone']!=None:
+                string+=f"\nTelefono:{rental['staff_telephone']}"
             return string
 
         def get_users_array_strings(self,users):

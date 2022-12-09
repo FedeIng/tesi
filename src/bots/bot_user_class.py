@@ -28,35 +28,38 @@ class BotUser:
                     if status!=None:
                         match status.id:
                             case 1:
-                                match txt:
-                                    case "vorrei vedere l'elenco dei giochi disponibili":
-                                        games=super().get_database().get_postgres().run_function("free_games_get")
-                                        if games==[]:
-                                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nessun gioco prestato.")
-                                        else:
-                                            divisore='\n'
-                                            send_message(super().get_bot(),from_id,tag_group(chat_type,user)+f"Lista dei giochi disponibili:\n{divisore.join(sorted(games))}")
-                                            if chat_id!=from_id:
-                                                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Lista inviata in privato.")
-                                    case "vorrei prendere un gioco":
-                                        games=super().get_database().get_postgres().run_function("rental_get_by_telegram_id",str(from_id))
-                                        if games==[]:
-                                            free_games=super().get_database().get_postgres().run_function("free_games_get")
-                                            if free_games==[]:
-                                                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nessun gioco disponibile.")
-                                            else:
-                                                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che gioco vuoi prendere?",reply_markup=super().set_keyboard(sorted(free_games)))
-                                                super().set_status(self.bot_name,chat_id,from_id,2,None)
-                                        else:
-                                            divisore='\n'
-                                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+f"Non puoi prendere un gico perchè hai già preso:\n{divisore.join(sorted(games))}")
-                                    case _:
-                                        send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Comando non trovato, si prega di rieseguire il comando \start.")
+                                self.case_one(txt,chat_id,from_id,chat_type,user)
                             case 2:
                                 if super().get_database().get_postgres().run_function("user_rental_set",str(from_id),"'"+txt+"'"):
                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Prenotazione presa con successo.")
                                 else:
                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la tua prenotazione non è andata a buon fine. Riesegui il comando \start e riprova.")
+
+        def case_one(self,txt,chat_id,from_id,chat_type,user):
+            match txt:
+                case "vorrei vedere l'elenco dei giochi disponibili":
+                    games=super().get_database().get_postgres().run_function("free_games_get")
+                    if games==[]:
+                        send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nessun gioco prestato.")
+                    else:
+                        divisore='\n'
+                        send_message(super().get_bot(),from_id,tag_group(chat_type,user)+f"Lista dei giochi disponibili:\n{divisore.join(sorted(games))}")
+                        if chat_id!=from_id:
+                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Lista inviata in privato.")
+                case "vorrei prendere un gioco":
+                    games=super().get_database().get_postgres().run_function("rental_get_by_telegram_id",str(from_id))
+                    if games==[]:
+                        free_games=super().get_database().get_postgres().run_function("free_games_get")
+                        if free_games==[]:
+                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nessun gioco disponibile.")
+                        else:
+                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che gioco vuoi prendere?",reply_markup=super().set_keyboard(sorted(free_games)))
+                            super().set_status(self.bot_name,chat_id,from_id,2,None)
+                    else:
+                        divisore='\n'
+                        send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+f"Non puoi prendere un gico perchè hai già preso:\n{divisore.join(sorted(games))}")
+                case _:
+                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().error_string)
 
     instance = None
     def __new__(cls,token): # __new__ always a classmethod

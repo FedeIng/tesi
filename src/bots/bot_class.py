@@ -11,6 +11,7 @@ class Bot:
         self.bot_instance=telepot.Bot(token)
         self.database=Database()
         self.bot_instance.message_loop({'chat':message,'callback_query':query})
+        self.error_string = "Comando non trovato, si prega di rieseguire il comando \start."
 
     def get_bot(self):
         return self.bot_instance
