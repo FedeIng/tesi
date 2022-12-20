@@ -14,6 +14,10 @@ class BotUser:
             self.bot_name="u"
             super().__init__(token,message=self.message)
 
+        def send_notifies(self,rentals):
+            for rental in rentals:
+                send_message(super().get_bot(),rental["user_telegram_id"],"Ricordati di restituire il gioco: "+rental["game_name"]+".")
+
         def message(self,msg):
             content_type, chat_type, chat_id = telepot.glance(msg)
             from_id=msg["from"]["id"]
@@ -59,7 +63,7 @@ class BotUser:
                         divisore='\n'
                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+f"Non puoi prendere un gico perchè hai già preso:\n{divisore.join(sorted(games))}")
                 case _:
-                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().error_string)
+                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().get_error_string())
 
     instance = None
     def __new__(cls,token): # __new__ always a classmethod

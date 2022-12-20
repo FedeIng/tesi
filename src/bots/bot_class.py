@@ -28,6 +28,9 @@ class Bot:
     def get_status(self,bot_name,chat_id,from_id):
         return self.database.get_redis().get_and_delete_object(bot_name,chat_id,from_id)
 
+    def get_error_string(self):
+        return self.error_string
+
     def set_keyboard(self,string_array,bool_var=True):
         i=0
         data=[]

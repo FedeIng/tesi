@@ -15,6 +15,12 @@ class BotStaff:
             self.bot_name="s"
             super().__init__(token,message=self.message)
 
+        def send_notifies(self,rentals):
+            staff_array = super().get_database().get_postgres().run_function("telegram_id_staff_get")
+            for staff in staff_array:
+                divisore='\n\n'
+                send_message(super().get_bot(),staff,f"Lista dei giochi prestati in ritardo di restituzione:\n\n{divisore.join(self.get_rentals_array_string(rentals))}")
+
         def message(self,msg):
             content_type, chat_type, chat_id = telepot.glance(msg)
             from_id=msg["from"]["id"]
@@ -84,7 +90,7 @@ class BotStaff:
                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che gioco vuoi restituire?",reply_markup=super().set_keyboard(games))
                         super().set_status(self.bot_name,chat_id,from_id,3,None)
                 case _:
-                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().error_string)
+                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().get_error_string())
         
         def case_two(self,txt,chat_id,from_id,chat_type,user):
             if txt in super().get_database().get_postgres().run_function("free_games_get"):
@@ -130,7 +136,7 @@ class BotStaff:
                 case "annulla":
                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Registrazione annullata.")
                 case _:
-                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().error_string)
+                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().get_error_string())
 
         def case_five(self,txt,chat_id,from_id,chat_type,user):
             match txt:
@@ -142,7 +148,7 @@ class BotStaff:
                 case "no":
                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nessun altro utente trovato con questo prestito, comando annullato.")
                 case _:
-                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().error_string)
+                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().get_error_string())
 
         def case_six(self,txt,chat_id,from_id,chat_type,user):
             if super().get_database().get_postgres().run_function("rental_set_by_full_name",status.obj.get_name(),"'"+txt+"'"):
