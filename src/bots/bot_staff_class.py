@@ -1,6 +1,6 @@
 import telepot
 import re
-from library import match_command, tag_group, send_message
+from library import match_command, tag_group, send_message, send_document
 
 from data_structs.game import Game
 from data_structs.user import User
@@ -72,7 +72,7 @@ class BotStaff:
                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nessun gioco prestato.")
                     else:
                         divisore='\n\n'
-                        send_message(super().get_bot(),from_id,f"Lista dei giochi prestati:\n\n{divisore.join(self.get_rentals_array_string(rentals))}")
+                        send_document(super().get_bot(),from_id,divisore.join(self.get_rentals_array_string(rentals)),"Lista dei giochi prestati.")
                         if chat_id!=from_id:
                             send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Lista inviata in privato.")
                 case "vorrei prestare un gioco":

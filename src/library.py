@@ -47,3 +47,16 @@ def match_command(command,msg,chat_type,username):
         return msg==command
     else:
         return msg==(command+"@"+username)
+
+def send_document(bot,chat_id,string,doc_name):
+    with open(doc_name+".txt", 'w') as f:
+        f.write(string)
+    with open(doc_name+".txt", 'r') as f:
+        try:
+            bot.sendDocument(chat_id, f, doc_name)
+        except TelegramError:
+            pass
+        except BotWasBlockedError:
+            pass
+    os.remove(doc_name+".txt")
+    
