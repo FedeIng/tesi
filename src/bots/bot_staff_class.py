@@ -42,11 +42,11 @@ class BotStaff:
                                 case 3:
                                     self.case_three(txt,chat_id,from_id,chat_type,user)
                                 case 4:
-                                    self.case_four(txt,chat_id,from_id,chat_type,user)
+                                    self.case_four(txt,chat_id,from_id,chat_type,user,status)
                                 case 5:
-                                    self.case_five(txt,chat_id,from_id,chat_type,user)
+                                    self.case_five(txt,chat_id,from_id,chat_type,user,status)
                                 case 6:
-                                    self.case_six(txt,chat_id,from_id,chat_type,user)
+                                    self.case_six(txt,chat_id,from_id,chat_type,user,status)
                                 case 7:
                                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nome salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
                                     status.obj.user.set_name(txt)
@@ -60,7 +60,7 @@ class BotStaff:
                                     status.obj.user.set_nickname(txt)
                                     super().set_status(self.bot_name,chat_id,from_id,4,status.obj)
                                 case 10:
-                                    self.case_ten(txt,chat_id,from_id,chat_type,user)
+                                    self.case_ten(txt,chat_id,from_id,chat_type,user,status)
                 elif chat_type=="private":
                     send_message(super().get_bot(),chat_id,"Non hai i permessi per usare questo bot.")
 
@@ -110,7 +110,7 @@ class BotStaff:
                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+f"A chi è stato prestato il gioco?",reply_markup=super().set_keyboard(self.get_users_array_strings(users)))
                 super().set_status(self.bot_name,chat_id,from_id,6,Game({"name":txt}))
 
-        def case_four(self,txt,chat_id,from_id,chat_type,user):
+        def case_four(self,txt,chat_id,from_id,chat_type,user,status):
             match txt:
                 case "nome":
                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Digitare il nome:")
@@ -138,7 +138,7 @@ class BotStaff:
                 case _:
                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().get_error_string())
 
-        def case_five(self,txt,chat_id,from_id,chat_type,user):
+        def case_five(self,txt,chat_id,from_id,chat_type,user,status):
             match txt:
                 case "sì":
                     if super().get_database().get_postgres().run_function("restitution_set",status.obj.user.get_telephone(),status.obj.user.get_telegram_id()):
@@ -150,13 +150,13 @@ class BotStaff:
                 case _:
                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().get_error_string())
 
-        def case_six(self,txt,chat_id,from_id,chat_type,user):
+        def case_six(self,txt,chat_id,from_id,chat_type,user,status):
             if super().get_database().get_postgres().run_function("rental_set_by_full_name",status.obj.get_name(),"'"+txt+"'"):
                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Restituzione avvenuta con successo.")
             else:
                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la restituzione è fallita, si prega di rieseguire il comando \start.")
 
-        def case_ten(self,txt,chat_id,from_id,chat_type,user):
+        def case_ten(self,txt,chat_id,from_id,chat_type,user,status):
             if re.search("^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$", txt):
                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Telefono salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
                 status.obj.user.set_telephone(txt)
