@@ -6,6 +6,8 @@ from telepot.exception import TelegramError, BotWasBlockedError
 import os
 
 db = Database()
+telegram_error = "TelegramError"
+bot_was_blocked_error = "BotWasBlockedError"
 
 def send_message(bot,chat_id,string,button_str="Indietro",bool_val=False,reply_markup=ReplyKeyboardRemove(selective=True)):
     global postgres_db
@@ -13,22 +15,18 @@ def send_message(bot,chat_id,string,button_str="Indietro",bool_val=False,reply_m
         try:
             return bot.sendMessage(chat_id,string)
         except TelegramError as e:
-            db.get_postgres().run_function("insert_log",str(chat_id),"'TelegramError'","'"+str(e)+"'",str(1))
-            pass
+            db.get_postgres().run_function("insert_log",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(1))
         except BotWasBlockedError:
-            db.get_postgres().run_function("insert_log",str(chat_id),"'BotWasBlockedError'","'"+str(e)+"'",str(2))
-            pass
+            db.get_postgres().run_function("insert_log",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(2))
         return
     if bool_val:
         reply_markup=sm_branch1(button_str,reply_markup)
     try:
         return bot.sendMessage(chat_id,string,reply_markup=reply_markup)
     except TelegramError:
-        postgres_db.run_function("insert_log",str(chat_id),"'TelegramError'","'"+str(e)+"'",str(3))
-        pass
+        postgres_db.run_function("insert_log",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(3))
     except BotWasBlockedError:
-        postgres_db.run_function("insert_log",str(chat_id),"'BotWasBlockedError'","'"+str(e)+"'",str(4))
-        pass
+        postgres_db.run_function("insert_log",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(4))
     
 def sm_branch1(button_str,reply_markup):
     var=reply_markup[0]
@@ -63,10 +61,8 @@ def send_document(bot,chat_id,string,doc_name):
         try:
             bot.sendDocument(chat_id, f, doc_name)
         except TelegramError:
-            db.get_postgres().run_function("insert_log",str(chat_id),"'TelegramError'","'"+str(e)+"'",str(5))
-            pass
+            db.get_postgres().run_function("insert_log",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(5))
         except BotWasBlockedError:
-            db.get_postgres().run_function("insert_log",str(chat_id),"'BotWasBlockedError'","'"+str(e)+"'",str(6))
-            pass
+            db.get_postgres().run_function("insert_log",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(6))
     os.remove(doc_name+".txt")
     
