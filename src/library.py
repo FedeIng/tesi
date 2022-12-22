@@ -1,16 +1,22 @@
 import telepot
 import datetime
+from databases.database_class import Database
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 from telepot.exception import TelegramError, BotWasBlockedError
 import os
 
+db = Database()
+
 def send_message(bot,chat_id,string,button_str="Indietro",bool_val=False,reply_markup=ReplyKeyboardRemove(selective=True)):
+    global postgres_db
     if reply_markup==None:
         try:
             return bot.sendMessage(chat_id,string)
-        except TelegramError:
+        except TelegramError as e:
+            db.get_postgres().run_function("insert_log",str(chat_id),"'TelegramError'","'"+str(e)+"'",str(1))
             pass
         except BotWasBlockedError:
+            db.get_postgres().run_function("insert_log",str(chat_id),"'BotWasBlockedError'","'"+str(e)+"'",str(2))
             pass
         return
     if bool_val:
@@ -18,8 +24,10 @@ def send_message(bot,chat_id,string,button_str="Indietro",bool_val=False,reply_m
     try:
         return bot.sendMessage(chat_id,string,reply_markup=reply_markup)
     except TelegramError:
+        postgres_db.run_function("insert_log",str(chat_id),"'TelegramError'","'"+str(e)+"'",str(3))
         pass
     except BotWasBlockedError:
+        postgres_db.run_function("insert_log",str(chat_id),"'BotWasBlockedError'","'"+str(e)+"'",str(4))
         pass
     
 def sm_branch1(button_str,reply_markup):
@@ -55,8 +63,10 @@ def send_document(bot,chat_id,string,doc_name):
         try:
             bot.sendDocument(chat_id, f, doc_name)
         except TelegramError:
+            db.get_postgres().run_function("insert_log",str(chat_id),"'TelegramError'","'"+str(e)+"'",str(5))
             pass
         except BotWasBlockedError:
+            db.get_postgres().run_function("insert_log",str(chat_id),"'BotWasBlockedError'","'"+str(e)+"'",str(6))
             pass
     os.remove(doc_name+".txt")
     
