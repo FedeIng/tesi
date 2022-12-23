@@ -34,16 +34,9 @@ class BotUser:
                             case 1:
                                 self.case_one(txt,chat_id,from_id,chat_type,user)
                             case 2:
-                                if super().get_database().get_postgres().run_function("free_games_check_by_name","'"+txt+"'") > 0:
-                                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+f"Vuoi prendere il gioco {txt}?",reply_markup=super().set_keyboard(["Sì","No"]))
-                                    super().set_status(self.bot_name,chat_id,from_id,3,Game({"name":txt}))
-                                else:
-                                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la tua prenotazione non è andata a buon fine. Riesegui il comando \start e riprova.")
+                                self.case_two(txt,chat_id,from_id,chat_type,user)
                             case 3:
-                                if txt == 'sì' and super().get_database().get_postgres().run_function("user_rental_set",str(from_id),"'"+status.obj.name+"'"):
-                                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Prenotazione presa con successo.")
-                                else:
-                                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la tua prenotazione non è andata a buon fine. Riesegui il comando \start e riprova.")
+                                self.case_three(txt,chat_id,from_id,chat_type,user,status)
 
         def case_one(self,txt,chat_id,from_id,chat_type,user):
             match txt:
@@ -68,6 +61,25 @@ class BotUser:
                     else:
                         divisore='\n'
                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+f"Non puoi prendere un gico perchè hai già preso:\n{divisore.join(sorted(games))}")
+                case _:
+                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().get_error_string())
+
+        def case_two(self,txt,chat_id,from_id,chat_type,user):
+            if super().get_database().get_postgres().run_function("free_games_check_by_name","'"+txt+"'") > 0:
+                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+f"Vuoi prendere il gioco {txt}?",reply_markup=super().set_keyboard(["Sì","No"]))
+                super().set_status(self.bot_name,chat_id,from_id,3,Game({"name":txt}))
+            else:
+                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la tua prenotazione non è andata a buon fine. Riesegui il comando \start e riprova.")
+
+        def case_three(self,txt,chat_id,from_id,chat_type,user,status):
+            match txt:
+                case 'sì':
+                    if super().get_database().get_postgres().run_function("user_rental_set",str(from_id),"'"+status.obj.name+"'"):
+                        send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Prenotazione presa con successo.")
+                    else:
+                        send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la tua prenotazione non è andata a buon fine. Riesegui il comando \start e riprova.")
+                case 'no':
+                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la tua prenotazione non è andata a buon fine. Riesegui il comando \start e riprova.")
                 case _:
                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().get_error_string())
 
