@@ -97,12 +97,12 @@ class BotStaff:
                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che dati dell'utente vuoi salvare per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
                 super().set_status(self.bot_name,chat_id,from_id,4,Rental({"game":{"name":txt},"user":{}}))
             else:
-                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo il gioco non è stato trovato. Riesegui il comando \start e riprova.")
+                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo il gioco non è stato trovato. Riesegui il comando /start e riprova.")
 
         def case_three(self,txt,chat_id,from_id,chat_type,user):
             users=super().get_database().get_postgres().run_function("user_rental_get_by_game_name","'"+txt+"'")
             if users==[]:
-                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Comando annullato, nessun utente ha preso in prestito questo gioco. Rilanciare il comando \start.")
+                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Comando annullato, nessun utente ha preso in prestito questo gioco. Rilanciare il comando /start.")
             elif len(users)==1:
                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+f"É stato prestato a {self.user_to_string(users[0])}?",reply_markup=super().set_keyboard(["Sì","No"]))
                 super().set_status(self.bot_name,chat_id,from_id,5,Rental({"game_obj":Game({"name":txt}),"user_obj":User({"name":users[0]["name"],"surname":users[0]["surname"],"nickname":users[0]["nickname"],"telephone":users[0]["telephone"],"telegram_id":users[0]["telegram_id"]})}))
@@ -132,7 +132,7 @@ class BotStaff:
                         if super().get_database().get_postgres().run_function("staff_rental_set",str(from_id),status.obj.game.get_name(),status.obj.user.get_name(),status.obj.user.get_surname(),status.obj.user.get_nickname(),status.obj.user.get_telephone()):
                             send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Prenotazione presa con successo.")
                         else:
-                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la prenotazione non è andata a buon fine. Riesegui il comando \start e riprova.")
+                            send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la prenotazione non è andata a buon fine. Riesegui il comando /start e riprova.")
                 case "annulla":
                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Registrazione annullata.")
                 case _:
@@ -144,7 +144,7 @@ class BotStaff:
                     if super().get_database().get_postgres().run_function("restitution_set",status.obj.user.get_telephone(),status.obj.user.get_telegram_id()):
                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Restituzione avvenuta con successo.")
                     else:
-                        send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la restituzione è fallita, si prega di rieseguire il comando \start.")
+                        send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la restituzione è fallita, si prega di rieseguire il comando /start.")
                 case "no":
                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Nessun altro utente trovato con questo prestito, comando annullato.")
                 case _:
@@ -154,7 +154,7 @@ class BotStaff:
             if super().get_database().get_postgres().run_function("rental_set_by_full_name",status.obj.get_name(),"'"+txt+"'"):
                 send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Restituzione avvenuta con successo.")
             else:
-                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la restituzione è fallita, si prega di rieseguire il comando \start.")
+                send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Purtroppo la restituzione è fallita, si prega di rieseguire il comando /start.")
 
         def case_ten(self,txt,chat_id,from_id,chat_type,user,status):
             if re.search("^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$", txt):
