@@ -11,26 +11,14 @@ bot_was_blocked_error = "BotWasBlockedError"
 
 def send_message(bot,chat_id,string,reply_markup=ReplyKeyboardRemove(selective=True),recursive=True):
     global postgres_db
-    if reply_markup==None:
-        try:
-            return bot.sendMessage(chat_id,string)
-        except TelegramError as e:
-            db.get_postgres().run_function("insert_exception",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(1))
-            if recursive:
-                send_logs("ERROR",e,chat_id)
-        except BotWasBlockedError:
-            db.get_postgres().run_function("insert_exception",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(2))
-            if recursive:
-                send_logs("ERROR",e,chat_id)
-        return
     try:
         return bot.sendMessage(chat_id,string,reply_markup=reply_markup)
     except TelegramError:
-        postgres_db.run_function("insert_exception",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(3))
+        postgres_db.run_function("insert_exception",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(1))
         if recursive:
             send_logs("ERROR",e,chat_id)
     except BotWasBlockedError:
-        postgres_db.run_function("insert_exception",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(4))
+        postgres_db.run_function("insert_exception",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(2))
         if recursive:
             send_logs("ERROR",e,chat_id)
 
@@ -53,11 +41,11 @@ def send_document(bot,chat_id,string,doc_name):
         try:
             bot.sendDocument(chat_id, f, doc_name)
         except TelegramError:
-            db.get_postgres().run_function("insert_exception",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(5))
+            db.get_postgres().run_function("insert_exception",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(3))
             if recursive:
                 send_logs("ERROR",e,chat_id)
         except BotWasBlockedError:
-            db.get_postgres().run_function("insert_exception",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(6))
+            db.get_postgres().run_function("insert_exception",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(4))
             if recursive:
                 send_logs("ERROR",e,chat_id)
     os.remove(doc_name+".txt")
