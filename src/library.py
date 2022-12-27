@@ -64,9 +64,9 @@ def send_document(bot,chat_id,string,doc_name):
     
 def send_logs(level,name,chat_id,recursive=False):
     logs_users=db.get_postgres().run_function("telegram_id_logs_get")
-    logs_string = format_logs_string(level,name,chat_id)
+    logs_string=format_logs_string(level,name,chat_id)
     for logs_user in logs_users:
-        send_message(db.get_bot_logs(), chat_id, string,recursive=recursive)
+        send_message(db.get_bot_logs(),logs_user,logs_string,recursive=recursive)
 
 def format_logs_string(level,name,chat_id):
     match level:
