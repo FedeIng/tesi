@@ -21,8 +21,8 @@ class Config:
         def get_user_token(self):
             return self.user_token
         
-        def get_admin_token(self):
-            return self.admin_token
+        def get_staff_token(self):
+            return self.staff_token
 
         def get_postgres_host(self):
             return self.postgres_host

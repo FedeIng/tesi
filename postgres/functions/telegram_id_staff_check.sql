@@ -12,11 +12,13 @@ DECLARE
 BEGIN    
 RETURN QUERY (
 	SELECT COUNT(*) = 1
-	FROM guild.users
-	WHERE is_staff = TRUE and telegram_id = v_telegram_id
+	FROM guild.users gu
+    INNER JOIN guild.users_roles gur ON gu.id = gur.user_id
+    INNER JOIN guild.roles gr ON gur.role_id = gr.id
+	WHERE gu.telegram_id = v_telegram_id and gr.name = "STAFF"
 );
 END;
 $BODY$;
 
-ALTER FUNCTION guild.telegram_id_staff_get()
+ALTER FUNCTION guild.telegram_id_staff_check()
     OWNER TO postgres;

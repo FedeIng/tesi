@@ -8,6 +8,7 @@ class Database:
             self.redis=None
             self.bot_staff=None   
             self.bot_user=None
+            self.bot_logs=None
 
         def set_postgres(self,db):
             self.postgres=db
@@ -32,6 +33,12 @@ class Database:
 
         def get_bot_user(self):
             return self.bot_user
+        
+        def set_bot_logs(self,bot):
+            self.bot_logs=bot
+        
+        def get_bot_logs(self):
+            return self.bot_logs
     
     instance = None
     def __new__(cls): # __new__ always a classmethod

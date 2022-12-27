@@ -6,20 +6,23 @@ from databases.postgres_class import PostgresDb
 from databases.redis_class import RedisDb
 from bots.bot_staff_class import BotStaff
 from bots.bot_user_class import BotUser
+from bots.bot_logs_class import BotLogs
 
 config=Config()
 
 database=Database()
 
-postgres=PostgresDb(config.postgres_host,config.postgres_database,config.postgres_username,config.postgres_password,config.postgres_port,config.postgres_schema)
+postgres=PostgresDb(config.get_postgres_host(),config.get_postgres_database(),config.get_postgres_username(),config.get_postgres_password(),config.get_postgres_port(),config.get_postgres_schema())
 database.set_postgres(postgres)
-redis=RedisDb(config.redis_host,config.redis_port)
+redis=RedisDb(config.get_redis_host(),config.get_redis_port())
 database.set_redis(redis)
 
-bot_staff=BotStaff(config.staff_token)
+bot_staff=BotStaff(config.get_staff_token())
 database.set_bot_staff(bot_staff)
-bot_user=BotUser(config.user_token)
+bot_user=BotUser(config.get_user_token())
 database.set_bot_staff(bot_user)
+bot_logs=BotLogs(config.get_logs_token())
+database.set_bot_logs(bot_logs)
 
 def work():
     global bot_staff

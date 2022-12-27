@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS guild.users
     name character varying COLLATE pg_catalog."default",
     surname character varying COLLATE pg_catalog."default",
     nickname character varying COLLATE pg_catalog."default",
-    is_staff boolean DEFAULT false,
     CONSTRAINT users_pkey PRIMARY KEY (id)
 )
 

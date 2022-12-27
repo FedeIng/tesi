@@ -29,7 +29,7 @@ class BotStaff:
                     txt=msg["text"].lower()
                     user=super().get_bot().getChat(from_id)
                     if match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]):
-                        send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Benvenuto nel bot telegram della Gilda del Grifone, cosa vuoi fare?",reply_markup=super().set_keyboard(["Vorrei vedere l'elenco dei giochi prestati","Vorrei prestare un gioco","Vorrei restituire un gioco"]))
+                        send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Benvenuto nel bot telegram della Gilda del Grifone, cosa vuoi fare?",reply_markup=super().set_keyboard(["Vorrei vedere l'elenco dei giochi prestati","Vorrei prestare un gioco","Vorrei restituire un gioco","Vorrei segnalare un bug"]))
                         super().set_status(self.bot_name,chat_id,from_id,1,None)
                     else:
                         status=super().get_status(self.bot_name,chat_id,from_id)
@@ -215,6 +215,10 @@ class BotStaff:
                 if string!="":
                     string+=" "
                 string+=user["surname"]
+            if user["nickname"]!=None:
+                if string!="":
+                    string+=" "
+                string+='('+user["nickname"]+')'
             return string
 
         def get_users_by_game(self,rentals,game_name):

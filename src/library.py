@@ -9,38 +9,30 @@ db = Database()
 telegram_error = "TelegramError"
 bot_was_blocked_error = "BotWasBlockedError"
 
-def send_message(bot,chat_id,string,button_str="Indietro",bool_val=False,reply_markup=ReplyKeyboardRemove(selective=True)):
+def send_message(bot,chat_id,string,reply_markup=ReplyKeyboardRemove(selective=True),recursive=True):
     global postgres_db
     if reply_markup==None:
         try:
             return bot.sendMessage(chat_id,string)
         except TelegramError as e:
-            db.get_postgres().run_function("insert_log",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(1))
+            db.get_postgres().run_function("insert_exception",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(1))
+            if recursive:
+                send_logs("ERROR",e,chat_id)
         except BotWasBlockedError:
-            db.get_postgres().run_function("insert_log",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(2))
+            db.get_postgres().run_function("insert_exception",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(2))
+            if recursive:
+                send_logs("ERROR",e,chat_id)
         return
-    if bool_val:
-        reply_markup=sm_branch1(button_str,reply_markup)
     try:
         return bot.sendMessage(chat_id,string,reply_markup=reply_markup)
     except TelegramError:
-        postgres_db.run_function("insert_log",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(3))
+        postgres_db.run_function("insert_exception",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(3))
+        if recursive:
+            send_logs("ERROR",e,chat_id)
     except BotWasBlockedError:
-        postgres_db.run_function("insert_log",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(4))
-    
-def sm_branch1(button_str,reply_markup):
-    var=reply_markup[0]
-    if reply_markup==ReplyKeyboardRemove(selective=True):
-        reply_markup=create_reply_keyboard([[button_str]])
-    elif reply_markup==ReplyKeyboardRemove() or reply_markup==ReplyKeyboardRemove(selective=False):
-        reply_markup=create_reply_keyboard([[button_str]],False)
-    else:
-        var.append([KeyboardButton(text=button_str)])
-        if len(reply_markup)==4:
-            reply_markup=ReplyKeyboardMarkup(keyboard=var,resize_keyboard=True,one_time_keyboard=True,selective=reply_markup[3])
-        else:
-            reply_markup=ReplyKeyboardMarkup(keyboard=var,resize_keyboard=True,one_time_keyboard=True)
-    return reply_markup
+        postgres_db.run_function("insert_exception",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(4))
+        if recursive:
+            send_logs("ERROR",e,chat_id)
 
 def tag_group(chat_type,user):
     string=""
@@ -61,8 +53,28 @@ def send_document(bot,chat_id,string,doc_name):
         try:
             bot.sendDocument(chat_id, f, doc_name)
         except TelegramError:
-            db.get_postgres().run_function("insert_log",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(5))
+            db.get_postgres().run_function("insert_exception",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(5))
+            if recursive:
+                send_logs("ERROR",e,chat_id)
         except BotWasBlockedError:
-            db.get_postgres().run_function("insert_log",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(6))
+            db.get_postgres().run_function("insert_exception",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(6))
+            if recursive:
+                send_logs("ERROR",e,chat_id)
     os.remove(doc_name+".txt")
     
+def send_logs(level,name,chat_id,recursive=False):
+    logs_users=db.get_postgres().run_function("telegram_id_logs_get")
+    logs_string = format_logs_string(level,name,chat_id)
+    for logs_user in logs_users:
+        send_message(db.get_bot_logs(), chat_id, string,recursive=recursive)
+
+def format_logs_string(level,name,chat_id):
+    match level:
+        case "ERROR":
+            return emoji.emojize(f'{str(chat_id)} >>> :red_circle: {name} :red_circle:')
+        case "WARNING":
+            return emoji.emojize(f'{str(chat_id)} >>> :yellow_circle: {name} :yellow_circle:')
+        case "OK":
+            return emoji.emojize(f'{str(chat_id)} >>> :green_circle: {name} :green_circle:')
+        case _:
+            return emoji.emojize(f'{str(chat_id)} >>> :black_circle: {name} :black_circle:')
