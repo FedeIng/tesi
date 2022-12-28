@@ -61,6 +61,8 @@ class BotStaff:
                                     super().set_status(self.bot_name,chat_id,from_id,4,status.obj)
                                 case 10:
                                     self.case_ten(txt,chat_id,from_id,chat_type,user,status)
+                                case 11:
+                                    super().send_bug(txt,chat_id,chat_type,user,self.bot_name)
                 elif chat_type=="private":
                     send_message(super().get_bot(),chat_id,"Non hai i permessi per usare questo bot.")
 
@@ -89,6 +91,9 @@ class BotStaff:
                     else:
                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che gioco vuoi restituire?",reply_markup=super().set_keyboard(games))
                         super().set_status(self.bot_name,chat_id,from_id,3,None)
+                case "vorrei segnalare un bug":
+                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che bug vuoi segnalare?")
+                    super().set_status(self.bot_name,chat_id,from_id,11,None)
                 case _:
                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().get_error_string())
         

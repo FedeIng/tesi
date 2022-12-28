@@ -3,6 +3,7 @@ import telepot
 from data_structs.status import Status
 from databases.database_class import Database
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
+from library import send_bug
 
 class Bot:
 
@@ -30,6 +31,10 @@ class Bot:
 
     def get_error_string(self):
         return self.error_string
+    
+    def send_bug(self,txt,chat_id,chat_type,user,bot_name):
+        send_message(self.bot_instance,chat_id,tag_group(chat_type,user)+"Bug segnalato.")
+        send_bug(self.bot_instance,bot_name,chat_id,txt)
 
     def set_keyboard(self,string_array,bool_var=True):
         i=0

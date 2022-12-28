@@ -38,6 +38,8 @@ class BotUser:
                                 self.case_two(txt,chat_id,from_id,chat_type,user)
                             case 3:
                                 self.case_three(txt,chat_id,from_id,chat_type,user,status)
+                            case 4:
+                                super().send_bug(txt,chat_id,chat_type,user,self.bot_name)
 
         def case_one(self,txt,chat_id,from_id,chat_type,user):
             match txt:
@@ -62,6 +64,9 @@ class BotUser:
                     else:
                         divisore='\n'
                         send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+f"Non puoi prendere un gico perchè hai già preso:\n{divisore.join(sorted(games))}")
+                case "vorrei segnalare un bug":
+                    send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+"Che bug vuoi segnalare?")
+                    super().set_status(self.bot_name,chat_id,from_id,4,None)
                 case _:
                     send_message(super().get_bot(),chat_id,tag_group(chat_type,user)+super().get_error_string())
 

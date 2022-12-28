@@ -9,16 +9,21 @@ db = Database()
 telegram_error = "TelegramError"
 bot_was_blocked_error = "BotWasBlockedError"
 
+def send_bug(bot,bot_name,chat_id,string):
+    global db
+    db.get_postgres().run_function("insert_bug",str(chat_id),"'"+bot_name+"'","'"+string+"'")
+    send_logs("WARNING",f"{bot_name} >>> {string}",chat_id,recursive=True)
+
 def send_message(bot,chat_id,string,reply_markup=ReplyKeyboardRemove(selective=True),recursive=True):
-    global postgres_db
+    global db
     try:
         return bot.sendMessage(chat_id,string,reply_markup=reply_markup)
     except TelegramError:
-        postgres_db.run_function("insert_exception",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(1))
+        db.get_postgres().run_function("insert_exception",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(1))
         if recursive:
             send_logs("ERROR",e,chat_id)
     except BotWasBlockedError:
-        postgres_db.run_function("insert_exception",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(2))
+        db.get_postgres().run_function("insert_exception",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(2))
         if recursive:
             send_logs("ERROR",e,chat_id)
 
@@ -35,6 +40,7 @@ def match_command(command,msg,chat_type,username):
         return msg==(command+"@"+username)
 
 def send_document(bot,chat_id,string,doc_name):
+    global db
     with open(doc_name+".txt", 'w') as f:
         f.write(string)
     with open(doc_name+".txt", 'r') as f:
@@ -51,6 +57,7 @@ def send_document(bot,chat_id,string,doc_name):
     os.remove(doc_name+".txt")
     
 def send_logs(level,name,chat_id,recursive=False):
+    global db
     logs_users=db.get_postgres().run_function("telegram_id_logs_get")
     logs_string=format_logs_string(level,name,chat_id)
     for logs_user in logs_users:
