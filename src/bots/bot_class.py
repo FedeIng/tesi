@@ -33,7 +33,7 @@ class Bot:
         return self.error_string
     
     def send_bug(self,txt,chat_id,chat_type,user,bot_name):
-        send_message(self.bot_instance,chat_id,tag_group(chat_type,user)+"Bug segnalato.")
+        send_message(self.bot_instance,chat_id,f"{tag_group(chat_type,user)} Bug segnalato.")
         send_bug(bot_name,chat_id,txt)
 
     def set_keyboard(self,string_array,bool_var=True):

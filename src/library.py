@@ -11,7 +11,7 @@ bot_was_blocked_error = "BotWasBlockedError"
 
 def send_bug(bot_name,chat_id,string):
     global db
-    db.get_postgres().run_function("insert_bug",str(chat_id),"'"+bot_name+"'","'"+string+"'")
+    db.get_postgres().run_function("insert_bug",str(chat_id),f"'{bot_name}'",f"'{string}'")
     send_logs("WARNING",f"{bot_name} >>> {string}",chat_id,recursive=True)
 
 def send_message(bot,chat_id,string,reply_markup=ReplyKeyboardRemove(selective=True),recursive=True):
@@ -19,18 +19,18 @@ def send_message(bot,chat_id,string,reply_markup=ReplyKeyboardRemove(selective=T
     try:
         return bot.sendMessage(chat_id,string,reply_markup=reply_markup)
     except TelegramError:
-        db.get_postgres().run_function("insert_exception",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(1))
+        db.get_postgres().run_function("insert_exception",str(chat_id),f"'{telegram_error}'",f"'{str(e)}'",str(1))
         if recursive:
             send_logs("ERROR",e,chat_id)
     except BotWasBlockedError:
-        db.get_postgres().run_function("insert_exception",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(2))
+        db.get_postgres().run_function("insert_exception",str(chat_id),f"'{bot_was_blocked_error}'",f"'{str(e)}'",str(2))
         if recursive:
             send_logs("ERROR",e,chat_id)
 
 def tag_group(chat_type,user):
     string=""
     if chat_type=="group" or chat_type=="supergroup":
-        string="@"+user["username"]+": "
+        string=f"@{user['username']}: "
     return string
 
 def match_command(command,msg,chat_type,username):
@@ -41,20 +41,20 @@ def match_command(command,msg,chat_type,username):
 
 def send_document(bot,chat_id,string,doc_name):
     global db
-    with open(doc_name+".txt", 'w') as f:
+    with open(f"{doc_name}.txt", 'w') as f:
         f.write(string)
-    with open(doc_name+".txt", 'r') as f:
+    with open(f"{doc_name}.txt", 'r') as f:
         try:
             bot.sendDocument(chat_id, f, doc_name)
         except TelegramError:
-            db.get_postgres().run_function("insert_exception",str(chat_id),"'"+telegram_error+"'","'"+str(e)+"'",str(3))
+            db.get_postgres().run_function("insert_exception",str(chat_id),f"'{telegram_error}'",f"'{str(e)}'",str(3))
             if recursive:
                 send_logs("ERROR",e,chat_id)
         except BotWasBlockedError:
-            db.get_postgres().run_function("insert_exception",str(chat_id),"'"+bot_was_blocked_error+"'","'"+str(e)+"'",str(4))
+            db.get_postgres().run_function("insert_exception",str(chat_id),f"'{bot_was_blocked_error}'",f"'{str(e)}'",str(4))
             if recursive:
                 send_logs("ERROR",e,chat_id)
-    os.remove(doc_name+".txt")
+    os.remove(f"{doc_name}.txt")
     
 def send_logs(level,name,chat_id,recursive=False):
     global db
@@ -66,10 +66,10 @@ def send_logs(level,name,chat_id,recursive=False):
 def format_logs_string(level,name,chat_id):
     match level:
         case "ERROR":
-            return emoji.emojize(f'{str(chat_id)} >>> :red_circle: {name} :red_circle:')
+            return emoji.emojize(f"{str(chat_id)} >>> :red_circle: {name} :red_circle:")
         case "WARNING":
-            return emoji.emojize(f'{str(chat_id)} >>> :yellow_circle: {name} :yellow_circle:')
+            return emoji.emojize(f"{str(chat_id)} >>> :yellow_circle: {name} :yellow_circle:")
         case "OK":
-            return emoji.emojize(f'{str(chat_id)} >>> :green_circle: {name} :green_circle:')
+            return emoji.emojize(f"{str(chat_id)} >>> :green_circle: {name} :green_circle:")
         case _:
-            return emoji.emojize(f'{str(chat_id)} >>> :black_circle: {name} :black_circle:')
+            return emoji.emojize(f"{str(chat_id)} >>> :black_circle: {name} :black_circle:")
