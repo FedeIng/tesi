@@ -35,21 +35,24 @@ class BotUser:
                 elif self.match_command('/bug',txt,chat_type,user):
                     self.command_three(chat_id,from_id,chat_type,user)
                 else:
-                    status=super().get_status(self.bot_name,chat_id,from_id)
-                    if status!=None:
-                        match status.id:
-                            case 1:
-                                self.case_one(txt,chat_id,from_id,chat_type,user)
-                            case 2:
-                                self.case_two(txt,chat_id,from_id,chat_type,user)
-                            case 3:
-                                self.case_three(txt,chat_id,from_id,chat_type,user,status)
-                            case 4:
-                                super().send_bug(txt,chat_id,chat_type,user,self.bot_name)
+                    self.match_status(txt,chat_id,from_id,chat_type,user)
 
         def match_command(self,command,txt,chat_type,user):
             return match_command(command,txt,chat_type,super().get_bot().getMe()["username"]) and super().get_database().get_postgres().run_function("user_set",str(user["id"]),"'"+user["first_name"].lower()+"'","'"+user["last_name"].lower()+"'","'"+user["username"].lower()+"'")
-            
+        
+        def match_status(self,txt,chat_id,from_id,chat_type,user):
+            status=super().get_status(self.bot_name,chat_id,from_id)
+            if status!=None:
+                match status.id:
+                    case 1:
+                        self.case_one(txt,chat_id,from_id,chat_type,user)
+                    case 2:
+                        self.case_two(txt,chat_id,from_id,chat_type,user)
+                    case 3:
+                        self.case_three(txt,chat_id,from_id,chat_type,user,status)
+                    case 4:
+                        super().send_bug(txt,chat_id,chat_type,user,self.bot_name)
+                                
         def case_one(self,txt,chat_id,from_id,chat_type,user):
             match txt:
                 case "vorrei vedere l'elenco dei giochi disponibili":
