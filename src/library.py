@@ -39,13 +39,13 @@ def match_command(command,msg,chat_type,username):
     else:
         return msg==(command+"@"+username)
 
-def send_document(bot,chat_id,string,doc_name):
+def send_document(bot,chat_id,string,message):
     global db
-    with open(f"{doc_name}.txt", 'w') as f:
+    with open(f"{str(chat_id)}.txt", 'w') as f:
         f.write(string)
-    with open(f"{doc_name}.txt", 'r') as f:
+    with open(f"{str(chat_id)}.txt", 'r') as f:
         try:
-            bot.sendDocument(chat_id, f, doc_name)
+            bot.sendDocument(chat_id, f, caption=message)
         except TelegramError:
             db.get_postgres().run_function("insert_exception",str(chat_id),f"'{telegram_error}'",f"'{str(e)}'",str(3))
             if recursive:
@@ -54,7 +54,7 @@ def send_document(bot,chat_id,string,doc_name):
             db.get_postgres().run_function("insert_exception",str(chat_id),f"'{bot_was_blocked_error}'",f"'{str(e)}'",str(4))
             if recursive:
                 send_logs("ERROR",e,chat_id)
-    os.remove(f"{doc_name}.txt")
+    os.remove(f"{str(chat_id)}.txt")
     
 def send_logs(level,name,chat_id,recursive=False):
     global db
