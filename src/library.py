@@ -9,7 +9,7 @@ db = Database()
 telegram_error = "TelegramError"
 bot_was_blocked_error = "BotWasBlockedError"
 
-def send_bug(bot,bot_name,chat_id,string):
+def send_bug(bot_name,chat_id,string):
     global db
     db.get_postgres().run_function("insert_bug",str(chat_id),"'"+bot_name+"'","'"+string+"'")
     send_logs("WARNING",f"{bot_name} >>> {string}",chat_id,recursive=True)
