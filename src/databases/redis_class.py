@@ -26,7 +26,8 @@ class RedisDb:
                 else:
                     data=json.loads(self.redis.get(f"{bot_name}-{str(chat_id)}-{str(from_id)}"))
                 return Status(data["id"],dictionary=data["obj"])
-            except TypeError:
+            except TypeError as error:
+                send_logs("ERROR",f"REDIS: {error}",0,recursive=True)
                 return None
 
         def delete_object(self,bot_name,chat_id,from_id):
