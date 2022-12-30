@@ -49,14 +49,12 @@ def send_document(bot,chat_id,string,message):
     with open(f"{str(chat_id)}.txt", 'r') as f:
         try:
             bot.sendDocument(chat_id, f, caption=message)
-        except TelegramError:
+        except TelegramError as e:
             db.get_postgres().run_function("insert_exception",str(chat_id),f"'{telegram_error}'",f"'{str(e)}'",str(3))
-            if recursive:
-                send_logs("ERROR",e,chat_id)
-        except BotWasBlockedError:
+            send_logs("ERROR",e,chat_id)
+        except BotWasBlockedError as e:
             db.get_postgres().run_function("insert_exception",str(chat_id),f"'{bot_was_blocked_error}'",f"'{str(e)}'",str(4))
-            if recursive:
-                send_logs("ERROR",e,chat_id)
+            send_logs("ERROR",e,chat_id)
     os.remove(f"{str(chat_id)}.txt")
     
 def send_logs(level,name,chat_id,recursive=False):

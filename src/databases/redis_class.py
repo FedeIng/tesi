@@ -4,6 +4,7 @@ import json
 from databases.database_class import Database
 from data_structs.status import Status
 from redis import Redis
+from library import send_logs
 
 class RedisDb:
     class Singleton:

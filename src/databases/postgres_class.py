@@ -32,7 +32,7 @@ class PostgresDb:
                         res=cur.fetchone()['result']
             except Exception as error:
                 if recursive:
-                    self.run_function("insert_exception",str(0),f"'{type(e)}'",f"'{error}'",str(5),recursive=False)
+                    self.run_function("insert_exception",str(0),f"'{type(error)}'",f"'{error}'",str(5),recursive=False)
                     send_logs("ERROR",error,0,recursive=True)
             finally:
                 if conn is not None:
