@@ -27,7 +27,7 @@ class RedisDb:
                     data=json.loads(self.redis.get(f"{bot_name}-{str(chat_id)}-{str(from_id)}"))
                 return Status(data["id"],dictionary=data["obj"])
             except TypeError as error:
-                db.get_postgres().run_function("insert_exception",str(0),f"'{type(e)}'",f"'{error}'",str(6))
+                db.get_postgres().run_function("insert_exception",str(0),f"'TypeError'",f"'{error}'",str(6))
                 send_logs("ERROR",error,0,recursive=True)
                 return None
 
