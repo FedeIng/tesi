@@ -10,3 +10,8 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS guild.games
     OWNER to postgres;
+
+CREATE INDEX IF NOT EXISTS idx_games_id
+    ON guild.games USING btree
+    (id ASC NULLS LAST)
+    TABLESPACE pg_default;

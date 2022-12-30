@@ -9,6 +9,7 @@ class Config:
                 data=yaml.load(f, Loader=yaml.FullLoader)
                 self.user_token=data['bots']['token']['user']
                 self.staff_token=data['bots']['token']['staff']
+                self.logs_token=data['bots']['token']['logs']
                 self.postgres_host=data['databases']['postgres']['host']
                 self.postgres_database=data['databases']['postgres']['database']
                 self.postgres_username=data['databases']['postgres']['username']
@@ -24,6 +25,9 @@ class Config:
         def get_staff_token(self):
             return self.staff_token
 
+        def get_logs_token(self):
+            return self.logs_token
+
         def get_postgres_host(self):
             return self.postgres_host
 
@@ -38,6 +42,9 @@ class Config:
 
         def get_postgres_port(self):
             return self.postgres_port
+        
+        def get_postgres_schema(self):
+            return self.postgres_schema
 
         def get_redis_host(self):
             return self.redis_host

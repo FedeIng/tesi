@@ -13,3 +13,8 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS guild.users
     OWNER to postgres;
+
+CREATE INDEX IF NOT EXISTS idx_users_id
+    ON guild.users USING btree
+    (id ASC NULLS LAST)
+    TABLESPACE pg_default;

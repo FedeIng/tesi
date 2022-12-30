@@ -13,7 +13,7 @@ RETURN QUERY (SELECT ARRAY(SELECT gu.telegram_id
 	FROM guild.users gu
     INNER JOIN guild.users_roles gur ON gu.id = gur.user_id
     INNER JOIN guild.roles gr ON gur.role_id = gr.id
-	WHERE gr.name = "LOG") as result
+	WHERE gr.name = 'LOG') as result
 );
 END;
 $BODY$;

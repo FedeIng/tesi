@@ -3,7 +3,7 @@ import telepot
 from data_structs.status import Status
 from databases.database_class import Database
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
-from library import send_bug
+from library import send_bug, send_message, tag_group
 
 class Bot:
 

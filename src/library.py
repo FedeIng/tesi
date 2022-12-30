@@ -4,6 +4,7 @@ from databases.database_class import Database
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 from telepot.exception import TelegramError, BotWasBlockedError
 import os
+import emoji
 
 db = Database()
 telegram_error = "TelegramError"
@@ -18,12 +19,14 @@ def send_message(bot,chat_id,string,reply_markup=ReplyKeyboardRemove(selective=T
     global db
     try:
         return bot.sendMessage(chat_id,string,reply_markup=reply_markup)
-    except TelegramError:
-        db.get_postgres().run_function("insert_exception",str(chat_id),f"'{telegram_error}'",f"'{str(e)}'",str(1))
+    except TelegramError as e:
+        e_str = str(e).replace("'","''")
+        db.get_postgres().run_function("insert_exception",str(chat_id),f"'{telegram_error}'",f"'{e_str}'",str(1))
         if recursive:
             send_logs("ERROR",e,chat_id)
-    except BotWasBlockedError:
-        db.get_postgres().run_function("insert_exception",str(chat_id),f"'{bot_was_blocked_error}'",f"'{str(e)}'",str(2))
+    except BotWasBlockedError as e:
+        e_str = str(e).replace("'","''")
+        db.get_postgres().run_function("insert_exception",str(chat_id),f"'{bot_was_blocked_error}'",f"'{e_str}'",str(2))
         if recursive:
             send_logs("ERROR",e,chat_id)
 
@@ -61,7 +64,7 @@ def send_logs(level,name,chat_id,recursive=False):
     logs_users=db.get_postgres().run_function("telegram_id_logs_get")
     logs_string=format_logs_string(level,name,chat_id)
     for logs_user in logs_users:
-        send_message(db.get_bot_logs(),logs_user,logs_string,recursive=recursive)
+        send_message(db.get_bot_logs().get_bot(),logs_user,logs_string,recursive=recursive)
 
 def format_logs_string(level,name,chat_id):
     match level:

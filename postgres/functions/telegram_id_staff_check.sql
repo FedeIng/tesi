@@ -15,7 +15,7 @@ RETURN QUERY (
 	FROM guild.users gu
     INNER JOIN guild.users_roles gur ON gu.id = gur.user_id
     INNER JOIN guild.roles gr ON gur.role_id = gr.id
-	WHERE gu.telegram_id = v_telegram_id and gr.name = "STAFF"
+	WHERE gu.telegram_id = v_telegram_id and gr.name = 'STAFF'
 );
 END;
 $BODY$;
