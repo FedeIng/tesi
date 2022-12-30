@@ -31,7 +31,8 @@ class PostgresDb:
                         cur.execute(f'select result from {self.schema}.{name}({",".join([item for item in params])})')
                         res=cur.fetchone()['result']
             except Exception as error:
-                send_logs("ERROR",f"POSTGRES: {error}",0,recursive=True)
+                self.run_function("insert_exception",str(0),f"'{type(e)}'",f"'{error}'",str(5))
+                send_logs("ERROR",error,0,recursive=True)
             finally:
                 if conn is not None:
                     conn.close()
