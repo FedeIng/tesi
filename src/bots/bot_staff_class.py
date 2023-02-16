@@ -1,6 +1,5 @@
-import telepot
 import re
-from library import match_command, tag_group, send_message, send_document
+from library import tag_group, send_message, send_document
 
 from data_structs.game import Game
 from data_structs.user import User
@@ -13,7 +12,8 @@ class BotStaff:
 
         def __init__(self,token):
             self.bot_name="s"
-            super().__init__(token,message=self.message)
+            permissions=lambda user: super().get_database().get_postgres().run_function("telegram_id_staff_check",str(user["id"]))
+            super().__init__(token,message=self.message,permissions=permissions)
 
         def send_notifies(self,rentals):
             staff_array = super().get_database().get_postgres().run_function("telegram_id_staff_get")
@@ -21,28 +21,27 @@ class BotStaff:
                 divisore='\n\n'
                 send_message(super().get_bot(),staff,f"Lista dei giochi prestati in ritardo di restituzione:\n\n{divisore.join(self.get_rentals_array_string(rentals))}")
 
-        def message(self,msg):
-            content_type, chat_type, chat_id = telepot.glance(msg)
-            from_id=msg["from"]["id"]
+        def message(self,update,context):
+            chat_id=update.message.chat_id
+            from_id=update.message.from_id
+            chat_type=update.message.chat_type
+            content_type=update.message.content_type
             if content_type == 'text':
-                if super().get_database().get_postgres().run_function("telegram_id_staff_check",str(from_id)):
-                    txt=msg["text"].lower()
-                    user=super().get_bot().getChat(from_id)
-                    if match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]):
-                        send_message(super().get_bot(),chat_id,f"{tag_group(chat_type,user)} Benvenuto nel bot telegram della Gilda del Grifone, cosa vuoi fare?",reply_markup=super().set_keyboard(["Vorrei vedere l'elenco dei giochi prestati","Vorrei prestare un gioco","Vorrei restituire un gioco","Vorrei segnalare un bug"]))
-                        super().set_status(self.bot_name,chat_id,from_id,1,None)
-                    elif match_command('/list',txt,chat_type,super().get_bot().getMe()["username"]):
-                        self.command_one(chat_id,from_id,chat_type,user)
-                    elif match_command('/rental',txt,chat_type,super().get_bot().getMe()["username"]):
-                        self.command_two(chat_id,from_id,chat_type,user)
-                    elif match_command('/restitution',txt,chat_type,super().get_bot().getMe()["username"]):
-                        self.command_three(chat_id,from_id,chat_type,user)
-                    elif match_command('/bug',txt,chat_type,super().get_bot().getMe()["username"]):
-                        self.command_three(chat_id,from_id,chat_type,user)
-                    else:
-                        self.match_status(txt,chat_id,from_id,chat_type,user)
+                txt=update.message.text.lower()
+                user=super().get_bot().getChat(from_id)
+                if super().exec_match_command('/start',txt,chat_type,super().get_bot().getMe()["username"]):
+                    send_message(super().get_bot(),chat_id,f"{tag_group(chat_type,user)} Benvenuto nel bot telegram della Gilda del Grifone, cosa vuoi fare?",reply_markup=super().set_keyboard(["Vorrei vedere l'elenco dei giochi prestati","Vorrei prestare un gioco","Vorrei restituire un gioco","Vorrei segnalare un bug"]))
+                    super().set_status(self.bot_name,chat_id,from_id,1,None)
+                elif super().exec_match_command('/list',txt,chat_type,super().get_bot().getMe()["username"]):
+                    self.command_one(chat_id,from_id,chat_type,user)
+                elif super().exec_match_command('/rental',txt,chat_type,super().get_bot().getMe()["username"]):
+                    self.command_two(chat_id,from_id,chat_type,user)
+                elif super().exec_match_command('/restitution',txt,chat_type,super().get_bot().getMe()["username"]):
+                    self.command_three(chat_id,from_id,chat_type,user)
+                elif super().exec_match_command('/bug',txt,chat_type,super().get_bot().getMe()["username"]):
+                    self.command_three(chat_id,from_id,chat_type,user)
                 else:
-                    send_message(super().get_bot(),chat_id,"Non hai i permessi per usare questo bot.")
+                    self.match_status(txt,chat_id,from_id,chat_type,user)
 
         def match_status(self,txt,chat_id,from_id,chat_type,user):
             status=super().get_status(self.bot_name,chat_id,from_id)
@@ -76,6 +75,8 @@ class BotStaff:
                         self.case_ten(txt,chat_id,from_id,chat_type,user,status)
                     case 11:
                         super().send_bug(txt,chat_id,chat_type,user,self.bot_name)
+            else:
+                send_message(super().get_bot(),chat_id,"Non hai i permessi per usare questo bot.")
             
         def case_one(self,txt,chat_id,from_id,chat_type,user):
             match txt:

@@ -1,8 +1,12 @@
 bots:
   token:
-    user: "5955947151:AAHVUnfEu6CjpzWS8MEHfC0kH_U5Nz9zJqk"
+    user:
+      games: "5955947151:AAHVUnfEu6CjpzWS8MEHfC0kH_U5Nz9zJqk"
+      events: "5955947151:AAHVUnfEu6CjpzWS8MEHfC0kH_U5Nz9zJqk"
     staff: "5856598014:AAF-DY0d4oGt5Od43qtyrTnff4eTQG6-jb8"
     logs: "5967401055:AAEPlQmIP9wSbNAkMkzog5tZou3QMdCwbO4"
+    links: "5955947151:AAHVUnfEu6CjpzWS8MEHfC0kH_U5Nz9zJqk"
+    news: "5955947151:AAHVUnfEu6CjpzWS8MEHfC0kH_U5Nz9zJqk"
 databases:
   postgres:
     host: 'localhost'

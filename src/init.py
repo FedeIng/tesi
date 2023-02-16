@@ -5,14 +5,16 @@ from databases.database_class import Database
 from databases.postgres_class import PostgresDb
 from databases.redis_class import RedisDb
 from bots.bot_staff_class import BotStaff
-from bots.bot_user_class import BotUser
+from bots.bot_user_games_class import BotUserGames
+from bots.bot_user_events_class import BotUserEvents
 from bots.bot_logs_class import BotLogs
+from bots.bot_news_class import BotNews
 
-def work(bot_staff, bot_user, database):
+def work(bot_staff, bot_user_games, database):
     rentals = database.get_postgres().run_function("rental_get_two_weeks")
     if len(rentals) > 0:
         bot_staff.send_notifies(rentals)
-        bot_user.send_notifies(rentals)
+        bot_user_games.send_notifies(rentals)
 
 if __name__ == "__main__":
     config=Config()
@@ -26,12 +28,16 @@ if __name__ == "__main__":
 
     bot_staff=BotStaff(config.get_staff_token())
     database.set_bot_staff(bot_staff)
-    bot_user=BotUser(config.get_user_token())
-    database.set_bot_staff(bot_user)
+    bot_user_games=BotUserGames(config.get_user_games_token())
+    database.set_bot_user_game(bot_user_games)
+    bot_user_events=BotUserEvents(config.get_user_events_token())
+    database.set_bot_user_event(bot_user_events)
     bot_logs=BotLogs(config.get_logs_token())
     database.set_bot_logs(bot_logs)
+    bot_news=BotNews(config.get_news_token())
+    database.set_bot_news(bot_news)
 
-    schedule.every().day.at("12:00").do(lambda: work(bot_staff, bot_user, database))
+    schedule.every().day.at("12:00").do(lambda: work(bot_staff, bot_user_games, database))
 
     print("Init complete")
 

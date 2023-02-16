@@ -4,7 +4,7 @@ class BotLogs:
     class Singleton(Bot):
 
         def __init__(self,token):
-            self.bot_name="l"
+            self.bot_name="lo"
             super().__init__(token)
     
     instance = None

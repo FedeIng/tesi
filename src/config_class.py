@@ -7,9 +7,12 @@ class Config:
         def __init__(self):
             with open('./config.yaml') as f:
                 data=yaml.load(f, Loader=yaml.FullLoader)
-                self.user_token=data['bots']['token']['user']
+                self.user_games_token=data['bots']['token']['user']['games']
+                self.user_events_token=data['bots']['token']['user']['events']
                 self.staff_token=data['bots']['token']['staff']
                 self.logs_token=data['bots']['token']['logs']
+                self.news_token=data['bots']['token']['news']
+                self.links_token=data['bots']['token']['links']
                 self.postgres_host=data['databases']['postgres']['host']
                 self.postgres_database=data['databases']['postgres']['database']
                 self.postgres_username=data['databases']['postgres']['username']
@@ -19,14 +22,23 @@ class Config:
                 self.redis_host=data['databases']['redis']['host']
                 self.redis_port=data['databases']['redis']['port']
 
-        def get_user_token(self):
-            return self.user_token
+        def get_user_games_token(self):
+            return self.user_games_token
+        
+        def get_user_events_token(self):
+            return self.user_events_token
         
         def get_staff_token(self):
             return self.staff_token
 
         def get_logs_token(self):
             return self.logs_token
+
+        def get_news_token(self):
+            return self.news_token
+
+        def get_links_token(self):
+            return self.links_token
 
         def get_postgres_host(self):
             return self.postgres_host

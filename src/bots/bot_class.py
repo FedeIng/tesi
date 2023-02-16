@@ -1,18 +1,26 @@
-import telepot
+from telegram.ext import Updater, MessageHandler, Filters, CallbackQueryHandler
+from telegram import ReplyKeyboardMarkup, KeyboardButton, Bot
 
 from data_structs.status import Status
 from databases.database_class import Database
-from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
-from library import send_bug, send_message, tag_group
+from library import send_bug, send_message, tag_group, match_command
 
 class Bot:
 
-    def __init__(self,token,message=lambda msg : None,query=lambda msg : None):
+    def __init__(self,token,message=lambda update, context : None,query=lambda update, context : None, permissions=lambda user : True):
         self.token=token
-        self.bot_instance=telepot.Bot(token)
+        self.bot_instance=Bot(token)
         self.database=Database()
-        self.bot_instance.message_loop({'chat':message,'callback_query':query})
-        self.error_string = "Comando non trovato, si prega di rieseguire il comando \start."
+        self.updater=Updater(token, use_context=True)
+        self.updater.dispatcher.add_handler(MessageHandler(Filters.text, message))
+        self.updater.dispatcher.add_handler(CallbackQueryHandler(query))
+        self.updater.start_polling()
+        self.updater.idle()
+        self.match_command = lambda command,txt,chat_type,user: match_command(command,txt,chat_type,user) and permissions(user)
+        self.error_string="Comando non trovato, si prega di rieseguire il comando \start."
+
+    def exec_match_command(self,command,txt,chat_type,user):
+        return self.match_command(command,txt,chat_type,user)
 
     def get_bot(self):
         return self.bot_instance

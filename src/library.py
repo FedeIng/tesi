@@ -1,8 +1,7 @@
-import telepot
+from telegram import TelegramError, BotWasBlockedError, ReplyKeyboardRemove
+
 import datetime
 from databases.database_class import Database
-from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
-from telepot.exception import TelegramError, BotWasBlockedError
 import os
 import emoji
 
