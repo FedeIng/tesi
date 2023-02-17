@@ -33,7 +33,7 @@ class BotStaff:
             elif match_command('/restitution',txt,chat_type,super().get_bot().getMe()["username"]):
                 self.command_three(chat_id,from_id,chat_type,user)
             elif match_command('/bug',txt,chat_type,super().get_bot().getMe()["username"]):
-                self.command_three(chat_id,from_id,chat_type,user)
+                self.command_four(chat_id,from_id,chat_type,user)
             else:
                 self.match_status(txt,chat_id,from_id,chat_type,user)
 
