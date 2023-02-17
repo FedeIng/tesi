@@ -11,10 +11,10 @@ from bots.user.bot_user_events_class import BotUserEvents
 from bots.bot_logs_class import BotLogs
 from bots.bot_news_class import BotNews
 
-def work(bot_staff, bot_user_games, database):
+def work(bot_staff_games, bot_user_games, database):
     rentals = database.get_postgres().run_function("rental_get_two_weeks")
     if len(rentals) > 0:
-        bot_staff.send_notifies(rentals)
+        bot_staff_games.send_notifies(rentals)
         bot_user_games.send_notifies(rentals)
 
 if __name__ == "__main__":
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     bot_news=BotNews(config.get_news_token())
     database.set_bot_news(bot_news)
 
-    schedule.every().day.at("12:00").do(lambda: work(bot_staff, bot_user_games, database))
+    schedule.every().day.at("12:00").do(lambda: work(bot_staff_games, bot_user_games, database))
 
     print("Init complete")
 
