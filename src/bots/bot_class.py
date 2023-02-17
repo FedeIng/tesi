@@ -3,24 +3,34 @@ from telegram import ReplyKeyboardMarkup, KeyboardButton, Bot
 
 from data_structs.status import Status
 from databases.database_class import Database
-from library import send_bug, send_message, tag_group, match_command
+from library import send_bug, send_message, tag_group
 
 class Bot:
 
-    def __init__(self,token,message=lambda update, context : None,query=lambda update, context : None, permissions=lambda user : True):
+    def __init__(self,token,match_command_handler=lambda chat_id,from_id,chat_type,content_type,txt,user : None,permissions=lambda user : True):
         self.token=token
+        self.permissions=permissions
+        self.match_command_handler=match_command_handler
         self.bot_instance=Bot(token)
         self.database=Database()
-        self.updater=Updater(token, use_context=True)
-        self.updater.dispatcher.add_handler(MessageHandler(Filters.text, message))
-        self.updater.dispatcher.add_handler(CallbackQueryHandler(query))
+        self.updater=Updater(token,use_context=True)
+        self.updater.dispatcher.add_handler(MessageHandler(Filters.text,self.message_handler))
         self.updater.start_polling()
         self.updater.idle()
-        self.match_command = lambda command,txt,chat_type,user: match_command(command,txt,chat_type,user) and permissions(user)
         self.error_string="Comando non trovato, si prega di rieseguire il comando \start."
-
-    def exec_match_command(self,command,txt,chat_type,user):
-        return self.match_command(command,txt,chat_type,user)
+        
+    def message_handler(self,update,context):
+        chat_id,from_id,chat_type,content_type=self.glance(update.message)
+        if content_type == 'text':
+            txt=update.message.text.lower()
+            user=self.get_bot().getChat(from_id)
+            if self.permissions(user):
+                self.match_command_handler(chat_id,from_id,chat_type,content_type,txt,user)
+            else:
+                send_message(self.get_bot(),chat_id,"Non hai i permessi per usare questo bot.")
+    
+    def glance(self,message):
+        return message.chat_id, message.from_id, message.chat_type, message.content_type
 
     def get_bot(self):
         return self.bot_instance

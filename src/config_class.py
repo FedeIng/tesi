@@ -10,6 +10,7 @@ class Config:
                 self.user_games_token=data['bots']['token']['user']['games']
                 self.user_events_token=data['bots']['token']['user']['events']
                 self.staff_token=data['bots']['token']['staff']
+                self.events_maker_token=data['bots']['token']['events_maker']
                 self.logs_token=data['bots']['token']['logs']
                 self.news_token=data['bots']['token']['news']
                 self.links_token=data['bots']['token']['links']
@@ -30,6 +31,9 @@ class Config:
         
         def get_staff_token(self):
             return self.staff_token
+        
+        def get_events_maker_token(self):
+            return self.events_maker_token
 
         def get_logs_token(self):
             return self.logs_token
