@@ -6,7 +6,8 @@ class Database:
         def __init__(self):
             self.postgres=None
             self.redis=None
-            self.bot_staff=None
+            self.bot_staff_games=None
+            self.bot_staff_events=None
             self.bot_events_maker=None
             self.bot_user_games=None
             self.bot_user_events=None
@@ -25,11 +26,17 @@ class Database:
         def get_redis(self):
             return self.redis    
 
-        def set_bot_staff(self,bot):
-            self.bot_staff=bot
+        def set_bot_staff_games(self,bot):
+            self.bot_staff_games=bot
 
-        def get_bot_staff(self):
-            return self.bot_staff
+        def get_bot_staff_games(self):
+            return self.bot_staff_games
+        
+        def set_bot_staff_events(self,bot):
+            self.bot_staff_events=bot
+
+        def get_bot_staff_events(self):
+            return self.bot_staff_events
         
         def set_bot_events_maker(self,bot):
             self.bot_event_maker=bot

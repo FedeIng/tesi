@@ -9,7 +9,8 @@ class Config:
                 data=yaml.load(f, Loader=yaml.FullLoader)
                 self.user_games_token=data['bots']['token']['user']['games']
                 self.user_events_token=data['bots']['token']['user']['events']
-                self.staff_token=data['bots']['token']['staff']
+                self.staff_games_token=data['bots']['token']['staff']['games']
+                self.staff_events_token=data['bots']['token']['staff']['events']
                 self.events_maker_token=data['bots']['token']['events_maker']
                 self.logs_token=data['bots']['token']['logs']
                 self.news_token=data['bots']['token']['news']
@@ -29,8 +30,11 @@ class Config:
         def get_user_events_token(self):
             return self.user_events_token
         
-        def get_staff_token(self):
-            return self.staff_token
+        def get_staff_games_token(self):
+            return self.staff_games_token
+        
+        def get_staff_events_token(self):
+            return self.staff_events_token
         
         def get_events_maker_token(self):
             return self.events_maker_token

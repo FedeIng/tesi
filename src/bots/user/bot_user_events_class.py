@@ -1,9 +1,9 @@
 from library import match_command, tag_group, send_message, send_document, match_command
 
-from bots.bot_class import Bot
+from bots.user.bot_user_class import BotUser
 
 class BotUserEvents:
-    class Singleton(Bot):
+    class Singleton(BotUser):
 
         def __init__(self,token):
             self.bot_name="ue"

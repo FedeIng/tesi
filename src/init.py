@@ -4,9 +4,10 @@ from config_class import Config
 from databases.database_class import Database
 from databases.postgres_class import PostgresDb
 from databases.redis_class import RedisDb
-from bots.bot_staff_class import BotStaff
-from bots.bot_user_games_class import BotUserGames
-from bots.bot_user_events_class import BotUserEvents
+from bots.staff.bot_staff_games_class import BotStaffGames
+from bots.staff.bot_staff_events_class import BotStaffEvents
+from bots.user.bot_user_games_class import BotUserGames
+from bots.user.bot_user_events_class import BotUserEvents
 from bots.bot_logs_class import BotLogs
 from bots.bot_news_class import BotNews
 
@@ -26,8 +27,10 @@ if __name__ == "__main__":
     redis=RedisDb(config.get_redis_host(),config.get_redis_port())
     database.set_redis(redis)
 
-    bot_staff=BotStaff(config.get_staff_token())
-    database.set_bot_staff(bot_staff)
+    bot_staff_games=BotStaffGames(config.get_staff_games_token())
+    database.set_bot_staff_games(bot_staff_games)
+    bot_staff_events=BotStaffEvents(config.get_staff_events_token())
+    database.set_bot_staff_events(bot_staff_events)
     bot_events_maker=BotUserGames(config.get_events_maker_token())
     database.set_bot_events_maker(bot_events_maker)
     bot_user_games=BotUserGames(config.get_user_games_token())

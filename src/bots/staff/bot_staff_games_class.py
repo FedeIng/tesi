@@ -4,17 +4,14 @@ from library import tag_group, send_message, send_document, match_command
 from data_structs.game import Game
 from data_structs.user import User
 from data_structs.rental import Rental
-from bots.bot_class import Bot
+from bots.staff.bot_staff_class import BotStaff
 
-class BotStaff:
-    class Singleton(Bot):
+class BotStaffGames:
+    class Singleton(BotStaff):
 
         def __init__(self,token):
-            self.bot_name="s"
-            super().__init__(token,match_command_handler=self.match_command_handler,permissions=self.permissions)
-            
-        def permissions(self,user):
-            return super().get_database().get_postgres().run_function("telegram_id_staff_check",str(user["id"]))
+            self.bot_name="sg"
+            super().__init__(token,match_command_handler=self.match_command_handler)
 
         def send_notifies(self,rentals):
             staff_array = super().get_database().get_postgres().run_function("telegram_id_staff_get")
@@ -258,6 +255,6 @@ class BotStaff:
 
     instance = None
     def __new__(cls,token): # __new__ always a classmethod
-        if not BotStaff.instance:
-            BotStaff.instance = BotStaff.Singleton(token)
-        return BotStaff.instance
+        if not BotStaffGames.instance:
+            BotStaffGames.instance = BotStaffGames.Singleton(token)
+        return BotStaffGames.instance

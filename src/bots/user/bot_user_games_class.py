@@ -3,10 +3,10 @@ from library import tag_group, send_message, send_document, match_command
 from data_structs.game import Game
 from data_structs.user import User
 from data_structs.rental import Rental
-from bots.bot_class import Bot
+from bots.user.bot_user_class import BotUser
 
 class BotUserGames:
-    class Singleton(Bot):
+    class Singleton(BotUser):
 
         def __init__(self,token):
             self.bot_name="ug"
