@@ -25,7 +25,7 @@ class BotLinks:
                 bot_array=self.create_buttons_array(['USER_GAMES','USER_EVENTS','NEWS']+user_powers)
                 send_message(super().get_bot(),chat_id,f"{tag_group(chat_type,user)} Benvenuto nel bot telegram della Gilda del Grifone, cosa bot vuoi usare?",reply_markup=super().set_keyboard(["Vorrei vedere l'elenco dei giochi disponibili","Vorrei prendere un gioco","Vorrei segnalare un bug"]))
 
-        def create_buttons_array(self):
+        def create_buttons_array(self,button_list):
             btn_array=[]
             for elem in button_list:
                 btn_array.append(self.button_bot_dict[elem])
