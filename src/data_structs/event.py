@@ -44,7 +44,7 @@ class Event:
             return "NULL"
         return f"'{self.date}'"
     
-    def set_description(self,date):
+    def set_description(self,description):
         self.description=description
 
     def get_description(self):
