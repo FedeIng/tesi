@@ -28,3 +28,6 @@ class BotUser(Bot):
     
     def match_status(self,txt,chat_id,from_id,chat_type,user,bot_name):
         super().match_status(txt,chat_id,from_id,chat_type,user,bot_name)
+        
+    def get_error_string(self):
+        return super().get_error_string()

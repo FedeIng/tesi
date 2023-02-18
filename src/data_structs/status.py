@@ -1,6 +1,7 @@
 from data_structs.game import Game
 from data_structs.user import User
 from data_structs.rental import Rental
+from data_structs.event import Event
 
 class Status:
 
@@ -12,11 +13,13 @@ class Status:
         elif dictionary!=None:
             match dictionary["class_name"]:
                 case "Game":
-                     self.obj=User(dictionary)
+                    self.obj=User(dictionary)
                 case "User":
-                     self.obj=User(dictionary)
+                    self.obj=User(dictionary)
                 case "Rental":
-                     self.obj=Rental(dictionary)
+                    self.obj=Rental(dictionary)
+                case "Event":
+                    self.obj=Event(dictionary)
 
     def __dict__(self):
         obj={

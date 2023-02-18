@@ -11,11 +11,15 @@ from bots.user.bot_user_events_class import BotUserEvents
 from bots.bot_logs_class import BotLogs
 from bots.bot_news_class import BotNews
 
-def work(bot_staff_games, bot_user_games, database):
+def work(bot_staff_games, bot_user_games, bot_events_maker, bot_user_events, database):
     rentals = database.get_postgres().run_function("rental_get_two_weeks")
     if len(rentals) > 0:
         bot_staff_games.send_notifies(rentals)
         bot_user_games.send_notifies(rentals)
+    events = database.get_postgres().run_function("event_get_today")
+    if len(events) > 0:
+        bot_events_maker.send_notifies(events)
+        bot_user_events.send_notifies(events)
 
 if __name__ == "__main__":
     config=Config()
@@ -42,7 +46,7 @@ if __name__ == "__main__":
     bot_news=BotNews(config.get_news_token())
     database.set_bot_news(bot_news)
 
-    schedule.every().day.at("12:00").do(lambda: work(bot_staff_games, bot_user_games, database))
+    schedule.every().day.at("12:00").do(lambda: work(bot_staff_games, bot_user_games, bot_events_maker, bot_user_events, database))
 
     print("Init complete")
 

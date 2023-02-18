@@ -11,7 +11,7 @@ class BotUserGames:
         def __init__(self,token):
             self.bot_name="ug"
             self.retry_string="Purtroppo la tua prenotazione non è andata a buon fine. Riesegui il comando /start e riprova."
-            super().__init__(token,match_command_handler=self.match_command_handler,permissions=self.permissions)
+            super().__init__(token,match_command_handler=self.match_command_handler,match_status=self.match_status)
 
         def permissions(self,user):
             return super().get_database().get_postgres().run_function("user_set",str(user["id"]),f"'{user['first_name'].lower()}'",f"'{user['last_name'].lower()}'",f"'{user['username'].lower()}'")
@@ -31,20 +31,18 @@ class BotUserGames:
             elif match_command('/bug',txt,chat_type,user):
                 self.command_three(chat_id,from_id,chat_type,user)
             else:
-                self.match_status(txt,chat_id,from_id,chat_type,user)
+                super().match_status(txt,chat_id,from_id,chat_type,user)
         
-        def match_status(self,txt,chat_id,from_id,chat_type,user):
-            status=super().get_status(self.bot_name,chat_id,from_id)
-            if status!=None:
-                match status.id:
-                    case 1:
-                        self.case_one(txt,chat_id,from_id,chat_type,user)
-                    case 2:
-                        self.case_two(txt,chat_id,from_id,chat_type,user)
-                    case 3:
-                        self.case_three(txt,chat_id,from_id,chat_type,user,status)
-                    case 4:
-                        super().send_bug(txt,chat_id,chat_type,user,self.bot_name)
+        def match_status(self,txt,chat_id,from_id,chat_type,user,status):
+            match status.id:
+                case 1:
+                    self.case_one(txt,chat_id,from_id,chat_type,user)
+                case 2:
+                    self.case_two(txt,chat_id,from_id,chat_type,user)
+                case 3:
+                    self.case_three(txt,chat_id,from_id,chat_type,user,status)
+                case 4:
+                    super().send_bug(txt,chat_id,chat_type,user,self.bot_name)
                                 
         def case_one(self,txt,chat_id,from_id,chat_type,user):
             match txt:

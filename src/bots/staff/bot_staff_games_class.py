@@ -11,7 +11,7 @@ class BotStaffGames:
 
         def __init__(self,token):
             self.bot_name="sg"
-            super().__init__(token,match_command_handler=self.match_command_handler)
+            super().__init__(token,match_command_handler=self.match_command_handler,match_status=self.match_status)
 
         def send_notifies(self,rentals):
             staff_array = super().get_database().get_postgres().run_function("telegram_id_staff_get")
@@ -32,7 +32,7 @@ class BotStaffGames:
             elif match_command('/bug',txt,chat_type,super().get_bot().getMe()["username"]):
                 self.command_four(chat_id,from_id,chat_type,user)
             else:
-                self.match_status(txt,chat_id,from_id,chat_type,user)
+                super().match_status(txt,chat_id,from_id,chat_type,user)
 
         def match_status(self,txt,chat_id,from_id,chat_type,user,status):
             match status.id:
