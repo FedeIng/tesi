@@ -11,7 +11,7 @@ class BotLinks:
             self.bot_name="li"
             self.button_bot_dict={
                 "USER":[[InlineKeyboardButton(text=emoji.emojize(f":video_game: Bot per prendere in prestito i giochi :video_game:"),url=self.create_link(super().get_database().get_bot_user_games()))],[InlineKeyboardButton(text=emoji.emojize(f":tada: Bot per partecipare agli eventi :tada:"),url=self.create_link(super().get_database().get_bot_user_events()))]],
-                "STAFF":[[InlineKeyboardButton(text=emoji.emojize(f":man: Bot per lo staff :man:"),url=self.create_link(super().get_database().get_bot_staff()))]],
+                "STAFF":[[InlineKeyboardButton(text=emoji.emojize(f":man: Bot per lo staff per i giochi :man:"),url=self.create_link(super().get_database().get_bot_staff_games()))],[InlineKeyboardButton(text=emoji.emojize(f":man_artist: Bot per lo staff per gli eventi :man_artist:"),url=self.create_link(super().get_database().get_bot_staff_events()))]],
                 "EVENT_MAKER":[[InlineKeyboardButton(text=emoji.emojize(f":construction_worker: Bot per la creazione di eventi :construction_worker:"),url=self.create_link(super().get_database().get_bot_staff()))]],
                 "LOG":[[InlineKeyboardButton(text=emoji.emojize(f":writing_hand: Bot per la gestione dei log :writing_hand:"),url=self.create_link(super().get_database().get_bot_logs()))]],
                 "NEWS":[[InlineKeyboardButton(text=emoji.emojize(f":newspaper: Bot per la gestione dei log :newspaper:"),url=self.create_link(super().get_database().get_bot_news()))]]

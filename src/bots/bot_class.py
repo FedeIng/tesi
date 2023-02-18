@@ -7,10 +7,11 @@ from library import send_bug, send_message, tag_group
 
 class Bot:
 
-    def __init__(self,token,match_command_handler=lambda chat_id,from_id,chat_type,content_type,txt,user : None,permissions=lambda user : True):
+    def __init__(self,token,match_command_handler=lambda chat_id,from_id,chat_type,content_type,txt,user : None,status_switcher=lambda txt,chat_id,from_id,chat_type,user,status : None,permissions=lambda user : True):
         self.token=token
         self.permissions=permissions
         self.match_command_handler=match_command_handler
+        self.status_switcher=status_switcher
         self.bot_instance=Bot(token)
         self.database=Database()
         self.updater=Updater(token,use_context=True)
@@ -53,6 +54,11 @@ class Bot:
     def send_bug(self,txt,chat_id,chat_type,user,bot_name):
         send_message(self.bot_instance,chat_id,f"{tag_group(chat_type,user)} Bug segnalato.")
         send_bug(bot_name,chat_id,txt)
+        
+    def match_status(self,txt,chat_id,from_id,chat_type,user,bot_name):
+        status=self.get_status(bot_name,chat_id,from_id)
+        if status!=None:
+            self.status_switcher(txt,chat_id,from_id,chat_type,user,status)
 
     def set_keyboard(self,string_array,bool_var=True):
         i=0

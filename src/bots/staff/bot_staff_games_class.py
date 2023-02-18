@@ -34,38 +34,36 @@ class BotStaffGames:
             else:
                 self.match_status(txt,chat_id,from_id,chat_type,user)
 
-        def match_status(self,txt,chat_id,from_id,chat_type,user):
-            status=super().get_status(self.bot_name,chat_id,from_id)
-            if status!=None:
-                match status.id:
-                    case 1:
-                        self.case_one(txt,chat_id,from_id,chat_type,user)
-                    case 2:
-                        self.case_two(txt,chat_id,from_id,chat_type,user)
-                    case 3:
-                        self.case_three(txt,chat_id,from_id,chat_type,user)
-                    case 4:
-                        self.case_four(txt,chat_id,from_id,chat_type,user,status)
-                    case 5:
-                        self.case_five(txt,chat_id,from_id,chat_type,user,status)
-                    case 6:
-                        self.case_six(txt,chat_id,from_id,chat_type,user,status)
-                    case 7:
-                        send_message(super().get_bot(),chat_id,f"{tag_group(chat_type,user)} Nome salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
-                        status.obj.user.set_name(txt)
-                        super().set_status(self.bot_name,chat_id,from_id,4,status.obj)
-                    case 8:
-                        send_message(super().get_bot(),chat_id,f"{tag_group(chat_type,user)} Cognome salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
-                        status.obj.user.set_surname(txt)
-                        super().set_status(self.bot_name,chat_id,from_id,4,status.obj)
-                    case 9:
-                        send_message(super().get_bot(),chat_id,f"{tag_group(chat_type,user)} Nickname salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
-                        status.obj.user.set_nickname(txt)
-                        super().set_status(self.bot_name,chat_id,from_id,4,status.obj)
-                    case 10:
-                        self.case_ten(txt,chat_id,from_id,chat_type,user,status)
-                    case 11:
-                        super().send_bug(txt,chat_id,chat_type,user,self.bot_name)
+        def match_status(self,txt,chat_id,from_id,chat_type,user,status):
+            match status.id:
+                case 1:
+                    self.case_one(txt,chat_id,from_id,chat_type,user)
+                case 2:
+                    self.case_two(txt,chat_id,from_id,chat_type,user)
+                case 3:
+                    self.case_three(txt,chat_id,from_id,chat_type,user)
+                case 4:
+                    self.case_four(txt,chat_id,from_id,chat_type,user,status)
+                case 5:
+                    self.case_five(txt,chat_id,from_id,chat_type,user,status)
+                case 6:
+                    self.case_six(txt,chat_id,from_id,chat_type,user,status)
+                case 7:
+                    send_message(super().get_bot(),chat_id,f"{tag_group(chat_type,user)} Nome salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
+                    status.obj.user.set_name(txt)
+                    super().set_status(self.bot_name,chat_id,from_id,4,status.obj)
+                case 8:
+                    send_message(super().get_bot(),chat_id,f"{tag_group(chat_type,user)} Cognome salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
+                    status.obj.user.set_surname(txt)
+                    super().set_status(self.bot_name,chat_id,from_id,4,status.obj)
+                case 9:
+                    send_message(super().get_bot(),chat_id,f"{tag_group(chat_type,user)} Nickname salvato. Vuoi salvare altri dati per questa prenotazione?",reply_markup=super().set_keyboard(["Nome","Cognome","Nickname","Telefono","Ok","Annulla"]))
+                    status.obj.user.set_nickname(txt)
+                    super().set_status(self.bot_name,chat_id,from_id,4,status.obj)
+                case 10:
+                    self.case_ten(txt,chat_id,from_id,chat_type,user,status)
+                case 11:
+                    super().send_bug(txt,chat_id,chat_type,user,self.bot_name)
             
         def case_one(self,txt,chat_id,from_id,chat_type,user):
             match txt:

@@ -2,8 +2,8 @@ from bots.bot_class import Bot
 
 class BotStaff(Bot):
     
-    def __init__(self,token,match_command_handler=lambda chat_id,from_id,chat_type,content_type,txt,user : None):
-        super().__init__(token,match_command_handler=match_command_handler,permissions=self.permissions)
+    def __init__(self,token,match_command_handler=lambda chat_id,from_id,chat_type,content_type,txt,user : None,status_switcher=lambda txt,chat_id,from_id,chat_type,user,status : None):
+        super().__init__(token,match_command_handler=match_command_handler,status_switcher=status_switcher,permissions=self.permissions)
     
     def permissions(self,user):
         return super().get_database().get_postgres().run_function("telegram_id_staff_check",str(user["id"]))
@@ -25,3 +25,6 @@ class BotStaff(Bot):
     
     def set_keyboard(self,array):
         return super().set_keyboard(array)
+    
+    def match_status(self,txt,chat_id,from_id,chat_type,user,bot_name):
+        super().match_status(txt,chat_id,from_id,chat_type,user,bot_name)
