@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS guild.users
+(
+    id bigint NOT NULL DEFAULT nextval('guild.users_id_seq'::regclass),
+    telegram_id bigint,
+    telephone character varying COLLATE pg_catalog."default",
+    name character varying COLLATE pg_catalog."default",
+    surname character varying COLLATE pg_catalog."default",
+    nickname character varying COLLATE pg_catalog."default",
+    CONSTRAINT users_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS guild.users
+    OWNER to postgres;
+
+CREATE INDEX IF NOT EXISTS idx_users_id
+    ON guild.users USING btree
+    (id ASC NULLS LAST)
+    TABLESPACE pg_default;
