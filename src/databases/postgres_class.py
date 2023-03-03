@@ -28,7 +28,8 @@ class PostgresDb:
                     password=self.password,
                     port=self.port) as conn:
                     with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
-                        cur.execute(f'select result from {self.schema}.{name}({",".join([item for item in params])})')
+                        table_name = '{self.schema}.{name}({",".join([item for item in params])})'
+                        cur.execute('select result from %s', (table_name, ))
                         res=cur.fetchone()['result']
             except Exception as error:
                 if recursive:
