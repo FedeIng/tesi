@@ -1,56 +1,48 @@
-from library import tag_group, send_message, send_document
+from library import tag_group, send_message, send_document, match_command
 
 from data_structs.game import Game
 from data_structs.user import User
 from data_structs.rental import Rental
-from bots.bot_class import Bot
-from databases.database_class import Database
+from bots.user.bot_user_class import BotUser
 
 class BotUserGames:
-    class Singleton(Bot):
+    class Singleton(BotUser):
 
         def __init__(self,token):
             self.bot_name="ug"
-            permissions=lambda user: super().get_database().get_postgres().run_function("user_set",str(user["id"]),f"'{user['first_name'].lower()}'",f"'{user['last_name'].lower()}'",f"'{user['username'].lower()}'")
             self.retry_string="Purtroppo la tua prenotazione non è andata a buon fine. Riesegui il comando /start e riprova."
-            super().__init__(token,message=self.message,permissions=permissions)
+            super().__init__(token,match_command_handler=self.match_command_handler,match_status=self.match_status)
 
+        def permissions(self,user):
+            return super().get_database().get_postgres().run_function("user_set",str(user["id"]),f"'{user['first_name'].lower()}'",f"'{user['last_name'].lower()}'",f"'{user['username'].lower()}'")
+        
         def send_notifies(self,rentals):
             for rental in rentals:
                 send_message(super().get_bot(),rental["user_telegram_id"],f"Ricordati di restituire il gioco: {rental['game_name']}.")
 
-        def message(self,update,context):
-            chat_id=update.message.chat_id
-            from_id=update.message.from_id
-            chat_type=update.message.chat_type
-            content_type=update.message.content_type
-            if content_type == 'text':
-                txt=update.message.text.lower()
-                user=super().get_bot().getChat(from_id)
-                if super().exec_match_command('/start',txt,chat_type,user):
-                    send_message(super().get_bot(),chat_id,f"{tag_group(chat_type,user)} Benvenuto nel bot telegram della Gilda del Grifone, cosa vuoi fare?",reply_markup=super().set_keyboard(["Vorrei vedere l'elenco dei giochi disponibili","Vorrei prendere un gioco","Vorrei segnalare un bug"]))
-                    super().set_status(self.bot_name,chat_id,from_id,1,None)
-                elif super().exec_match_command('/list',txt,chat_type,user):
-                    self.command_one(chat_id,from_id,chat_type,user)
-                elif super().exec_match_command('/rental',txt,chat_type,user):
-                    self.command_two(chat_id,from_id,chat_type,user)
-                elif super().exec_match_command('/bug',txt,chat_type,user):
-                    self.command_three(chat_id,from_id,chat_type,user)
-                else:
-                    self.match_status(txt,chat_id,from_id,chat_type,user)
+        def match_command_handler(self,chat_id,from_id,chat_type,content_type,txt,user):
+            if match_command('/start',txt,chat_type,user):
+                send_message(super().get_bot(),chat_id,f"{tag_group(chat_type,user)} Benvenuto nel bot telegram della Gilda del Grifone, cosa vuoi fare?",reply_markup=super().set_keyboard(["Vorrei vedere l'elenco dei giochi disponibili","Vorrei prendere un gioco","Vorrei segnalare un bug"]))
+                super().set_status(self.bot_name,chat_id,from_id,1,None)
+            elif match_command('/list',txt,chat_type,user):
+                self.command_one(chat_id,from_id,chat_type,user)
+            elif match_command('/rental',txt,chat_type,user):
+                self.command_two(chat_id,from_id,chat_type,user)
+            elif match_command('/bug',txt,chat_type,user):
+                self.command_three(chat_id,from_id,chat_type,user)
+            else:
+                super().match_status(txt,chat_id,from_id,chat_type,user)
         
-        def match_status(self,txt,chat_id,from_id,chat_type,user):
-            status=super().get_status(self.bot_name,chat_id,from_id)
-            if status!=None:
-                match status.id:
-                    case 1:
-                        self.case_one(txt,chat_id,from_id,chat_type,user)
-                    case 2:
-                        self.case_two(txt,chat_id,from_id,chat_type,user)
-                    case 3:
-                        self.case_three(txt,chat_id,from_id,chat_type,user,status)
-                    case 4:
-                        super().send_bug(txt,chat_id,chat_type,user,self.bot_name)
+        def match_status(self,txt,chat_id,from_id,chat_type,user,status):
+            match status.id:
+                case 1:
+                    self.case_one(txt,chat_id,from_id,chat_type,user)
+                case 2:
+                    self.case_two(txt,chat_id,from_id,chat_type,user)
+                case 3:
+                    self.case_three(txt,chat_id,from_id,chat_type,user,status)
+                case 4:
+                    super().send_bug(txt,chat_id,chat_type,user,self.bot_name)
                                 
         def case_one(self,txt,chat_id,from_id,chat_type,user):
             match txt:

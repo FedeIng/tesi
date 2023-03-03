@@ -6,10 +6,13 @@ class Database:
         def __init__(self):
             self.postgres=None
             self.redis=None
-            self.bot_staff=None   
-            self.bot_user_game=None
-            self.bot_user_event=None
+            self.bot_staff_games=None
+            self.bot_staff_events=None
+            self.bot_events_maker=None
+            self.bot_user_games=None
+            self.bot_user_events=None
             self.bot_logs=None
+            self.bot_news=None
 
         def set_postgres(self,db):
             self.postgres=db
@@ -23,22 +26,34 @@ class Database:
         def get_redis(self):
             return self.redis    
 
-        def set_bot_staff(self,bot):
-            self.bot_staff=bot
+        def set_bot_staff_games(self,bot):
+            self.bot_staff_games=bot
 
-        def get_bot_staff(self):
-            return self.bot_staff
+        def get_bot_staff_games(self):
+            return self.bot_staff_games
         
-        def set_bot_user_game(self,bot):
+        def set_bot_staff_events(self,bot):
+            self.bot_staff_events=bot
+
+        def get_bot_staff_events(self):
+            return self.bot_staff_events
+        
+        def set_bot_events_maker(self,bot):
+            self.bot_event_maker=bot
+
+        def get_bot_events_maker(self):
+            return self.bot_event_maker
+        
+        def set_bot_user_games(self,bot):
             self.bot_user_game=bot
 
-        def get_bot_user_game(self):
+        def get_bot_user_games(self):
             return self.bot_user_game
 
-        def set_bot_user_event(self,bot):
+        def set_bot_user_events(self,bot):
             self.bot_user_event=bot
 
-        def get_bot_user_event(self):
+        def get_bot_user_events(self):
             return self.bot_user_event
         
         def set_bot_logs(self,bot):
@@ -46,6 +61,12 @@ class Database:
         
         def get_bot_logs(self):
             return self.bot_logs
+        
+        def set_bot_news(self,bot):
+            self.bot_news=bot
+        
+        def get_bot_news(self):
+            return self.bot_news
     
     instance = None
     def __new__(cls): # __new__ always a classmethod
